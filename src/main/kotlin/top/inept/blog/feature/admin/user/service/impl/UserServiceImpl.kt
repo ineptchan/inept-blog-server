@@ -5,9 +5,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.constant.JwtClaimsConstant
 import top.inept.blog.constant.UserConstant
-import top.inept.blog.feature.admin.user.pojo.dto.UserLoginDTO
+import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
 import top.inept.blog.feature.admin.user.pojo.entity.User
-import top.inept.blog.feature.admin.user.pojo.vo.UserLoginVO
+import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVo
 import top.inept.blog.feature.admin.user.repository.UserRepository
 import top.inept.blog.feature.admin.user.service.UserService
 import top.inept.blog.properties.JwtProperties
@@ -54,7 +54,7 @@ class UserServiceImpl(
 
     override fun deleteUserById(id: Long) = userRepository.deleteById(id)
 
-    override fun loginUser(userLoginDTO: UserLoginDTO): UserLoginVO {
+    override fun loginUser(userLoginDTO: LoginUserDto): LoginUserVo {
         val dbUser = userRepository.findByUsername(userLoginDTO.username)
         //没有用户
         if (dbUser == null) {
@@ -77,7 +77,7 @@ class UserServiceImpl(
             claims = payload
         )
 
-        return UserLoginVO(
+        return LoginUserVo(
             id = dbUser.id,
             username = dbUser.username,
             token = token

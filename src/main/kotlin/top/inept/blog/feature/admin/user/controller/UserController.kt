@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController
 import top.inept.blog.constant.UserConstant
 import top.inept.blog.feature.admin.user.pojo.convert.toUser
 import top.inept.blog.feature.admin.user.pojo.convert.toUserVO
-import top.inept.blog.feature.admin.user.pojo.dto.UserDTO
-import top.inept.blog.feature.admin.user.pojo.dto.UserLoginDTO
-import top.inept.blog.feature.admin.user.pojo.vo.UserLoginVO
-import top.inept.blog.feature.admin.user.pojo.vo.UserVO
+import top.inept.blog.feature.admin.user.pojo.dto.UserDto
+import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
+import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVo
+import top.inept.blog.feature.admin.user.pojo.vo.UserVo
 import top.inept.blog.feature.admin.user.service.UserService
 
 @RestController
@@ -29,7 +29,7 @@ class UserController(
      * @return
      */
     @GetMapping
-    fun getUsers(): Result<List<UserVO>> {
+    fun getUsers(): Result<List<UserVo>> {
         val users = userService.getUsers().map { it.toUserVO() }
         return Result.Companion.success(users)
     }
@@ -41,7 +41,7 @@ class UserController(
      * @return
      */
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: Long): Result<UserVO> {
+    fun getUserById(@PathVariable id: Long): Result<UserVo> {
         val user = userService.getUserById(id)
         if (user == null) {
             throw Exception(UserConstant.USER_NOT_FOUND)
@@ -56,7 +56,7 @@ class UserController(
      * @return
      */
     @PostMapping
-    fun createUser(@Validated @RequestBody user: UserDTO): UserVO {
+    fun createUser(@Validated @RequestBody user: UserDto): UserVo {
         val user = userService.createUser(user.toUser())
         return user.toUserVO()
     }
@@ -68,7 +68,7 @@ class UserController(
      * @return
      */
     @PutMapping
-    fun updateUser(@Validated @RequestBody user: UserDTO): UserVO {
+    fun updateUser(@Validated @RequestBody user: UserDto): UserVo {
         val user = userService.updateUser(user.toUser())
         return user.toUserVO()
     }
@@ -90,7 +90,7 @@ class UserController(
      * @return
      */
     @GetMapping("/login")
-    fun login(@Validated @RequestBody userLoginDTO: UserLoginDTO): Result<UserLoginVO> {
+    fun login(@Validated @RequestBody userLoginDTO: LoginUserDto): Result<LoginUserVo> {
         val userLoginVO = userService.loginUser(userLoginDTO)
         return Result.success(userLoginVO)
     }
