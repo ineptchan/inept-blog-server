@@ -12,3 +12,7 @@ top:
       adminSecretKey: U7lIBboDJW24Ak1ROncsOyuVNuugnZriJWZBY9ULB//4EdZU5AeGCRlVAdXMKxinBynktrcuQgGVCM4Fm54tBg==  #openssl rand -base64 64
       adminTtlHours: 168  #7day
       adminTokenName: token
+
+      userSecretKey: Ny9XYnqy8/n4KMoD0Rfyuf7YqlmgN4eFsp4a8TUhSeGkAqwHPFvb/RhRPVoRj0ulZRFsUYi0jFzyOD1KrFr/7A== #openssl rand -base64 64
+      userTtlHours: 168
+      userTokenName: token

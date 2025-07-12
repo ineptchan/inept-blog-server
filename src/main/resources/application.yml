@@ -27,3 +27,7 @@ top:
       adminSecretKey: ${top.inept.jwt.adminSecretKey}
       adminTtlHours: ${top.inept.jwt.adminTtlHours}
       adminTokenName: ${top.inept.jwt.adminTokenName}
+
+      userSecretKey: ${top.inept.jwt.userSecretKey}
+      userTtlHours: ${top.inept.jwt.userTtlHours}
+      userTokenName: ${top.inept.jwt.userTokenName}

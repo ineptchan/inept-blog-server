@@ -8,12 +8,11 @@ import top.inept.blog.constant.UserConstant
 import top.inept.blog.feature.admin.user.pojo.dto.UserLoginDTO
 import top.inept.blog.feature.admin.user.pojo.entity.User
 import top.inept.blog.feature.admin.user.pojo.vo.UserLoginVO
-import top.inept.blog.properties.JwtProperties
 import top.inept.blog.feature.admin.user.repository.UserRepository
 import top.inept.blog.feature.admin.user.service.UserService
+import top.inept.blog.properties.JwtProperties
 import top.inept.blog.utils.JwtUtil
 import top.inept.blog.utils.PasswordUtil
-
 
 @Service
 class UserServiceImpl(
@@ -69,10 +68,10 @@ class UserServiceImpl(
 
         //生成token
         val payload = HashMap<String, Any>()
-        payload.put(JwtClaimsConstant.ADMIN_ID, dbUser.id)
-        payload.put(JwtClaimsConstant.ADMIN_NAME, dbUser.username)
+        payload.put(JwtClaimsConstant.ID, dbUser.id)
+        payload.put(JwtClaimsConstant.NAME, dbUser.username)
 
-        val token = JwtUtil.createAdminJWT(
+        val token = JwtUtil.createJWT(
             secretKey = jwtProperties.adminSecretKey,
             ttlHours = jwtProperties.adminTtlHours,
             claims = payload

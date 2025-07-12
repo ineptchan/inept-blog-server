@@ -15,7 +15,6 @@ import top.inept.blog.utils.JwtUtil
 class JwtTokenAdminInterceptor(
     private val jwtProperties: JwtProperties,
 ) : HandlerInterceptor {
-
     override fun preHandle(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -27,24 +26,24 @@ class JwtTokenAdminInterceptor(
             return true
         }
 
-        //从请求头中获取令牌
-        val token = request.getHeader(jwtProperties.adminTokenName)
+        try {
+            //从请求头中获取令牌
+            val token = request.getHeader(jwtProperties.adminTokenName)
 
-        val jwtClaims = JwtUtil.parseAdminJWT(
-            secretKey = jwtProperties.adminSecretKey,
-            token = token
-        )
+            val jwtClaims = JwtUtil.parseJWT(
+                secretKey = jwtProperties.adminSecretKey,
+                token = token
+            )
 
-        if (jwtClaims != null) {
-            val id = jwtClaims.payload.get(JwtClaimsConstant.ADMIN_ID).toString().toLongOrNull()
+            if (jwtClaims == null) throw Exception("Invalid JWT token")
 
-            if (id != null) {
-                BaseContext.setCurrentId(id)
-                return true
-            }
+            val id = jwtClaims.payload.get(JwtClaimsConstant.ID).toString().toLong()
+
+            BaseContext.setCurrentId(id)
+            return true
+        } catch (e: Exception) {
+            response.status = 401
+            return false
         }
-
-        response.status = 401
-        return false
     }
 }
