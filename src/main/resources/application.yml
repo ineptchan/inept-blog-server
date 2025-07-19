@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update  # Warning: Please do not use in release mode
+      ddl-auto: ${top.inept.datasource.ddl-auto}
     show-sql: true
     properties:
       hibernate:

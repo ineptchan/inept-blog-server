@@ -2,6 +2,7 @@ package top.inept.blog.feature.admin.user.service.impl
 
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import top.inept.blog.constant.JwtClaimsConstant
 import top.inept.blog.constant.UserConstant
@@ -12,7 +13,6 @@ import top.inept.blog.feature.admin.user.repository.UserRepository
 import top.inept.blog.feature.admin.user.service.UserService
 import top.inept.blog.properties.JwtProperties
 import top.inept.blog.utils.JwtUtil
-import top.inept.blog.utils.PasswordUtil
 
 @Service
 class UserServiceImpl(
@@ -61,8 +61,9 @@ class UserServiceImpl(
             throw Exception(UserConstant.USERNAME_OR_PASSWORD_ERROR)
         }
 
-        //密码错误
-        if (dbUser.password != PasswordUtil.formatPassword(userLoginDTO.password)) {
+        //校验密码
+        val bCryptPasswordEncoder = BCryptPasswordEncoder()
+        if (!bCryptPasswordEncoder.matches(dbUser.password, userLoginDTO.password)){
             throw Exception(UserConstant.USERNAME_OR_PASSWORD_ERROR)
         }
 

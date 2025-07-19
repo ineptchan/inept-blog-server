@@ -5,30 +5,48 @@ import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import java.time.LocalDateTime
+import top.inept.blog.feature.admin.user.pojo.entity.enums.UserRole
+import java.time.OffsetDateTime
 
 /**
- * 开启JPA审计功能，需要在Application添加@EnableJpaAuditing
+ * 用户表
+ *
+ * @property id
+ * @property username   用户名
+ * @property email      邮箱
+ * @property password   密码 BCrypt
+ * @property role       角色
+ * @property createdAt  创建时间
+ * @property updatedAt  更新时间
+ * @constructor Create empty User
  */
 @Entity
 @Table(name = "users")
 @EntityListeners(value = [AuditingEntityListener::class])   //注册审计监听器
- class User(
+class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
 
-    @Column(length = 16, unique = true)
+    @Column(length = 16, unique = true, nullable = false)
     var username: String,
 
+    @Column(unique = true, nullable = true)
+    var email: String? = null,
+
+    @Column(nullable = false)
     var password: String,
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @CreatedDate
-    @Column(updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "user_role", nullable = false)
+    var role: UserRole = UserRole.USER,
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @CreatedDate
+    @Column(updatable = false, nullable = false)
+    var createdAt: OffsetDateTime = OffsetDateTime.now(),
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @LastModifiedDate
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: OffsetDateTime = OffsetDateTime.now()
 )
