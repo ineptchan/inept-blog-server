@@ -13,6 +13,7 @@ import top.inept.blog.feature.admin.user.service.UserService
 
 @RestController
 @RequestMapping("/admin/user")
+@Validated
 class UserController(
     private val userService: UserService,
 ) {
@@ -49,7 +50,7 @@ class UserController(
      * @return
      */
     @PostMapping
-    fun createUser(@Validated @RequestBody user: UserDto): UserVo {
+    fun createUser(@RequestBody user: UserDto): UserVo {
         val user = userService.createUser(user.toUser())
         return user.toUserVO()
     }
@@ -61,7 +62,7 @@ class UserController(
      * @return
      */
     @PutMapping
-    fun updateUser(@Validated @RequestBody user: UserDto): UserVo {
+    fun updateUser(@RequestBody user: UserDto): UserVo {
         val user = userService.updateUser(user.toUser())
         return user.toUserVO()
     }
@@ -83,7 +84,7 @@ class UserController(
      * @return
      */
     @GetMapping("/login")
-    fun login(@Validated @RequestBody userLoginDTO: LoginUserDto): Result<LoginUserVo> {
+    fun login(@RequestBody userLoginDTO: LoginUserDto): Result<LoginUserVo> {
         val userLoginVO = userService.loginUser(userLoginDTO)
         return Result.success(userLoginVO)
     }

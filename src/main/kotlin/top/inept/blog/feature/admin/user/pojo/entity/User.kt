@@ -6,7 +6,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.admin.user.pojo.entity.enums.UserRole
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 /**
  * 用户表
@@ -37,16 +37,16 @@ class User(
     @Column(nullable = false)
     var password: String,
 
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "user_role", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
     var role: UserRole = UserRole.USER,
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    var createdAt: OffsetDateTime = OffsetDateTime.now(),
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @LastModifiedDate
-    var updatedAt: OffsetDateTime = OffsetDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 )

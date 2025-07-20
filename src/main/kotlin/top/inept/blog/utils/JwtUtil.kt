@@ -2,13 +2,16 @@ package top.inept.blog.utils
 
 import io.jsonwebtoken.*
 import org.slf4j.LoggerFactory
+import top.inept.blog.constant.JwtClaimsConstant
+import top.inept.blog.exception.JwtInvalidException
+import top.inept.blog.feature.admin.user.pojo.entity.enums.UserRole
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 
 object JwtUtil {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun createJWT(
+    private fun createJWT(
         secretKey: String,
         ttlHours: Long,
         claims: Map<String, Any>
@@ -24,28 +27,62 @@ object JwtUtil {
             .compact()
     }
 
+    fun createJWT(
+        secretKey: String,
+        ttlHours: Long,
+        id: Long,
+        username: String,
+        role: UserRole,
+    ): String {
+        val payload = HashMap<String, Any>()
+        payload.put(JwtClaimsConstant.ID, id)
+        payload.put(JwtClaimsConstant.USERNAME, username)
+        payload.put(JwtClaimsConstant.ROLE, role.toString())
+
+        return createJWT(secretKey, ttlHours, payload)
+    }
+
     fun parseJWT(
         secretKey: String,
         token: String
-    ): Jws<Claims>? {
+    ): Jws<Claims> {
         val hmacKey = SecretKeySpec(Base64.getDecoder().decode(secretKey), "HmacSHA512")
 
-        val claims = try {
+        return try {
             Jwts.parser()
                 .verifyWith(hmacKey)
                 .build()
                 .parseSignedClaims(token)
         } catch (e: ExpiredJwtException) {
-            log.error("token过期:", e)
-            return null
+            throw JwtInvalidException("token过期")
         } catch (e: JwtException) {
-            log.error("token无效:", e)
-            return null
-        } catch (e: Exception) {
-            log.error("token解析失败:", e)
-            return null
+            throw JwtInvalidException("token无效")
         }
+    }
 
-        return claims
+    fun getIdFromClaims(claims: Claims): Long? {
+        val raw = claims[JwtClaimsConstant.ID]
+
+        return when (raw) {
+            is Number -> raw.toLong()
+            is String -> raw.toLongOrNull()
+            else -> null
+        }
+    }
+
+    fun getUsernameFromClaims(claims: Claims): String? {
+        val raw = claims[JwtClaimsConstant.USERNAME]
+        return raw as? String
+    }
+
+    fun getRoleFromClaims(claims: Claims): UserRole? {
+        val raw = claims[JwtClaimsConstant.ROLE]
+        if (raw !is String) return null
+
+        return try {
+            UserRole.valueOf(raw)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
     }
 }

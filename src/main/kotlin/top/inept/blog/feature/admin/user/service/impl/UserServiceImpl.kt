@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import top.inept.blog.constant.JwtClaimsConstant
 import top.inept.blog.constant.UserConstant
 import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
 import top.inept.blog.feature.admin.user.pojo.entity.User
@@ -61,21 +60,21 @@ class UserServiceImpl(
             throw Exception(UserConstant.USERNAME_OR_PASSWORD_ERROR)
         }
 
+        userLoginDTO
+
         //校验密码
         val bCryptPasswordEncoder = BCryptPasswordEncoder()
-        if (!bCryptPasswordEncoder.matches(dbUser.password, userLoginDTO.password)){
+        if (!bCryptPasswordEncoder.matches(userLoginDTO.password, dbUser.password)) {
             throw Exception(UserConstant.USERNAME_OR_PASSWORD_ERROR)
         }
 
         //生成token
-        val payload = HashMap<String, Any>()
-        payload.put(JwtClaimsConstant.ID, dbUser.id)
-        payload.put(JwtClaimsConstant.NAME, dbUser.username)
-
         val token = JwtUtil.createJWT(
-            secretKey = jwtProperties.adminSecretKey,
-            ttlHours = jwtProperties.adminTtlHours,
-            claims = payload
+            secretKey = jwtProperties.secretKey,
+            ttlHours = jwtProperties.ttlHours,
+            id = dbUser.id,
+            username = dbUser.username,
+            role = dbUser.role,
         )
 
         return LoginUserVo(
