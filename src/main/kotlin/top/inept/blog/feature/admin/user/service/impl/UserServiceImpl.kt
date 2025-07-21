@@ -1,10 +1,11 @@
 package top.inept.blog.feature.admin.user.service.impl
 
 import org.slf4j.LoggerFactory
+import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import top.inept.blog.constant.UserConstant
+import top.inept.blog.extensions.get
 import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
 import top.inept.blog.feature.admin.user.pojo.entity.User
 import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVo
@@ -16,18 +17,26 @@ import top.inept.blog.utils.JwtUtil
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val jwtProperties: JwtProperties
+    private val jwtProperties: JwtProperties,
+    private val messages: MessageSourceAccessor,
+    private val jwtUtil: JwtUtil
 ) : UserService {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun getUsers() = userRepository.findAll()
 
-    override fun getUserById(id: Long) = userRepository.findByIdOrNull(id)
+    override fun getUserById(id: Long): User {
+        val user = userRepository.findByIdOrNull(id)
+        if (user == null) {
+            throw Exception(messages["user.user_not_found"])
+        }
+        return user
+    }
 
     override fun createUser(user: User): User {
         val isUsername = userRepository.existsByUsername(user.username)
         if (isUsername) {
-            throw Exception(UserConstant.DUPLICATE_USERNAME)
+            throw Exception(messages["user.duplicate_username"])
         }
 
         return userRepository.save(user)
@@ -37,13 +46,13 @@ class UserServiceImpl(
         //判断这个id的用户存不存在
         val isUser = userRepository.existsById(user.id)
         if (!isUser) {
-            throw Exception(UserConstant.UNKNOWN_ID)
+            throw Exception(messages["common.id_does_not_exist"])
         }
 
         //判断用户名存不存在
         val isUsername = userRepository.existsByUsername(user.username)
         if (isUsername) {
-            throw Exception(UserConstant.DUPLICATE_USERNAME)
+            throw Exception(messages["user.duplicate_username"])
         }
 
         val save = userRepository.save(user)
@@ -57,7 +66,7 @@ class UserServiceImpl(
         val dbUser = userRepository.findByUsername(userLoginDTO.username)
         //没有用户
         if (dbUser == null) {
-            throw Exception(UserConstant.USERNAME_OR_PASSWORD_ERROR)
+            throw Exception(messages["user.user_not_found"])
         }
 
         userLoginDTO
@@ -65,11 +74,11 @@ class UserServiceImpl(
         //校验密码
         val bCryptPasswordEncoder = BCryptPasswordEncoder()
         if (!bCryptPasswordEncoder.matches(userLoginDTO.password, dbUser.password)) {
-            throw Exception(UserConstant.USERNAME_OR_PASSWORD_ERROR)
+            throw Exception(messages["user.username_or_password_error"])
         }
 
         //生成token
-        val token = JwtUtil.createJWT(
+        val token = jwtUtil.createJWT(
             secretKey = jwtProperties.secretKey,
             ttlHours = jwtProperties.ttlHours,
             id = dbUser.id,

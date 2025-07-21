@@ -33,6 +33,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     implementation("io.jsonwebtoken:jjwt:0.12.6")
+    implementation("commons-io:commons-io:2.16.1")
 }
 
 kotlin {

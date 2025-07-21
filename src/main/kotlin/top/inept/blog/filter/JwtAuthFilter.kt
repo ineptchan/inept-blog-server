@@ -15,6 +15,7 @@ import top.inept.blog.utils.JwtUtil
 @Component
 class JwtAuthFilter(
     private val jwtProperties: JwtProperties,
+    private val jwtUtil: JwtUtil,
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -33,11 +34,11 @@ class JwtAuthFilter(
         val token = authHeader.substring(7)
 
         //解析token
-        val claims = JwtUtil.parseJWT(secretKey = jwtProperties.secretKey, token)
+        val claims = jwtUtil.parseJWT(secretKey = jwtProperties.secretKey, token)
 
         //获取用户名与role
-        val username = JwtUtil.getUsernameFromClaims(claims.payload)
-        val role = JwtUtil.getRoleFromClaims(claims.payload)
+        val username = jwtUtil.getUsernameFromClaims(claims.payload)
+        val role = jwtUtil.getRoleFromClaims(claims.payload)
 
         if (username == null || role == null) {
             filterChain.doFilter(request, response)

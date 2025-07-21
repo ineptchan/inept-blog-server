@@ -1,16 +1,17 @@
 package top.inept.blog.utils
 
 import io.jsonwebtoken.*
-import org.slf4j.LoggerFactory
+import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.stereotype.Component
 import top.inept.blog.constant.JwtClaimsConstant
 import top.inept.blog.exception.JwtInvalidException
+import top.inept.blog.extensions.get
 import top.inept.blog.feature.admin.user.pojo.entity.enums.UserRole
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 
-object JwtUtil {
-    private val log = LoggerFactory.getLogger(this::class.java)
-
+@Component
+class JwtUtil(private val messages: MessageSourceAccessor) {
     private fun createJWT(
         secretKey: String,
         ttlHours: Long,
@@ -54,9 +55,9 @@ object JwtUtil {
                 .build()
                 .parseSignedClaims(token)
         } catch (e: ExpiredJwtException) {
-            throw JwtInvalidException("token过期")
+            throw JwtInvalidException(messages["jwt.expired"])
         } catch (e: JwtException) {
-            throw JwtInvalidException("token无效")
+            throw JwtInvalidException(messages["jwt.invalid"])
         }
     }
 

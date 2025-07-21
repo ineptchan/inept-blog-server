@@ -2,7 +2,6 @@ package top.inept.blog.feature.admin.user.controller
 
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import top.inept.blog.constant.UserConstant
 import top.inept.blog.feature.admin.user.pojo.convert.toUser
 import top.inept.blog.feature.admin.user.pojo.convert.toUserVO
 import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
@@ -36,11 +35,7 @@ class UserController(
      */
     @GetMapping("/{id}")
     fun getUserById(@PathVariable id: Long): Result<UserVo> {
-        val user = userService.getUserById(id)
-        if (user == null) {
-            throw Exception(UserConstant.USER_NOT_FOUND)
-        }
-        return Result.Companion.success(user.toUserVO())
+        return Result.Companion.success(userService.getUserById(id).toUserVO())
     }
 
     /**
@@ -83,7 +78,7 @@ class UserController(
      * @param userLoginDTO
      * @return
      */
-    @GetMapping("/login")
+    @PostMapping("/login")
     fun login(@RequestBody userLoginDTO: LoginUserDto): Result<LoginUserVo> {
         val userLoginVO = userService.loginUser(userLoginDTO)
         return Result.success(userLoginVO)

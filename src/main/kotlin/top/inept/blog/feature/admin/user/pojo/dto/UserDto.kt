@@ -7,7 +7,7 @@ import top.inept.blog.feature.admin.user.pojo.validated.ValidatedEmail
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedPassword
 
 data class UserDto(
-    @field:PositiveOrZero(message = "错误的id")
+    @field:PositiveOrZero(message = "common.id")
     val id: Long = 0,
 
     @field:ValidUsername

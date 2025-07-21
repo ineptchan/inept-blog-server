@@ -4,5 +4,5 @@ import jakarta.validation.constraints.Email
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-@Email(message = "错误的邮箱")
+@Email(message = "user.email")
 annotation class ValidatedEmail()

@@ -13,7 +13,7 @@ import top.inept.blog.filter.JwtAuthFilter
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfiguration(
+class SecurityConfig(
     private val jwtAuthFilter: JwtAuthFilter
 ) {
     @Bean

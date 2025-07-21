@@ -18,6 +18,11 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
 
+  messages:
+    basename: i18n/messages,i18n/validation
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
 server:
   port: ${top.inept.server.port}
 
