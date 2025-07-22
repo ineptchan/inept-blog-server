@@ -19,7 +19,7 @@ spring:
     database: postgresql
 
   messages:
-    basename: i18n/messages,i18n/validation
+    basename: i18n/messages,i18n/validation,i18n/openapi
     encoding: UTF-8
     fallback-to-system-locale: false
 

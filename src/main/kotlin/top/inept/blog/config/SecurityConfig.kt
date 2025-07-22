@@ -1,7 +1,9 @@
 package top.inept.blog.config
 
+import org.hibernate.cfg.Environment
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
@@ -14,7 +16,7 @@ import top.inept.blog.filter.JwtAuthFilter
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtAuthFilter: JwtAuthFilter
+    private val jwtAuthFilter: JwtAuthFilter,
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -29,6 +31,11 @@ class SecurityConfig(
                 authorize("/admin/user/login", permitAll) // 登录接口公开
                 authorize("/user/**", hasAuthority(UserRole.USER.authority)) // /user/** 路径需要 USER 角色
                 authorize("/admin/**", hasAuthority(UserRole.ADMIN.authority)) // /admin/** 路径需要 ADMIN 角色
+
+                //TODO 发布时关闭
+                authorize("/swagger-ui/**", permitAll)
+                authorize("/v3/api-docs/**", permitAll)
+
                 authorize(anyRequest, authenticated) // 其他所有请求都需要认证
             }
 
