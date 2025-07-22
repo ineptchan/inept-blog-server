@@ -27,14 +27,17 @@ class UserServiceImpl(
 
     override fun getUserById(id: Long): User {
         val user = userRepository.findByIdOrNull(id)
+        //判断有没有用户
         if (user == null) {
             throw Exception(messages["user.user_not_found"])
         }
+
         return user
     }
 
     override fun createUser(user: User): User {
         val isUsername = userRepository.existsByUsername(user.username)
+        //判断有没有重复用户名
         if (isUsername) {
             throw Exception(messages["user.duplicate_username"])
         }
@@ -43,18 +46,19 @@ class UserServiceImpl(
     }
 
     override fun updateUser(user: User): User {
+        val dbUser = userRepository.findByIdOrNull(user.id)
+
         //判断这个id的用户存不存在
-        val isUser = userRepository.existsById(user.id)
-        if (!isUser) {
+        if (dbUser == null) {
             throw Exception(messages["common.id_does_not_exist"])
         }
 
         //判断用户名存不存在
-        val isUsername = userRepository.existsByUsername(user.username)
-        if (isUsername) {
+        if (user.username != dbUser.username && userRepository.existsByUsername(user.username)) {
             throw Exception(messages["user.duplicate_username"])
         }
 
+        //保存用户
         val save = userRepository.save(user)
 
         return save
@@ -68,8 +72,6 @@ class UserServiceImpl(
         if (dbUser == null) {
             throw Exception(messages["user.user_not_found"])
         }
-
-        userLoginDTO
 
         //校验密码
         val bCryptPasswordEncoder = BCryptPasswordEncoder()

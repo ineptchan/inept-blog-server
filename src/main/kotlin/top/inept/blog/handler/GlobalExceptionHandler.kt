@@ -7,7 +7,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import top.inept.blog.base.Result
+import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.ValidationError
 import top.inept.blog.extensions.get
 
@@ -18,28 +18,28 @@ class GlobalExceptionHandler(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @ExceptionHandler
-    fun exceptionHandler(ex: Exception): Result<String> {
-
+    fun exceptionHandler(ex: Exception): ApiResponse<String> {
         logger.error(ex.message, ex)
-        return Result.error(ex.message ?: messages["common.unknown_error"])
+
+        return ApiResponse.success(messages["common.unknown_error"])
     }
 
     @ExceptionHandler
-    fun exceptionHandler(ex: HttpMessageNotReadableException): Result<String> {
+    fun exceptionHandler(ex: HttpMessageNotReadableException): ApiResponse<String> {
         logger.error(ex.message, ex)
 
         if (ex.cause is MissingKotlinParameterException) {
-            return Result.error(messages["common.missing_json_field"])
+            return ApiResponse.error(messages["common.missing_json_field", ex.message ?: "Null"])
         }
 
-        return Result.error(messages["common.unknown_error"])
+        return ApiResponse.error(ex.message ?: messages["common.unknown_error"])
     }
 
     /**
      * Validated的验证错误
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun exceptionHandler(ex: MethodArgumentNotValidException): Result<List<ValidationError>> {
+    fun exceptionHandler(ex: MethodArgumentNotValidException): ApiResponse<List<ValidationError>> {
         val errors = ex.bindingResult.fieldErrors.map { fe ->
             ValidationError(
                 field = fe.field,
@@ -47,6 +47,6 @@ class GlobalExceptionHandler(
             )
         }
 
-        return Result.error(messages["common.illegal_parameters"], errors)
+        return ApiResponse.error(messages["common.illegal_parameters"], errors)
     }
 }

@@ -2,6 +2,7 @@ package top.inept.blog.feature.admin.user.controller
 
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import top.inept.blog.base.ApiResponse
 import top.inept.blog.feature.admin.user.pojo.convert.toUser
 import top.inept.blog.feature.admin.user.pojo.convert.toUserVO
 import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
@@ -22,9 +23,9 @@ class UserController(
      * @return
      */
     @GetMapping
-    fun getUsers(): Result<List<UserVo>> {
+    fun getUsers(): ApiResponse<List<UserVo>> {
         val users = userService.getUsers().map { it.toUserVO() }
-        return Result.Companion.success(users)
+        return ApiResponse.success(users)
     }
 
     /**
@@ -34,8 +35,8 @@ class UserController(
      * @return
      */
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: Long): Result<UserVo> {
-        return Result.Companion.success(userService.getUserById(id).toUserVO())
+    fun getUserById(@PathVariable id: Long): ApiResponse<UserVo> {
+        return ApiResponse.success(userService.getUserById(id).toUserVO())
     }
 
     /**
@@ -45,9 +46,9 @@ class UserController(
      * @return
      */
     @PostMapping
-    fun createUser(@RequestBody user: UserDto): UserVo {
+    fun createUser(@RequestBody user: UserDto): ApiResponse<UserVo> {
         val user = userService.createUser(user.toUser())
-        return user.toUserVO()
+        return ApiResponse.success(user.toUserVO())
     }
 
     /**
@@ -57,9 +58,9 @@ class UserController(
      * @return
      */
     @PutMapping
-    fun updateUser(@RequestBody user: UserDto): UserVo {
+    fun updateUser(@RequestBody user: UserDto): ApiResponse<UserVo> {
         val user = userService.updateUser(user.toUser())
-        return user.toUserVO()
+        return ApiResponse.success(user.toUserVO())
     }
 
     /**
@@ -68,8 +69,10 @@ class UserController(
      * @param id
      */
     @DeleteMapping("/{id}")
-    fun deleteUserById(@PathVariable id: Long) {
+    fun deleteUserById(@PathVariable id: Long): ApiResponse<Boolean> {
+        //TODO 成功提示
         userService.deleteUserById(id)
+        return ApiResponse.success(true)
     }
 
     /**
@@ -79,8 +82,8 @@ class UserController(
      * @return
      */
     @PostMapping("/login")
-    fun login(@RequestBody userLoginDTO: LoginUserDto): Result<LoginUserVo> {
+    fun login(@RequestBody userLoginDTO: LoginUserDto): ApiResponse<LoginUserVo> {
         val userLoginVO = userService.loginUser(userLoginDTO)
-        return Result.success(userLoginVO)
+        return ApiResponse.success(userLoginVO)
     }
 }

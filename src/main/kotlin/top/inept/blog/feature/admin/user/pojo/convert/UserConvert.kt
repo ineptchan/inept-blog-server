@@ -17,5 +17,6 @@ fun UserDto.toUser(): User {
         username = this.username,
         password = BCryptPasswordEncoder().encode(this.password),
         email = this.email,
+        role = this.role,
     )
 }
