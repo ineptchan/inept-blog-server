@@ -32,13 +32,13 @@ class CategoriesController(
 
     @Operation(summary = "创建分类")
     @PostMapping()
-    fun createCategory(categories: CategoriesDTO): ApiResponse<CategoriesVO> {
+    fun createCategory(@RequestBody categories: CategoriesDTO): ApiResponse<CategoriesVO> {
         return ApiResponse.success(categoriesService.createCategory(categories.toCategories()).toCategoriesVO())
     }
 
     @Operation(summary = "更新分类")
     @PutMapping()
-    fun updateCategory(categories: CategoriesDTO): ApiResponse<CategoriesVO> {
+    fun updateCategory(@RequestBody categories: CategoriesDTO): ApiResponse<CategoriesVO> {
         return ApiResponse.success(categoriesService.updateCategory(categories.toCategories()).toCategoriesVO())
     }
 
