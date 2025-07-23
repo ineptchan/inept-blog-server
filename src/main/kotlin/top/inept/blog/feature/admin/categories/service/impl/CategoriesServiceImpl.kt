@@ -26,9 +26,14 @@ class CategoriesServiceImpl(
     }
 
     override fun createCategory(categories: Categories): Categories {
-        //判断分类名称是否重复
-        if (categoriesRepository.existsByName(categories.name))
-            throw Exception(messages["message.categories.duplicate_name"])
+        //初次判断分类名称与分类slug是否重复
+        if (categoriesRepository.existsByNameOrSlug(categories.name, categories.slug)) {
+            //判断分类名称是否重复
+            if (categoriesRepository.existsByName(categories.name)) throw Exception(messages["message.categories.duplicate_name"])
+
+            //判断分类slug是否重复
+            if (categoriesRepository.existsBySlug(categories.slug)) throw Exception(messages["message.categories.duplicate_slug"])
+        }
 
         return categoriesRepository.save(categories)
     }
@@ -40,17 +45,23 @@ class CategoriesServiceImpl(
         //判断分类是否存在
         if (dbCategories == null) throw Exception(messages["message.categories.categories_not_found"])
 
-        //判断分类名称是否重复
-        if (categories.name != dbCategories.name && categoriesRepository.existsByName(categories.name))
-            throw Exception(messages["message.categories.duplicate_name"])
+        //初次判断分类名称与分类Slug是否重复
+        if (categoriesRepository.existsByNameOrSlug(categories.name, categories.slug)) {
+            //判断分类名称是否重复
+            if (categories.name != dbCategories.name && categoriesRepository.existsByName(categories.name))
+                throw Exception(messages["message.categories.duplicate_name"])
+
+            //判断分类slug是否重复
+            if (categories.slug != dbCategories.slug && categoriesRepository.existsBySlug(categories.slug))
+                throw Exception(messages["message.categories.duplicate_slug"])
+        }
 
         return categoriesRepository.save(categories)
     }
 
     override fun deleteCategory(id: Long) {
-        //判断分类是否存在
-        if (!categoriesRepository.existsById(id))
-            throw Exception(messages["message.categories.categories_not_found"])
+        //根据id判断分类是否存在
+        if (!categoriesRepository.existsById(id)) throw Exception(messages["message.categories.categories_not_found"])
 
         //删除分类
         categoriesRepository.deleteById(id)

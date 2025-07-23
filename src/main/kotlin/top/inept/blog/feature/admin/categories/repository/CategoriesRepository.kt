@@ -7,5 +7,7 @@ import top.inept.blog.feature.admin.categories.pojo.entity.Categories
 @Repository
 interface CategoriesRepository : JpaRepository<Categories, Long> {
     fun existsByName(name: String): Boolean
+    fun existsBySlug(slug: String): Boolean
+    fun existsByNameOrSlug(name: String, slug: String): Boolean
 
 }
