@@ -37,8 +37,12 @@ class UserServiceImpl(
 
     override fun createUser(user: User): User {
         //判断有没有重复用户名
-        if (userRepository.existsByUsername(user.username))
-            throw Exception(messages["message.user.duplicate_username"])
+        if (userRepository.existsByUsername(user.username)) throw Exception(messages["message.user.duplicate_username"])
+
+        //判断邮箱是否存在
+        user.email?.let { email ->
+            if (userRepository.existsByEmail(email)) throw Exception(messages["message.user.duplicate_email"])
+        }
 
         return userRepository.save(user)
     }
@@ -54,6 +58,11 @@ class UserServiceImpl(
         if (user.username != dbUser.username && userRepository.existsByUsername(user.username))
             throw Exception(messages["message.user.duplicate_username"])
 
+        //判断邮箱是否存在
+        user.email?.let { email ->
+            if (user.email != dbUser.email && userRepository.existsByEmail(email)) throw Exception(messages["message.user.duplicate_email"])
+        }
+
         //保存用户
         val save = userRepository.save(user)
 
@@ -61,9 +70,8 @@ class UserServiceImpl(
     }
 
     override fun deleteUserById(id: Long) {
-        //判断用户是否存在
-        if (!userRepository.existsById(id))
-            throw Exception(messages["message.user.user_not_found"])
+        //根据id判断用户是否存在
+        if (!userRepository.existsById(id)) throw Exception(messages["message.user.user_not_found"])
 
         //删除用户
         userRepository.deleteById(id)
@@ -74,15 +82,12 @@ class UserServiceImpl(
         val dbUser = userRepository.findByUsername(userLoginDTO.username)
 
         //没有用户
-        if (dbUser == null) {
-            throw Exception(messages["message.user.user_not_found"])
-        }
+        if (dbUser == null) throw Exception(messages["message.user.user_not_found"])
 
         //校验密码
         val bCryptPasswordEncoder = BCryptPasswordEncoder()
-        if (!bCryptPasswordEncoder.matches(userLoginDTO.password, dbUser.password)) {
+        if (!bCryptPasswordEncoder.matches(userLoginDTO.password, dbUser.password))
             throw Exception(messages["message.user.username_or_password_error"])
-        }
 
         //生成token
         val token = jwtUtil.createJWT(

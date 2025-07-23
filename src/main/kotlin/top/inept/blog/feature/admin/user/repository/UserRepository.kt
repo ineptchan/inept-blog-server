@@ -8,4 +8,5 @@ import top.inept.blog.feature.admin.user.pojo.entity.User
 interface UserRepository : JpaRepository<User, Long> {
     fun existsByUsername(username: String): Boolean
     fun findByUsername(username: String): User?
+    fun existsByEmail(email: String): Boolean
 }
