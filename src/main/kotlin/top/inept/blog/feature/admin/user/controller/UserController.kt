@@ -11,8 +11,8 @@ import top.inept.blog.feature.admin.user.pojo.dto.UserDto
 import top.inept.blog.feature.admin.user.pojo.vo.UserVo
 import top.inept.blog.feature.admin.user.service.UserService
 
-@Tag(name = "用户管理")
-@RestController
+@Tag(name = "管理员用户接口")
+@RestController("adminUserController")
 @RequestMapping("/admin/user")
 @Validated
 class UserController(

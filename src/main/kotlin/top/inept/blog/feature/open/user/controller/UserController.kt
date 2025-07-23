@@ -12,8 +12,8 @@ import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
 import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVo
 import top.inept.blog.feature.admin.user.service.UserService
 
-@Tag(name = "登录")
-@RestController(value = "openUserController")
+@Tag(name = "公开用户接口")
+@RestController( "openUserController")
 @RequestMapping("/open")
 @Validated
 class UserController(

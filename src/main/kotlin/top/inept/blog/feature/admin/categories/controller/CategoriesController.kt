@@ -11,8 +11,8 @@ import top.inept.blog.feature.admin.categories.pojo.dto.CategoriesDTO
 import top.inept.blog.feature.admin.categories.pojo.vo.CategoriesVO
 import top.inept.blog.feature.admin.categories.service.CategoriesService
 
-@Tag(name = "分类管理")
-@RestController
+@Tag(name = "管理员分类接口")
+@RestController("adminCategoriesController")
 @RequestMapping("/admin/categories")
 @Validated
 class CategoriesController(
