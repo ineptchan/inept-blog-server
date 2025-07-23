@@ -8,6 +8,7 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.feature.admin.categories.pojo.convert.toCategories
 import top.inept.blog.feature.admin.categories.pojo.convert.toCategoriesVO
 import top.inept.blog.feature.admin.categories.pojo.dto.CategoriesDTO
+import top.inept.blog.feature.admin.categories.pojo.dto.CreateCategoriesDTO
 import top.inept.blog.feature.admin.categories.pojo.vo.CategoriesVO
 import top.inept.blog.feature.admin.categories.service.CategoriesService
 
@@ -32,7 +33,7 @@ class CategoriesController(
 
     @Operation(summary = "创建分类")
     @PostMapping
-    fun createCategory(@RequestBody categories: CategoriesDTO): ApiResponse<CategoriesVO> {
+    fun createCategory(@RequestBody categories: CreateCategoriesDTO): ApiResponse<CategoriesVO> {
         return ApiResponse.success(categoriesService.createCategory(categories.toCategories()).toCategoriesVO())
     }
 

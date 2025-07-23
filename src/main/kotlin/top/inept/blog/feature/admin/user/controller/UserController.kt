@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
 import top.inept.blog.feature.admin.user.pojo.convert.toUser
 import top.inept.blog.feature.admin.user.pojo.convert.toUserVO
+import top.inept.blog.feature.admin.user.pojo.dto.CreateUserDto
 import top.inept.blog.feature.admin.user.pojo.dto.UserDto
 import top.inept.blog.feature.admin.user.pojo.vo.UserVo
 import top.inept.blog.feature.admin.user.service.UserService
@@ -33,7 +34,7 @@ class UserController(
 
     @Operation(summary = "创建用户")
     @PostMapping
-    fun createUser(@RequestBody user: UserDto): ApiResponse<UserVo> {
+    fun createUser(@RequestBody user: CreateUserDto): ApiResponse<UserVo> {
         val user = userService.createUser(user.toUser())
         return ApiResponse.success(user.toUserVO())
     }
