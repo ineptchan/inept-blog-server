@@ -21,7 +21,7 @@ class GlobalExceptionHandler(
     fun exceptionHandler(ex: Exception): ApiResponse<String> {
         logger.error(ex.message, ex)
 
-        return ApiResponse.success(messages["message.common.unknown_error"])
+        return ApiResponse.success(ex.message ?: messages["message.common.unknown_error"])
     }
 
     @ExceptionHandler
