@@ -16,7 +16,7 @@ import top.inept.blog.feature.admin.categories.service.CategoriesService
 @RequestMapping("/admin/categories")
 @Validated
 class CategoriesController(
-    val categoriesService: CategoriesService
+    private val categoriesService: CategoriesService
 ) {
     @Operation(summary = "获取分类列表")
     @GetMapping()
