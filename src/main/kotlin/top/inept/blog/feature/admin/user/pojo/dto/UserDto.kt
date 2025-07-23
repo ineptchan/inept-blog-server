@@ -8,20 +8,20 @@ import top.inept.blog.feature.admin.user.pojo.validated.ValidatedEmail
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedPassword
 
 data class UserDto(
-    @field:PositiveOrZero(message = "common.id")
     @Schema(description = "openapi.user.id")
+    @field:PositiveOrZero(message = "valid.common.id")
     val id: Long = 0,
 
-    @field:ValidUsername
     @Schema(description = "openapi.user.username")
+    @field:ValidUsername
     val username: String,
 
-    @field:ValidatedPassword
     @Schema(description = "openapi.user.password")
+    @field:ValidatedPassword
     val password: String,
 
-    @field:ValidatedEmail
     @Schema(description = "openapi.user.email")
+    @field:ValidatedEmail
     val email: String?,
 
     @Schema(description = "openapi.user.role")

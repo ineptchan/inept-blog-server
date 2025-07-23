@@ -5,5 +5,5 @@ import jakarta.validation.constraints.Pattern
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-@Pattern(regexp = "^[a-zA-Z0-9_]{6,16}$", message = "user.username_pattern")
+@Pattern(regexp = "^[a-zA-Z0-9_]{6,16}$", message = "valid.user.username_pattern")
 annotation class ValidUsername

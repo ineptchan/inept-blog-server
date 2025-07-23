@@ -6,6 +6,6 @@ import jakarta.validation.constraints.Pattern
 @Retention(AnnotationRetention.RUNTIME)
 @Pattern(
     regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>,.?/]{6,20}$",
-    message = "user.password_pattern"
+    message = "valid.user.password_pattern"
 )
 annotation class ValidatedPassword

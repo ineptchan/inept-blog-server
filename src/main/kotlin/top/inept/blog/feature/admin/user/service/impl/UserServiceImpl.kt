@@ -26,37 +26,33 @@ class UserServiceImpl(
     override fun getUsers() = userRepository.findAll()
 
     override fun getUserById(id: Long): User {
+        //根据id查找用户
         val user = userRepository.findByIdOrNull(id)
+
         //判断有没有用户
-        if (user == null) {
-            throw Exception(messages["user.user_not_found"])
-        }
+        if (user == null) throw Exception(messages["message.user.user_not_found"])
 
         return user
     }
 
     override fun createUser(user: User): User {
-        val isUsername = userRepository.existsByUsername(user.username)
         //判断有没有重复用户名
-        if (isUsername) {
-            throw Exception(messages["user.duplicate_username"])
-        }
+        if (userRepository.existsByUsername(user.username))
+            throw Exception(messages["message.user.duplicate_username"])
 
         return userRepository.save(user)
     }
 
     override fun updateUser(user: User): User {
+        //根据id查找用户
         val dbUser = userRepository.findByIdOrNull(user.id)
 
-        //判断这个id的用户存不存在
-        if (dbUser == null) {
-            throw Exception(messages["common.id_does_not_exist"])
-        }
+        //判断这个用户是否存在
+        if (dbUser == null) throw Exception(messages["message.user.user_not_found"])
 
-        //判断用户名存不存在
-        if (user.username != dbUser.username && userRepository.existsByUsername(user.username)) {
-            throw Exception(messages["user.duplicate_username"])
-        }
+        //判断用户名是否存在
+        if (user.username != dbUser.username && userRepository.existsByUsername(user.username))
+            throw Exception(messages["message.user.duplicate_username"])
 
         //保存用户
         val save = userRepository.save(user)
@@ -64,19 +60,28 @@ class UserServiceImpl(
         return save
     }
 
-    override fun deleteUserById(id: Long) = userRepository.deleteById(id)
+    override fun deleteUserById(id: Long) {
+        //判断用户是否存在
+        if (!userRepository.existsById(id))
+            throw Exception(messages["message.user.user_not_found"])
+
+        //删除用户
+        userRepository.deleteById(id)
+    }
 
     override fun loginUser(userLoginDTO: LoginUserDto): LoginUserVo {
+        //根据用户名查找用户
         val dbUser = userRepository.findByUsername(userLoginDTO.username)
+
         //没有用户
         if (dbUser == null) {
-            throw Exception(messages["user.user_not_found"])
+            throw Exception(messages["message.user.user_not_found"])
         }
 
         //校验密码
         val bCryptPasswordEncoder = BCryptPasswordEncoder()
         if (!bCryptPasswordEncoder.matches(userLoginDTO.password, dbUser.password)) {
-            throw Exception(messages["user.username_or_password_error"])
+            throw Exception(messages["message.user.username_or_password_error"])
         }
 
         //生成token

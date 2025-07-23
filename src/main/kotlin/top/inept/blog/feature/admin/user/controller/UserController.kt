@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
 import top.inept.blog.feature.admin.user.pojo.convert.toUser
 import top.inept.blog.feature.admin.user.pojo.convert.toUserVO
-import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
 import top.inept.blog.feature.admin.user.pojo.dto.UserDto
-import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVo
 import top.inept.blog.feature.admin.user.pojo.vo.UserVo
 import top.inept.blog.feature.admin.user.service.UserService
 
@@ -50,15 +48,7 @@ class UserController(
     @Operation(summary = "删除用户")
     @DeleteMapping("/{id}")
     fun deleteUserById(@PathVariable id: Long): ApiResponse<Boolean> {
-        //TODO 成功提示
         userService.deleteUserById(id)
         return ApiResponse.success(true)
-    }
-
-    @Operation(summary = "登录")
-    @PostMapping("/login")
-    fun login(@RequestBody userLoginDTO: LoginUserDto): ApiResponse<LoginUserVo> {
-        val userLoginVO = userService.loginUser(userLoginDTO)
-        return ApiResponse.success(userLoginVO)
     }
 }

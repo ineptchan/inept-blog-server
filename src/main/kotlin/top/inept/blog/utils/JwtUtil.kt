@@ -55,9 +55,9 @@ class JwtUtil(private val messages: MessageSourceAccessor) {
                 .build()
                 .parseSignedClaims(token)
         } catch (e: ExpiredJwtException) {
-            throw JwtInvalidException(messages["jwt.expired"])
+            throw JwtInvalidException(messages["message.jwt.expired"])
         } catch (e: JwtException) {
-            throw JwtInvalidException(messages["jwt.invalid"])
+            throw JwtInvalidException(messages["message.jwt.invalid"])
         }
     }
 
