@@ -19,7 +19,7 @@ class CategoriesController(
     private val categoriesService: CategoriesService
 ) {
     @Operation(summary = "获取分类列表")
-    @GetMapping()
+    @GetMapping
     fun getCategories(): ApiResponse<List<CategoriesVO>> {
         return ApiResponse.success(categoriesService.getCategories().map { it.toCategoriesVO() })
     }
@@ -31,13 +31,13 @@ class CategoriesController(
     }
 
     @Operation(summary = "创建分类")
-    @PostMapping()
+    @PostMapping
     fun createCategory(@RequestBody categories: CategoriesDTO): ApiResponse<CategoriesVO> {
         return ApiResponse.success(categoriesService.createCategory(categories.toCategories()).toCategoriesVO())
     }
 
     @Operation(summary = "更新分类")
-    @PutMapping()
+    @PutMapping
     fun updateCategory(@RequestBody categories: CategoriesDTO): ApiResponse<CategoriesVO> {
         return ApiResponse.success(categoriesService.updateCategory(categories.toCategories()).toCategoriesVO())
     }
