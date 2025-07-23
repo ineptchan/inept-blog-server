@@ -50,7 +50,7 @@ class CategoriesServiceImpl(
     override fun deleteCategory(id: Long) {
         //判断分类是否存在
         if (!categoriesRepository.existsById(id))
-            throw Exception(messages["message.categories.not_found"])
+            throw Exception(messages["message.categories.categories_not_found"])
 
         //删除分类
         categoriesRepository.deleteById(id)
