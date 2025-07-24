@@ -21,13 +21,14 @@ class GlobalExceptionHandler(
     fun exceptionHandler(ex: Exception): ApiResponse<String> {
         logger.error(ex.message, ex)
 
-        return ApiResponse.success(ex.message ?: messages["message.common.unknown_error"])
+        return ApiResponse.error(ex.message ?: messages["message.common.unknown_error"])
     }
 
     @ExceptionHandler
     fun exceptionHandler(ex: HttpMessageNotReadableException): ApiResponse<String> {
         logger.error(ex.message, ex)
 
+        //json解析时缺少字段报错
         if (ex.cause is MissingKotlinParameterException) {
             return ApiResponse.error(messages["message.common.missing_json_field", ex.message ?: "Null"])
         }
@@ -43,7 +44,7 @@ class GlobalExceptionHandler(
         val errors = ex.bindingResult.fieldErrors.map { fe ->
             ValidationError(
                 field = fe.field,
-                message = fe.defaultMessage ?: messages["message.common.illegal_parameters"],
+                message = messages[fe.defaultMessage ?: "message.common.illegal_parameters"],
             )
         }
 
