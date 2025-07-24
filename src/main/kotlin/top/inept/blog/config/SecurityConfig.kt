@@ -27,8 +27,6 @@ class SecurityConfig(
             authorizeHttpRequests {
                 // 定义访问权限
                 authorize("/open/**", permitAll)
-                authorize("/user/user/login", permitAll) // 登录接口公开
-                authorize("/admin/user/login", permitAll) // 登录接口公开
                 authorize("/user/**", hasAuthority(UserRole.USER.authority)) // /user/** 路径需要 USER 角色
                 authorize("/admin/**", hasAuthority(UserRole.ADMIN.authority)) // /admin/** 路径需要 ADMIN 角色
 
@@ -44,8 +42,6 @@ class SecurityConfig(
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
 
-            // 将 JWT 过滤器添加到 Spring Security 过滤器链中
-            // 添加在 UsernamePasswordAuthenticationFilter 之前
             addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
         }
         return http.build()
