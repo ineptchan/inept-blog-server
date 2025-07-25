@@ -7,7 +7,7 @@ import top.inept.blog.feature.admin.user.pojo.validated.ValidateUserUsername
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserEmail
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserPassword
 
-data class UserDto(
+data class UserDTO(
     @Schema(description = "openapi.user.id")
     @field:PositiveOrZero(message = "valid.common.id")
     val id: Long = 0,

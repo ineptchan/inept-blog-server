@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import top.inept.blog.feature.admin.user.pojo.validated.ValidateUserUsername
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserPassword
 
-data class LoginUserDto(
+data class LoginUserDTO(
     @Schema(description = "openapi.user.username")
     @field:ValidateUserUsername
     val username: String,

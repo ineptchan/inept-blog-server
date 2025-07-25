@@ -6,9 +6,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import top.inept.blog.extensions.get
-import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
+import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDTO
 import top.inept.blog.feature.admin.user.pojo.entity.User
-import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVo
+import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVO
 import top.inept.blog.feature.admin.user.repository.UserRepository
 import top.inept.blog.feature.admin.user.service.UserService
 import top.inept.blog.properties.JwtProperties
@@ -77,7 +77,7 @@ class UserServiceImpl(
         userRepository.deleteById(id)
     }
 
-    override fun loginUser(userLoginDTO: LoginUserDto): LoginUserVo {
+    override fun loginUser(userLoginDTO: LoginUserDTO): LoginUserVO {
         //根据用户名查找用户
         val dbUser = userRepository.findByUsername(userLoginDTO.username)
 
@@ -98,7 +98,7 @@ class UserServiceImpl(
             role = dbUser.role,
         )
 
-        return LoginUserVo(
+        return LoginUserVO(
             id = dbUser.id,
             username = dbUser.username,
             token = token

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import top.inept.blog.base.ApiResponse
-import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDto
-import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVo
+import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDTO
+import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVO
 import top.inept.blog.feature.admin.user.service.UserService
 
 @Tag(name = "公开用户接口")
@@ -22,7 +22,7 @@ class UserController(
 ) {
     @Operation(summary = "登录")
     @PostMapping("/login")
-    fun login(@Valid @RequestBody userLoginDTO: LoginUserDto): ApiResponse<LoginUserVo> {
+    fun login(@Valid @RequestBody userLoginDTO: LoginUserDTO): ApiResponse<LoginUserVO> {
         val userLoginVO = userService.loginUser(userLoginDTO)
         return ApiResponse.Companion.success(userLoginVO)
     }

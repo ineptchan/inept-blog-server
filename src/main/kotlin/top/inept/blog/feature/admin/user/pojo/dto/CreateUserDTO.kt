@@ -6,7 +6,7 @@ import top.inept.blog.feature.admin.user.pojo.validated.ValidateUserUsername
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserEmail
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserPassword
 
-data class CreateUserDto(
+data class CreateUserDTO(
     @Schema(description = "openapi.user.username")
     @field:ValidateUserUsername
     val username: String,

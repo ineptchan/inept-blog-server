@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
 import top.inept.blog.feature.admin.user.pojo.convert.toUser
 import top.inept.blog.feature.admin.user.pojo.convert.toUserVO
-import top.inept.blog.feature.admin.user.pojo.dto.CreateUserDto
-import top.inept.blog.feature.admin.user.pojo.dto.UserDto
-import top.inept.blog.feature.admin.user.pojo.vo.UserVo
+import top.inept.blog.feature.admin.user.pojo.dto.CreateUserDTO
+import top.inept.blog.feature.admin.user.pojo.dto.UserDTO
+import top.inept.blog.feature.admin.user.pojo.vo.UserVO
 import top.inept.blog.feature.admin.user.service.UserService
 
 @Tag(name = "管理员用户接口")
@@ -22,27 +22,27 @@ class UserController(
 ) {
     @Operation(summary = "获取用户列表")
     @GetMapping
-    fun getUsers(): ApiResponse<List<UserVo>> {
+    fun getUsers(): ApiResponse<List<UserVO>> {
         val users = userService.getUsers().map { it.toUserVO() }
         return ApiResponse.success(users)
     }
 
     @Operation(summary = "根据id获取用户")
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: Long): ApiResponse<UserVo> {
+    fun getUserById(@PathVariable id: Long): ApiResponse<UserVO> {
         return ApiResponse.success(userService.getUserById(id).toUserVO())
     }
 
     @Operation(summary = "创建用户")
     @PostMapping
-    fun createUser(@Valid @RequestBody user: CreateUserDto): ApiResponse<UserVo> {
+    fun createUser(@Valid @RequestBody user: CreateUserDTO): ApiResponse<UserVO> {
         val user = userService.createUser(user.toUser())
         return ApiResponse.success(user.toUserVO())
     }
 
     @Operation(summary = "更新用户")
     @PutMapping
-    fun updateUser(@Valid @RequestBody user: UserDto): ApiResponse<UserVo> {
+    fun updateUser(@Valid @RequestBody user: UserDTO): ApiResponse<UserVO> {
         val user = userService.updateUser(user.toUser())
         return ApiResponse.success(user.toUserVO())
     }
