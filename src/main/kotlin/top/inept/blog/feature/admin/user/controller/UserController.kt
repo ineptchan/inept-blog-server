@@ -6,10 +6,9 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
-import top.inept.blog.feature.admin.user.pojo.convert.toUser
 import top.inept.blog.feature.admin.user.pojo.convert.toUserVO
 import top.inept.blog.feature.admin.user.pojo.dto.CreateUserDTO
-import top.inept.blog.feature.admin.user.pojo.dto.UserDTO
+import top.inept.blog.feature.admin.user.pojo.dto.UpdateUserDTO
 import top.inept.blog.feature.admin.user.pojo.vo.UserVO
 import top.inept.blog.feature.admin.user.service.UserService
 
@@ -35,16 +34,15 @@ class UserController(
 
     @Operation(summary = "创建用户")
     @PostMapping
-    fun createUser(@Valid @RequestBody user: CreateUserDTO): ApiResponse<UserVO> {
-        val user = userService.createUser(user.toUser())
+    fun createUser(@Valid @RequestBody createUserDTO: CreateUserDTO): ApiResponse<UserVO> {
+        val user = userService.createUser(createUserDTO)
         return ApiResponse.success(user.toUserVO())
     }
 
     @Operation(summary = "更新用户")
     @PutMapping
-    fun updateUser(@Valid @RequestBody user: UserDTO): ApiResponse<UserVO> {
-        val user = userService.updateUser(user.toUser())
-        return ApiResponse.success(user.toUserVO())
+    fun updateUser(@Valid @RequestBody updateUserDTO: UpdateUserDTO): ApiResponse<UserVO> {
+        return ApiResponse.success(userService.updateUser(updateUserDTO).toUserVO())
     }
 
     @Operation(summary = "删除用户")

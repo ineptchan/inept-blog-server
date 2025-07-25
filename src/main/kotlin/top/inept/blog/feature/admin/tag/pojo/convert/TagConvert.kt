@@ -1,7 +1,7 @@
 package top.inept.blog.feature.admin.tag.pojo.convert
 
 import top.inept.blog.feature.admin.tag.pojo.dto.CreateTagDTO
-import top.inept.blog.feature.admin.tag.pojo.dto.TagDTO
+import top.inept.blog.feature.admin.tag.pojo.dto.UpdateTagDTO
 import top.inept.blog.feature.admin.tag.pojo.entity.Tag
 import top.inept.blog.feature.admin.tag.pojo.vo.TagVO
 
@@ -11,7 +11,7 @@ fun Tag.toTagVO() = TagVO(
     slug = this.slug,
 )
 
-fun TagDTO.toTag() = Tag(
+fun UpdateTagDTO.toTag() = Tag(
     id = this.id,
     name = this.name,
     slug = this.slug,

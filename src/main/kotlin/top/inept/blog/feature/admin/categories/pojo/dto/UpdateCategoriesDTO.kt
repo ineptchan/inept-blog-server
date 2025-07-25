@@ -5,7 +5,7 @@ import jakarta.validation.constraints.PositiveOrZero
 import top.inept.blog.feature.admin.categories.pojo.validated.ValidatedCategoriesName
 import top.inept.blog.feature.admin.categories.pojo.validated.ValidatedCategoriesSlug
 
-data class CategoriesDTO(
+data class UpdateCategoriesDTO(
     @Schema(description = "openapi.categories.id")
     @field:PositiveOrZero(message = "valid.common.id")
     val id: Long,

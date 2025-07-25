@@ -6,7 +6,10 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import top.inept.blog.extensions.get
+import top.inept.blog.feature.admin.user.pojo.convert.toUser
+import top.inept.blog.feature.admin.user.pojo.dto.CreateUserDTO
 import top.inept.blog.feature.admin.user.pojo.dto.LoginUserDTO
+import top.inept.blog.feature.admin.user.pojo.dto.UpdateUserDTO
 import top.inept.blog.feature.admin.user.pojo.entity.User
 import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVO
 import top.inept.blog.feature.admin.user.repository.UserRepository
@@ -35,36 +38,36 @@ class UserServiceImpl(
         return user
     }
 
-    override fun createUser(user: User): User {
+    override fun createUser(createUserDTO: CreateUserDTO): User {
         //判断有没有重复用户名
-        if (userRepository.existsByUsername(user.username)) throw Exception(messages["message.user.duplicate_username"])
+        if (userRepository.existsByUsername(createUserDTO.username)) throw Exception(messages["message.user.duplicate_username"])
 
         //判断邮箱是否存在
-        user.email?.let { email ->
+        createUserDTO.email?.let { email ->
             if (userRepository.existsByEmail(email)) throw Exception(messages["message.user.duplicate_email"])
         }
 
-        return userRepository.save(user)
+        return userRepository.save(createUserDTO.toUser())
     }
 
-    override fun updateUser(user: User): User {
+    override fun updateUser(updateUserDTO: UpdateUserDTO): User {
         //根据id查找用户
-        val dbUser = userRepository.findByIdOrNull(user.id)
+        val dbUser = userRepository.findByIdOrNull(updateUserDTO.id)
 
         //判断这个用户是否存在
         if (dbUser == null) throw Exception(messages["message.user.user_not_found"])
 
         //判断用户名是否存在
-        if (user.username != dbUser.username && userRepository.existsByUsername(user.username))
+        if (updateUserDTO.username != dbUser.username && userRepository.existsByUsername(updateUserDTO.username))
             throw Exception(messages["message.user.duplicate_username"])
 
         //判断邮箱是否存在
-        user.email?.let { email ->
-            if (user.email != dbUser.email && userRepository.existsByEmail(email)) throw Exception(messages["message.user.duplicate_email"])
+        updateUserDTO.email?.let { email ->
+            if (updateUserDTO.email != dbUser.email && userRepository.existsByEmail(email)) throw Exception(messages["message.user.duplicate_email"])
         }
 
         //保存用户
-        val save = userRepository.save(user)
+        val save = userRepository.save(updateUserDTO.toUser())
 
         return save
     }

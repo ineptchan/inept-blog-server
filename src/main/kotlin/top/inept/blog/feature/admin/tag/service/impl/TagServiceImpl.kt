@@ -4,6 +4,9 @@ import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.extensions.get
+import top.inept.blog.feature.admin.tag.pojo.convert.toTag
+import top.inept.blog.feature.admin.tag.pojo.dto.CreateTagDTO
+import top.inept.blog.feature.admin.tag.pojo.dto.UpdateTagDTO
 import top.inept.blog.feature.admin.tag.pojo.entity.Tag
 import top.inept.blog.feature.admin.tag.repository.TagRepository
 import top.inept.blog.feature.admin.tag.service.TagService
@@ -25,36 +28,36 @@ class TagServiceImpl(
         return tag
     }
 
-    override fun createTag(tag: Tag): Tag {
+    override fun createTag(createTagDTO: CreateTagDTO): Tag {
         //初次判断标签名称与标签slug是否重复
-        if (tagRepository.existsByNameOrSlug(tag.name, tag.slug)) {
+        if (tagRepository.existsByNameOrSlug(createTagDTO.name, createTagDTO.slug)) {
             //判断标签名称是否重复
-            if (tagRepository.existsByName(tag.name)) throw Exception(messages["message.tag.duplicate_name"])
+            if (tagRepository.existsByName(createTagDTO.name)) throw Exception(messages["message.tag.duplicate_name"])
 
             //判断标签slug是否重复
-            if (tagRepository.existsBySlug(tag.slug)) throw Exception(messages["message.tag.duplicate_slug"])
+            if (tagRepository.existsBySlug(createTagDTO.slug)) throw Exception(messages["message.tag.duplicate_slug"])
         }
 
-        return tagRepository.save(tag)
+        return tagRepository.save(createTagDTO.toTag())
     }
 
-    override fun updateTag(tag: Tag): Tag {
+    override fun updateTag(updateTagDTO: UpdateTagDTO): Tag {
         //根据id查找标签
-        val dbTag = tagRepository.findByIdOrNull(tag.id)
+        val dbTag = tagRepository.findByIdOrNull(updateTagDTO.id)
 
         //判断标签是否存在
         if (dbTag == null) throw Exception(messages["message.tag.tag_not_found"])
 
         //初次判断标签名称与标签slug是否重复
-        if (tagRepository.existsByNameOrSlug(tag.name, tag.slug)) {
+        if (tagRepository.existsByNameOrSlug(updateTagDTO.name, updateTagDTO.slug)) {
             //判断标签名称是否重复
-            if (tag.name != dbTag.name && tagRepository.existsByName(tag.name)) throw Exception(messages["message.tag.duplicate_name"])
+            if (updateTagDTO.name != dbTag.name && tagRepository.existsByName(updateTagDTO.name)) throw Exception(messages["message.tag.duplicate_name"])
 
             //判断标签slug是否重复
-            if (tag.slug != dbTag.slug && tagRepository.existsBySlug(tag.slug)) throw Exception(messages["message.tag.duplicate_slug"])
+            if (updateTagDTO.slug != dbTag.slug && tagRepository.existsBySlug(updateTagDTO.slug)) throw Exception(messages["message.tag.duplicate_slug"])
         }
 
-        return tagRepository.save(tag)
+        return tagRepository.save(updateTagDTO.toTag())
     }
 
     override fun deleteTag(id: Long) {

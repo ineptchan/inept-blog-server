@@ -4,6 +4,9 @@ import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.extensions.get
+import top.inept.blog.feature.admin.categories.pojo.convert.toCategories
+import top.inept.blog.feature.admin.categories.pojo.dto.UpdateCategoriesDTO
+import top.inept.blog.feature.admin.categories.pojo.dto.CreateCategoriesDTO
 import top.inept.blog.feature.admin.categories.pojo.entity.Categories
 import top.inept.blog.feature.admin.categories.repository.CategoriesRepository
 import top.inept.blog.feature.admin.categories.service.CategoriesService
@@ -25,38 +28,38 @@ class CategoriesServiceImpl(
         return categories
     }
 
-    override fun createCategory(categories: Categories): Categories {
+    override fun createCategory(createCategoriesDTO: CreateCategoriesDTO): Categories {
         //初次判断分类名称与分类slug是否重复
-        if (categoriesRepository.existsByNameOrSlug(categories.name, categories.slug)) {
+        if (categoriesRepository.existsByNameOrSlug(createCategoriesDTO.name, createCategoriesDTO.slug)) {
             //判断分类名称是否重复
-            if (categoriesRepository.existsByName(categories.name)) throw Exception(messages["message.categories.duplicate_name"])
+            if (categoriesRepository.existsByName(createCategoriesDTO.name)) throw Exception(messages["message.categories.duplicate_name"])
 
             //判断分类slug是否重复
-            if (categoriesRepository.existsBySlug(categories.slug)) throw Exception(messages["message.categories.duplicate_slug"])
+            if (categoriesRepository.existsBySlug(createCategoriesDTO.slug)) throw Exception(messages["message.categories.duplicate_slug"])
         }
 
-        return categoriesRepository.save(categories)
+        return categoriesRepository.save(createCategoriesDTO.toCategories())
     }
 
-    override fun updateCategory(categories: Categories): Categories {
+    override fun updateCategory(updateCategoriesDTO: UpdateCategoriesDTO): Categories {
         //根据id查找分类
-        val dbCategories = categoriesRepository.findByIdOrNull(categories.id)
+        val dbCategories = categoriesRepository.findByIdOrNull(updateCategoriesDTO.id)
 
         //判断分类是否存在
         if (dbCategories == null) throw Exception(messages["message.categories.categories_not_found"])
 
         //初次判断分类名称与分类Slug是否重复
-        if (categoriesRepository.existsByNameOrSlug(categories.name, categories.slug)) {
+        if (categoriesRepository.existsByNameOrSlug(updateCategoriesDTO.name, updateCategoriesDTO.slug)) {
             //判断分类名称是否重复
-            if (categories.name != dbCategories.name && categoriesRepository.existsByName(categories.name))
+            if (updateCategoriesDTO.name != dbCategories.name && categoriesRepository.existsByName(updateCategoriesDTO.name))
                 throw Exception(messages["message.categories.duplicate_name"])
 
             //判断分类slug是否重复
-            if (categories.slug != dbCategories.slug && categoriesRepository.existsBySlug(categories.slug))
+            if (updateCategoriesDTO.slug != dbCategories.slug && categoriesRepository.existsBySlug(updateCategoriesDTO.slug))
                 throw Exception(messages["message.categories.duplicate_slug"])
         }
 
-        return categoriesRepository.save(categories)
+        return categoriesRepository.save(updateCategoriesDTO.toCategories())
     }
 
     override fun deleteCategory(id: Long) {

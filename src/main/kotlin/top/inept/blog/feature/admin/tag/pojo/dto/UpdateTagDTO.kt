@@ -5,7 +5,7 @@ import jakarta.validation.constraints.PositiveOrZero
 import top.inept.blog.feature.admin.tag.pojo.validated.ValidatedTagName
 import top.inept.blog.feature.admin.tag.pojo.validated.ValidatedTagSlug
 
-data class TagDTO(
+data class UpdateTagDTO(
     @Schema(description = "openapi.tag.id")
     @field:PositiveOrZero(message = "valid.common.id")
     val id: Long,

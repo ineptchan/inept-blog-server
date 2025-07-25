@@ -6,10 +6,9 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
-import top.inept.blog.feature.admin.tag.pojo.convert.toTag
 import top.inept.blog.feature.admin.tag.pojo.convert.toTagVO
 import top.inept.blog.feature.admin.tag.pojo.dto.CreateTagDTO
-import top.inept.blog.feature.admin.tag.pojo.dto.TagDTO
+import top.inept.blog.feature.admin.tag.pojo.dto.UpdateTagDTO
 import top.inept.blog.feature.admin.tag.pojo.vo.TagVO
 import top.inept.blog.feature.admin.tag.service.TagService
 
@@ -34,14 +33,14 @@ class TagController(
 
     @Operation(summary = "创建标签")
     @PostMapping
-    fun createTag(@Valid @RequestBody tag: CreateTagDTO): ApiResponse<TagVO> {
-        return ApiResponse.success(tagService.createTag(tag.toTag()).toTagVO())
+    fun createTag(@Valid @RequestBody createTagDTO: CreateTagDTO): ApiResponse<TagVO> {
+        return ApiResponse.success(tagService.createTag(createTagDTO).toTagVO())
     }
 
     @Operation(summary = "更新标签")
     @PutMapping
-    fun updateTag(@Valid @RequestBody tag: TagDTO): ApiResponse<TagVO> {
-        return ApiResponse.success(tagService.updateTag(tag.toTag()).toTagVO())
+    fun updateTag(@Valid @RequestBody updateTagDTO: UpdateTagDTO): ApiResponse<TagVO> {
+        return ApiResponse.success(tagService.updateTag(updateTagDTO).toTagVO())
     }
 
     @Operation(summary = "删除标签")

@@ -1,6 +1,6 @@
 package top.inept.blog.feature.admin.categories.pojo.convert
 
-import top.inept.blog.feature.admin.categories.pojo.dto.CategoriesDTO
+import top.inept.blog.feature.admin.categories.pojo.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.admin.categories.pojo.dto.CreateCategoriesDTO
 import top.inept.blog.feature.admin.categories.pojo.entity.Categories
 import top.inept.blog.feature.admin.categories.pojo.vo.CategoriesVO
@@ -11,7 +11,7 @@ fun Categories.toCategoriesVO() = CategoriesVO(
     slug = this.slug
 )
 
-fun CategoriesDTO.toCategories() = Categories(
+fun UpdateCategoriesDTO.toCategories() = Categories(
     id = this.id,
     name = this.name,
     slug = this.slug
