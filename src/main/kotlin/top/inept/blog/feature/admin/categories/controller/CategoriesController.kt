@@ -2,6 +2,7 @@ package top.inept.blog.feature.admin.categories.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
@@ -33,13 +34,13 @@ class CategoriesController(
 
     @Operation(summary = "创建分类")
     @PostMapping
-    fun createCategory(@RequestBody categories: CreateCategoriesDTO): ApiResponse<CategoriesVO> {
+    fun createCategory(@Valid @RequestBody categories: CreateCategoriesDTO): ApiResponse<CategoriesVO> {
         return ApiResponse.success(categoriesService.createCategory(categories.toCategories()).toCategoriesVO())
     }
 
     @Operation(summary = "更新分类")
     @PutMapping
-    fun updateCategory(@RequestBody categories: CategoriesDTO): ApiResponse<CategoriesVO> {
+    fun updateCategory(@Valid @RequestBody categories: CategoriesDTO): ApiResponse<CategoriesVO> {
         return ApiResponse.success(categoriesService.updateCategory(categories.toCategories()).toCategoriesVO())
     }
 

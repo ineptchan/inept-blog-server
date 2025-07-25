@@ -2,6 +2,7 @@ package top.inept.blog.feature.admin.user.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
@@ -34,14 +35,14 @@ class UserController(
 
     @Operation(summary = "创建用户")
     @PostMapping
-    fun createUser(@RequestBody user: CreateUserDto): ApiResponse<UserVo> {
+    fun createUser(@Valid @RequestBody user: CreateUserDto): ApiResponse<UserVo> {
         val user = userService.createUser(user.toUser())
         return ApiResponse.success(user.toUserVO())
     }
 
     @Operation(summary = "更新用户")
     @PutMapping
-    fun updateUser(@RequestBody user: UserDto): ApiResponse<UserVo> {
+    fun updateUser(@Valid @RequestBody user: UserDto): ApiResponse<UserVo> {
         val user = userService.updateUser(user.toUser())
         return ApiResponse.success(user.toUserVO())
     }

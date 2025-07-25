@@ -2,6 +2,7 @@ package top.inept.blog.feature.open.user.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -21,7 +22,7 @@ class UserController(
 ) {
     @Operation(summary = "登录")
     @PostMapping("/login")
-    fun login(@RequestBody userLoginDTO: LoginUserDto): ApiResponse<LoginUserVo> {
+    fun login(@Valid @RequestBody userLoginDTO: LoginUserDto): ApiResponse<LoginUserVo> {
         val userLoginVO = userService.loginUser(userLoginDTO)
         return ApiResponse.Companion.success(userLoginVO)
     }

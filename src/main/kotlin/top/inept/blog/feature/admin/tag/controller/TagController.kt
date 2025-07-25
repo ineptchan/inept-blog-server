@@ -2,6 +2,7 @@ package top.inept.blog.feature.admin.tag.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
@@ -33,13 +34,13 @@ class TagController(
 
     @Operation(summary = "创建标签")
     @PostMapping
-    fun createTag(@RequestBody tag: CreateTagDTO): ApiResponse<TagVO> {
+    fun createTag(@Valid @RequestBody tag: CreateTagDTO): ApiResponse<TagVO> {
         return ApiResponse.success(tagService.createTag(tag.toTag()).toTagVO())
     }
 
     @Operation(summary = "更新标签")
     @PutMapping
-    fun updateTag(@RequestBody tag: TagDTO): ApiResponse<TagVO> {
+    fun updateTag(@Valid @RequestBody tag: TagDTO): ApiResponse<TagVO> {
         return ApiResponse.success(tagService.updateTag(tag.toTag()).toTagVO())
     }
 

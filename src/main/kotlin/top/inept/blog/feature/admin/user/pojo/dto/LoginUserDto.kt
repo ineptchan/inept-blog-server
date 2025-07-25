@@ -1,15 +1,15 @@
 package top.inept.blog.feature.admin.user.pojo.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import top.inept.blog.feature.admin.user.pojo.validated.ValidUsername
-import top.inept.blog.feature.admin.user.pojo.validated.ValidatedPassword
+import top.inept.blog.feature.admin.user.pojo.validated.ValidateUserUsername
+import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserPassword
 
 data class LoginUserDto(
-    @field:ValidUsername
     @Schema(description = "openapi.user.username")
+    @field:ValidateUserUsername
     val username: String,
 
-    @field:ValidatedPassword
     @Schema(description = "openapi.user.password")
+    @field:ValidatedUserPassword
     val password: String,
 )
