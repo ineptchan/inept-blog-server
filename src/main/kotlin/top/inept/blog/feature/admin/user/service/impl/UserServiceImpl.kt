@@ -66,10 +66,7 @@ class UserServiceImpl(
             if (updateUserDTO.email != dbUser.email && userRepository.existsByEmail(email)) throw Exception(messages["message.user.duplicate_email"])
         }
 
-        //保存用户
-        val save = userRepository.save(updateUserDTO.toUser())
-
-        return save
+        return userRepository.save(updateUserDTO.toUser())
     }
 
     override fun deleteUserById(id: Long) {
