@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "articles")
 @EntityListeners(value = [AuditingEntityListener::class])
-class Articles(
+class Article(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,

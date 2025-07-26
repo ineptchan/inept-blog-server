@@ -3,13 +3,13 @@ package top.inept.blog.feature.admin.article.service
 import top.inept.blog.feature.admin.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleStatusDTO
-import top.inept.blog.feature.admin.article.pojo.entity.Articles
+import top.inept.blog.feature.admin.article.pojo.entity.Article
 
 interface ArticleService {
-    fun getArticles(): List<Articles>
-    fun getArticleById(id: Long): Articles
-    fun createArticle(createArticleDTO: CreateArticleDTO): Articles
-    fun updateArticle(updateArticleDTO: UpdateArticleDTO): Articles
+    fun getArticles(): List<Article>
+    fun getArticleById(id: Long): Article
+    fun createArticle(createArticleDTO: CreateArticleDTO): Article
+    fun updateArticle(updateArticleDTO: UpdateArticleDTO): Article
     fun deleteArticle(id: Long)
-    fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Articles
+    fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Article
 }

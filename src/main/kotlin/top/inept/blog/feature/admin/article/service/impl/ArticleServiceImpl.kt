@@ -7,7 +7,7 @@ import top.inept.blog.extensions.get
 import top.inept.blog.feature.admin.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleStatusDTO
-import top.inept.blog.feature.admin.article.pojo.entity.Articles
+import top.inept.blog.feature.admin.article.pojo.entity.Article
 import top.inept.blog.feature.admin.article.repository.ArticleRepository
 import top.inept.blog.feature.admin.article.service.ArticleService
 import top.inept.blog.feature.admin.categories.service.CategoriesService
@@ -22,9 +22,9 @@ class ArticleServiceImpl(
     private val tagService: TagService,
     private val messages: MessageSourceAccessor,
 ) : ArticleService {
-    override fun getArticles(): List<Articles> = articleRepository.findAll()
+    override fun getArticles(): List<Article> = articleRepository.findAll()
 
-    override fun getArticleById(id: Long): Articles {
+    override fun getArticleById(id: Long): Article {
         //根据id查找文章
         val articles = articleRepository.findByIdOrNull(id)
 
@@ -34,7 +34,7 @@ class ArticleServiceImpl(
         return articles
     }
 
-    override fun createArticle(createArticleDTO: CreateArticleDTO): Articles {
+    override fun createArticle(createArticleDTO: CreateArticleDTO): Article {
         //判断文章slug是否重复
         if (articleRepository.existsBySlug(createArticleDTO.slug)) throw Exception(messages["message.articles.duplicate_slug"])
 
@@ -48,7 +48,7 @@ class ArticleServiceImpl(
         val tags = tagService.getTagsByIds(createArticleDTO.tagIds)
 
         return articleRepository.save(
-            Articles(
+            Article(
                 title = createArticleDTO.title,
                 slug = createArticleDTO.slug,
                 content = createArticleDTO.content,
@@ -59,7 +59,7 @@ class ArticleServiceImpl(
         )
     }
 
-    override fun updateArticle(updateArticleDTO: UpdateArticleDTO): Articles {
+    override fun updateArticle(updateArticleDTO: UpdateArticleDTO): Article {
         //根据id查找文章
         val dbArticle = articleRepository.findByIdOrNull(updateArticleDTO.id)
 
@@ -80,7 +80,7 @@ class ArticleServiceImpl(
         val tags = tagService.getTagsByIds(updateArticleDTO.tagIds)
 
         return articleRepository.save(
-            Articles(
+            Article(
                 id = updateArticleDTO.id,
                 title = updateArticleDTO.title,
                 slug = updateArticleDTO.slug,
@@ -100,7 +100,7 @@ class ArticleServiceImpl(
         articleRepository.deleteById(id)
     }
 
-    override fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Articles {
+    override fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Article {
         //根据id查找文章
         val dbArticle = articleRepository.findByIdOrNull(updateArticleStatusDTO.id)
 

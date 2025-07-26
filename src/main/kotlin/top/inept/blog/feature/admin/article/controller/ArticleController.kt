@@ -54,7 +54,6 @@ class ArticleController(
     @Operation(summary = "更新文章状态")
     @PutMapping("/status")
     fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ApiResponse<ArticleVO> {
-
         return ApiResponse.success(articleService.updateArticleStatus(updateArticleStatusDTO).toArticleVO())
     }
 }
