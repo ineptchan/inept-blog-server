@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.admin.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleDTO
+import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.admin.article.pojo.entity.Articles
 import top.inept.blog.feature.admin.article.repository.ArticleRepository
 import top.inept.blog.feature.admin.article.service.ArticleService
@@ -99,4 +100,15 @@ class ArticleServiceImpl(
         articleRepository.deleteById(id)
     }
 
+    override fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Articles {
+        //根据id查找文章
+        val dbArticle = articleRepository.findByIdOrNull(updateArticleStatusDTO.id)
+
+        //判断文章是否存在
+        if (dbArticle == null) throw Exception(messages["message.articles.articles_not_found"])
+
+        dbArticle.articleStatus = updateArticleStatusDTO.articleStatus
+
+        return articleRepository.save(dbArticle)
+    }
 }

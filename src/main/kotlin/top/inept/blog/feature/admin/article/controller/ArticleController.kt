@@ -9,6 +9,7 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.feature.admin.article.pojo.convert.toArticleVO
 import top.inept.blog.feature.admin.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleDTO
+import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.admin.article.pojo.vo.ArticleVO
 import top.inept.blog.feature.admin.article.service.ArticleService
 
@@ -20,7 +21,7 @@ class ArticleController(
     private val articleService: ArticleService,
 ) {
     @Operation(summary = "获取文章列表")
-    @GetMapping()
+    @GetMapping
     fun getArticles(): ApiResponse<List<ArticleVO>> {
         return ApiResponse.success(articleService.getArticles().map { it.toArticleVO() })
     }
@@ -48,5 +49,12 @@ class ArticleController(
     fun deleteArticle(@PathVariable id: Long): ApiResponse<Boolean> {
         articleService.deleteArticle(id)
         return ApiResponse.success(true)
+    }
+
+    @Operation(summary = "更新文章状态")
+    @PutMapping("/status")
+    fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ApiResponse<ArticleVO> {
+
+        return ApiResponse.success(articleService.updateArticleStatus(updateArticleStatusDTO).toArticleVO())
     }
 }
