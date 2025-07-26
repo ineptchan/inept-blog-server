@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [])
-@Pattern(regexp = "^[a-z0-9]+(-[a-z0-9]+)$", message = "valid.tag.slug")
+@Pattern(regexp = "^[a-z0-9]+(-[a-z0-9]+)*$", message = "valid.tag.slug")
 annotation class ValidatedTagSlug(
     val message: String = "valid.common.unknown_error",
     val groups: Array<KClass<*>> = [],
