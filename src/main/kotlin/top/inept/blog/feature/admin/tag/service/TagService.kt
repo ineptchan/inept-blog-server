@@ -10,4 +10,5 @@ interface TagService {
     fun createTag(createTagDTO: CreateTagDTO): Tag
     fun updateTag(updateTagDTO: UpdateTagDTO): Tag
     fun deleteTag(id: Long)
+    fun getTagsByIds(ids: List<Long>): List<Tag>
 }

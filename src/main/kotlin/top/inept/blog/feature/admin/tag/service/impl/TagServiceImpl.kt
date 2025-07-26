@@ -51,10 +51,14 @@ class TagServiceImpl(
         //初次判断标签名称与标签slug是否重复
         if (tagRepository.existsByNameOrSlug(updateTagDTO.name, updateTagDTO.slug)) {
             //判断标签名称是否重复
-            if (updateTagDTO.name != dbTag.name && tagRepository.existsByName(updateTagDTO.name)) throw Exception(messages["message.tag.duplicate_name"])
+            if (updateTagDTO.name != dbTag.name && tagRepository.existsByName(updateTagDTO.name)) throw Exception(
+                messages["message.tag.duplicate_name"]
+            )
 
             //判断标签slug是否重复
-            if (updateTagDTO.slug != dbTag.slug && tagRepository.existsBySlug(updateTagDTO.slug)) throw Exception(messages["message.tag.duplicate_slug"])
+            if (updateTagDTO.slug != dbTag.slug && tagRepository.existsBySlug(updateTagDTO.slug)) throw Exception(
+                messages["message.tag.duplicate_slug"]
+            )
         }
 
         return tagRepository.save(updateTagDTO.toTag())
@@ -62,10 +66,23 @@ class TagServiceImpl(
 
     override fun deleteTag(id: Long) {
         //根据id判断标签是否存在
-        if (!tagRepository.existsById(id))
-            throw Exception(messages["message.tag.not_found"])
+        if (!tagRepository.existsById(id)) throw Exception(messages["message.tag.not_found"])
 
         //删除标签
         tagRepository.deleteById(id)
+    }
+
+    override fun getTagsByIds(ids: List<Long>): List<Tag> {
+        //一次查询多个id
+        val tags = tagRepository.findAllById(ids)
+
+        //判断是否查询的全面
+        if (tags.size != ids.size) {
+            val foundIds = tags.map { it.id }.toSet()
+            val notFoundIds = ids.filterNot { foundIds.contains(it) }
+            throw Exception(messages["message.tag.tags_not_found", notFoundIds.joinToString()])
+        }
+
+        return tags
     }
 }
