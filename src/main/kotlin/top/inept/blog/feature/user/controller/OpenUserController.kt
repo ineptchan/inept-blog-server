@@ -15,7 +15,7 @@ import top.inept.blog.feature.user.service.UserService
 
 @Tag(name = "公开用户接口")
 @RestController
-@RequestMapping("/open")
+@RequestMapping("/open/user")
 @Validated
 class OpenUserController(
     private val userService: UserService,
