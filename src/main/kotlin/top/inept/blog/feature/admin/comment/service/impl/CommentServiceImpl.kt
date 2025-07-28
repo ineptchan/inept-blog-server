@@ -81,8 +81,12 @@ class CommentServiceImpl(
         //根据用户名获取用户
         val user = userService.getUserByUsername(username)
 
-        //TODO 考虑是否抛出错误还是成为顶级评论
-        val parentComment = createCommentDTO.parentCommentId?.let { commentRepository.findByIdOrNull(it) }
+        //判断有没有父级评论
+        val parentComment = createCommentDTO.parentCommentId?.let {
+            val parentComment = commentRepository.findByIdOrNull(it)
+            if (parentComment == null) throw NotFoundException(messages["message.comment.parent_comment_not_found"])
+            parentComment
+        }
 
         val comment = Comment(
             content = createCommentDTO.content,
