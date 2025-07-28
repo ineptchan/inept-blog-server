@@ -3,6 +3,7 @@ package top.inept.blog.feature.admin.comment.service.impl
 import jakarta.persistence.EntityManager
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
@@ -20,8 +21,8 @@ import top.inept.blog.feature.admin.comment.pojo.vo.CommentSummaryVO
 import top.inept.blog.feature.admin.comment.pojo.vo.CommentVO
 import top.inept.blog.feature.admin.comment.repository.CommentRepository
 import top.inept.blog.feature.admin.comment.service.CommentService
-import top.inept.blog.feature.admin.user.pojo.entity.User
 import top.inept.blog.feature.admin.user.service.UserService
+import top.inept.blog.utils.SecurityUtil
 
 @Service
 class CommentServiceImpl(
@@ -73,8 +74,12 @@ class CommentServiceImpl(
 
         val article = entityManager.getReference(Article::class.java, articleTitle.id)
 
-        //TODO 添加真正的用户
-        val user = entityManager.getReference(User::class.java, 1L)
+        //从上下文获取用户名
+        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
+            ?: throw Exception("message.common.unknown_user")
+
+        //根据用户名获取用户
+        val user = userService.getUserByUsername(username)
 
         //TODO 考虑是否抛出错误还是成为顶级评论
         val parentComment = createCommentDTO.parentCommentId?.let { commentRepository.findByIdOrNull(it) }

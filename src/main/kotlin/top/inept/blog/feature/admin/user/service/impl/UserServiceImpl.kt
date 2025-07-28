@@ -31,12 +31,12 @@ class UserServiceImpl(
 
     override fun getUserById(id: Long): User {
         //根据id查找用户
-        val user = userRepository.findByIdOrNull(id)
+        return userRepository.findByIdOrNull(id)?: throw NotFoundException("message.user.user_not_found")
+    }
 
-        //判断有没有用户
-        if (user == null) throw NotFoundException(messages["message.user.user_not_found"])
-
-        return user
+    override fun getUserByUsername(username: String): User {
+        //根据username查找用户
+        return userRepository.findByUsername(username) ?: throw NotFoundException("message.user.user_not_found")
     }
 
     override fun createUser(createUserDTO: CreateUserDTO): User {

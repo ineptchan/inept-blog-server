@@ -9,6 +9,7 @@ import top.inept.blog.feature.admin.user.pojo.vo.LoginUserVO
 interface UserService {
     fun getUsers(): List<User>
     fun getUserById(id: Long): User
+    fun getUserByUsername(username: String): User
     fun createUser(createUserDTO: CreateUserDTO): User
     fun updateUser(updateUserDTO: UpdateUserDTO): User
     fun deleteUserById(id: Long)
