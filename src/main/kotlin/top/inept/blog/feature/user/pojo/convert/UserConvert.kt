@@ -19,23 +19,19 @@ fun User.toUserPublicVO() = UserPublicVO(
     nickname = this.nickname,
 )
 
-fun UpdateUserDTO.toUser(): User {
-    return User(
-        id = this.id,
-        nickname = this.nickname,
-        username = this.username,
-        password = PasswordUtil.encode(this.password),
-        email = this.email,
-        role = this.role,
-    )
-}
+fun UpdateUserDTO.toUser() = User(
+    id = this.id,
+    nickname = this.nickname,
+    username = this.username,
+    password = PasswordUtil.encode(this.password),
+    email = this.email,
+    role = this.role,
+)
 
-fun CreateUserDTO.toUser(): User {
-    return User(
-        nickname = this.nickname,
-        username = this.username,
-        password = PasswordUtil.encode(this.password),
-        email = this.email,
-        role = this.role,
-    )
-}
+fun CreateUserDTO.toUser() = User(
+    nickname = this.nickname,
+    username = this.username,
+    password = PasswordUtil.encode(this.password),
+    email = this.email,
+    role = this.role,
+)
