@@ -106,7 +106,9 @@ class UserServiceImpl(
 
         return LoginUserVO(
             id = dbUser.id,
+            nickname = dbUser.nickname,
             username = dbUser.username,
+            email = dbUser.email,
             token = token
         )
     }

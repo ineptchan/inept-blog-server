@@ -3,7 +3,6 @@ package top.inept.blog.feature.article.pojo.validated
 import jakarta.validation.Constraint
 import jakarta.validation.Payload
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.FIELD)

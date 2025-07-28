@@ -23,7 +23,6 @@ class OpenUserController(
     @Operation(summary = "登录")
     @PostMapping("/login")
     fun login(@Valid @RequestBody userLoginDTO: LoginUserDTO): ApiResponse<LoginUserVO> {
-        val userLoginVO = userService.loginUser(userLoginDTO)
-        return ApiResponse.Companion.success(userLoginVO)
+        return ApiResponse.Companion.success(userService.loginUser(userLoginDTO))
     }
 }
