@@ -3,6 +3,7 @@ package top.inept.blog.feature.admin.categories.service.impl
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.admin.categories.pojo.convert.toCategories
 import top.inept.blog.feature.admin.categories.pojo.dto.UpdateCategoriesDTO
@@ -23,7 +24,7 @@ class CategoriesServiceImpl(
         val categories = categoriesRepository.findByIdOrNull(id)
 
         //判断分类是否存在
-        if (categories == null) throw Exception(messages["message.categories.categories_not_found"])
+        if (categories == null) throw NotFoundException(messages["message.categories.categories_not_found"])
 
         return categories
     }
@@ -46,7 +47,7 @@ class CategoriesServiceImpl(
         val dbCategories = categoriesRepository.findByIdOrNull(updateCategoriesDTO.id)
 
         //判断分类是否存在
-        if (dbCategories == null) throw Exception(messages["message.categories.categories_not_found"])
+        if (dbCategories == null) throw NotFoundException(messages["message.categories.categories_not_found"])
 
         //初次判断分类名称与分类Slug是否重复
         if (categoriesRepository.existsByNameOrSlug(updateCategoriesDTO.name, updateCategoriesDTO.slug)) {
@@ -64,7 +65,7 @@ class CategoriesServiceImpl(
 
     override fun deleteCategory(id: Long) {
         //根据id判断分类是否存在
-        if (!categoriesRepository.existsById(id)) throw Exception(messages["message.categories.categories_not_found"])
+        if (!categoriesRepository.existsById(id)) throw NotFoundException(messages["message.categories.categories_not_found"])
 
         //删除分类
         categoriesRepository.deleteById(id)

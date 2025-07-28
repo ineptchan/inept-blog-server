@@ -3,6 +3,7 @@ package top.inept.blog.feature.admin.tag.service.impl
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.admin.tag.pojo.convert.toTag
 import top.inept.blog.feature.admin.tag.pojo.dto.CreateTagDTO
@@ -23,7 +24,7 @@ class TagServiceImpl(
         val tag = tagRepository.findByIdOrNull(id)
 
         //判断标签是否存在
-        if (tag == null) throw Exception(messages["message.tag.tag_not_found"])
+        if (tag == null) throw NotFoundException(messages["message.tag.tag_not_found"])
 
         return tag
     }
@@ -46,7 +47,7 @@ class TagServiceImpl(
         val dbTag = tagRepository.findByIdOrNull(updateTagDTO.id)
 
         //判断标签是否存在
-        if (dbTag == null) throw Exception(messages["message.tag.tag_not_found"])
+        if (dbTag == null) throw NotFoundException(messages["message.tag.tag_not_found"])
 
         //初次判断标签名称与标签slug是否重复
         if (tagRepository.existsByNameOrSlug(updateTagDTO.name, updateTagDTO.slug)) {
@@ -80,7 +81,7 @@ class TagServiceImpl(
         if (tags.size != ids.size) {
             val foundIds = tags.map { it.id }.toSet()
             val notFoundIds = ids.filterNot { foundIds.contains(it) }
-            throw Exception(messages["message.tag.tags_not_found", notFoundIds.joinToString()])
+            throw NotFoundException(messages["message.tag.tags_not_found", notFoundIds.joinToString()])
         }
 
         return tags

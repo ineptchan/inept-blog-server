@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import top.inept.blog.feature.admin.article.pojo.entity.enums.ArticleStatus
 import top.inept.blog.feature.admin.categories.pojo.vo.CategoriesVO
 import top.inept.blog.feature.admin.tag.pojo.vo.TagVO
-import top.inept.blog.feature.admin.user.pojo.vo.UserVO
+import top.inept.blog.feature.admin.user.pojo.vo.UserPublicVO
 
 data class ArticleVO(
     @Schema(description = "openapi.article.id")
@@ -20,7 +20,7 @@ data class ArticleVO(
     val content: String,
 
     @Schema(description = "openapi.article.author")
-    val author: UserVO,
+    val author: UserPublicVO,
 
     @Schema(description = "openapi.article.category")
     val category: CategoriesVO,

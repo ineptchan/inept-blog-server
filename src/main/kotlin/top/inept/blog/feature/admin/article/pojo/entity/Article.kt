@@ -25,6 +25,7 @@ class Article(
     @Column(nullable = false, unique = true)
     var slug: String,
 
+    //@Basic(fetch = FetchType.LAZY)
     @Column(nullable = false, columnDefinition = "TEXT")
     var content: String,
 

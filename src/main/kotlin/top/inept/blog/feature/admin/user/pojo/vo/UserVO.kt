@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 data class UserVO(
     @Schema(description = "openapi.user.id")
-    val id: Long = 0,
+    val id: Long,
 
     @Schema(description = "openapi.user.username")
     val username: String,

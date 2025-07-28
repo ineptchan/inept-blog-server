@@ -3,7 +3,9 @@ package top.inept.blog.feature.admin.article.service.impl
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
+import top.inept.blog.feature.admin.article.pojo.dto.ArticleTitleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleStatusDTO
@@ -29,7 +31,7 @@ class ArticleServiceImpl(
         val articles = articleRepository.findByIdOrNull(id)
 
         //判断文章是否存在
-        if (articles == null) throw Exception(messages["message.articles.articles_not_found"])
+        if (articles == null) throw NotFoundException(messages["message.articles.articles_not_found"])
 
         return articles
     }
@@ -64,7 +66,7 @@ class ArticleServiceImpl(
         val dbArticle = articleRepository.findByIdOrNull(updateArticleDTO.id)
 
         //判断文章是否存在
-        if (dbArticle == null) throw Exception(messages["message.articles.articles_not_found"])
+        if (dbArticle == null) throw NotFoundException(messages["message.articles.articles_not_found"])
 
         //判断文章slug是否重复
         if (updateArticleDTO.slug != dbArticle.slug && articleRepository.existsBySlug(updateArticleDTO.slug))
@@ -94,7 +96,7 @@ class ArticleServiceImpl(
 
     override fun deleteArticle(id: Long) {
         //根据id判断文章是否存在
-        if (articleRepository.existsById(id)) throw Exception(messages["message.articles.articles_not_found"])
+        existsArticleById(id)
 
         //删除文章
         articleRepository.deleteById(id)
@@ -105,10 +107,29 @@ class ArticleServiceImpl(
         val dbArticle = articleRepository.findByIdOrNull(updateArticleStatusDTO.id)
 
         //判断文章是否存在
-        if (dbArticle == null) throw Exception(messages["message.articles.articles_not_found"])
+        if (dbArticle == null) throw NotFoundException(messages["message.articles.articles_not_found"])
 
         dbArticle.articleStatus = updateArticleStatusDTO.articleStatus
 
         return articleRepository.save(dbArticle)
+    }
+
+    override fun getArticleTitleById(articleIds: List<Long>): List<ArticleTitleDTO> {
+        return articleRepository.findTitleAllById(articleIds)
+    }
+
+    override fun getArticleTitleById(articleId: Long): ArticleTitleDTO {
+        //按id查找文章
+        val articleTitleDTO = articleRepository.findTitleByIdOrNull(articleId)
+
+        //未找到文章
+        if (articleTitleDTO == null) throw NotFoundException(messages["message.articles.articles_not_found"])
+
+        return  articleTitleDTO
+    }
+
+    override fun existsArticleById(id: Long): Boolean {
+        if (articleRepository.existsById(id)) throw NotFoundException(messages["message.articles.articles_not_found"])
+        return true
     }
 }

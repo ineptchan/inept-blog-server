@@ -1,5 +1,6 @@
 package top.inept.blog.feature.admin.article.service
 
+import top.inept.blog.feature.admin.article.pojo.dto.ArticleTitleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.admin.article.pojo.dto.UpdateArticleStatusDTO
@@ -12,4 +13,7 @@ interface ArticleService {
     fun updateArticle(updateArticleDTO: UpdateArticleDTO): Article
     fun deleteArticle(id: Long)
     fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Article
+    fun getArticleTitleById(articleIds: List<Long>): List<ArticleTitleDTO>
+    fun getArticleTitleById(articleId: Long): ArticleTitleDTO
+    fun existsArticleById(id: Long): Boolean
 }

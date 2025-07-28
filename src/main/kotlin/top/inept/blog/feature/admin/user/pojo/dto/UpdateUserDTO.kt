@@ -10,7 +10,7 @@ import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserPassword
 data class UpdateUserDTO(
     @Schema(description = "openapi.user.id")
     @field:PositiveOrZero(message = "valid.common.id")
-    val id: Long = 0,
+    val id: Long,
 
     @Schema(description = "openapi.user.username")
     @field:ValidateUserUsername

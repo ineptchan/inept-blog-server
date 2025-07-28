@@ -31,6 +31,13 @@ class Comment(
     @JoinColumn(name = "parent_comment_id")
     var parentComment: Comment? = null,
 
+    @OneToMany(
+        mappedBy = "parentComment",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
+    var replies: MutableList<Comment> = mutableListOf(),
+
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
     @Column(updatable = false, nullable = false)
