@@ -1,6 +1,6 @@
 package top.inept.blog.feature.article.pojo.convert
 
-import top.inept.blog.feature.article.pojo.dto.ArticleTitleDTO
+import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.pojo.entity.Article
 import top.inept.blog.feature.article.pojo.vo.ArticleTitleVO
 import top.inept.blog.feature.article.pojo.vo.ArticleVO

@@ -2,19 +2,21 @@ package top.inept.blog.feature.article.service.impl
 
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
-import top.inept.blog.feature.article.pojo.dto.ArticleTitleDTO
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.pojo.entity.Article
 import top.inept.blog.feature.article.repository.ArticleRepository
+import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.categories.service.CategoriesService
 import top.inept.blog.feature.tag.service.TagService
 import top.inept.blog.feature.user.service.UserService
+import top.inept.blog.utils.SecurityUtil
 
 @Service
 class ArticleServiceImpl(
@@ -40,8 +42,12 @@ class ArticleServiceImpl(
         //判断文章slug是否重复
         if (articleRepository.existsBySlug(createArticleDTO.slug)) throw Exception(messages["message.articles.duplicate_slug"])
 
-        //根据id查找用户
-        val user = userService.getUserById(createArticleDTO.authorId)
+        //从上下文获取用户名
+        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
+            ?: throw Exception("message.common.unknown_user")
+
+        //根据用户名获取用户
+        val user = userService.getUserByUsername(username)
 
         //根据id查找分类
         val categories = categoriesService.getCategoriesById(createArticleDTO.categoryId)
@@ -72,8 +78,12 @@ class ArticleServiceImpl(
         if (updateArticleDTO.slug != dbArticle.slug && articleRepository.existsBySlug(updateArticleDTO.slug))
             throw Exception(messages["message.articles.duplicate_slug"])
 
-        //根据id查找用户
-        val user = userService.getUserById(updateArticleDTO.authorId)
+        //从上下文获取用户名
+        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
+            ?: throw Exception("message.common.unknown_user")
+
+        //根据用户名获取用户
+        val user = userService.getUserByUsername(username)
 
         //根据id查找分类
         val categories = categoriesService.getCategoriesById(updateArticleDTO.categoryId)
@@ -125,7 +135,7 @@ class ArticleServiceImpl(
         //未找到文章
         if (articleTitleDTO == null) throw NotFoundException(messages["message.articles.articles_not_found"])
 
-        return  articleTitleDTO
+        return articleTitleDTO
     }
 
     override fun existsArticleById(id: Long): Boolean {

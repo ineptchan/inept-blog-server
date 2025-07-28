@@ -19,10 +19,6 @@ data class CreateArticleDTO(
     @field:ValidatedArticleContent
     val content: String,
 
-    @Schema(description = "openapi.article.author")
-    @field:PositiveOrZero(message = "valid.article.author_cannot_be_empty")
-    val authorId: Long,
-
     @Schema(description = "openapi.article.category")
     @field:PositiveOrZero(message = "valid.article.category_cannot_be_empty")
     val categoryId: Long,

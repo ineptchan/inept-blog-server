@@ -1,6 +1,6 @@
 package top.inept.blog.feature.article.service
 
-import top.inept.blog.feature.article.pojo.dto.ArticleTitleDTO
+import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
