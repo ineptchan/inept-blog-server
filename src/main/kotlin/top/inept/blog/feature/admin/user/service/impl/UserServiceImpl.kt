@@ -31,7 +31,7 @@ class UserServiceImpl(
 
     override fun getUserById(id: Long): User {
         //根据id查找用户
-        return userRepository.findByIdOrNull(id)?: throw NotFoundException("message.user.user_not_found")
+        return userRepository.findByIdOrNull(id) ?: throw NotFoundException("message.user.user_not_found")
     }
 
     override fun getUserByUsername(username: String): User {
@@ -42,6 +42,9 @@ class UserServiceImpl(
     override fun createUser(createUserDTO: CreateUserDTO): User {
         //判断有没有重复用户名
         if (userRepository.existsByUsername(createUserDTO.username)) throw Exception(messages["message.user.duplicate_username"])
+
+        //判断有没有重复昵称
+        if (userRepository.existsByNickname(createUserDTO.nickname)) throw Exception(messages["message.user.duplicate_nickname"])
 
         //判断邮箱是否存在
         createUserDTO.email?.let { email ->
@@ -59,6 +62,10 @@ class UserServiceImpl(
         //判断用户名是否重复
         if (updateUserDTO.username != dbUser.username && userRepository.existsByUsername(updateUserDTO.username))
             throw Exception(messages["message.user.duplicate_username"])
+
+        //判断有没有重复昵称
+        if (updateUserDTO.nickname != dbUser.nickname && userRepository.existsByNickname(updateUserDTO.nickname))
+            throw Exception(messages["message.user.duplicate_nickname"])
 
         //判断邮箱是否重复
         updateUserDTO.email?.let { email ->

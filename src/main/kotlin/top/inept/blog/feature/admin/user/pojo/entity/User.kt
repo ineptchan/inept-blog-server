@@ -12,6 +12,7 @@ import java.time.LocalDateTime
  * 用户表
  *
  * @property id
+ * @property nickname   昵称
  * @property username   用户名
  * @property email      邮箱
  * @property password   密码 BCrypt
@@ -27,6 +28,9 @@ class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
+
+    @Column(length = 16, unique = true, nullable = false)
+    var nickname: String,
 
     @Column(length = 16, unique = true, nullable = false)
     var username: String,

@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 @Constraint(validatedBy = [])
 @Pattern(
     regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>,.?/]{6,20}$",
-    message = "valid.user.password_pattern"
+    message = "valid.user.password"
 )
 annotation class ValidatedUserPassword(
     val message: String = "valid.common.unknown_error",

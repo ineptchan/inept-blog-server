@@ -9,18 +9,20 @@ import top.inept.blog.utils.PasswordUtil
 
 fun User.toUserVO() = UserVO(
     id = this.id,
+    nickname = this.nickname,
     username = this.username,
     email = this.email,
 )
 
 fun User.toUserPublicVO() = UserPublicVO(
     id = this.id,
-    username = this.username,
+    nickname = this.nickname,
 )
 
 fun UpdateUserDTO.toUser(): User {
     return User(
         id = this.id,
+        nickname = this.nickname,
         username = this.username,
         password = PasswordUtil.encode(this.password),
         email = this.email,
@@ -30,6 +32,7 @@ fun UpdateUserDTO.toUser(): User {
 
 fun CreateUserDTO.toUser(): User {
     return User(
+        nickname = this.nickname,
         username = this.username,
         password = PasswordUtil.encode(this.password),
         email = this.email,

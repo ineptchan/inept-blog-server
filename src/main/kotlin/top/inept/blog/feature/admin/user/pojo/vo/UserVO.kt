@@ -6,6 +6,9 @@ data class UserVO(
     @Schema(description = "openapi.user.id")
     val id: Long,
 
+    @Schema(description = "openapi.user.nickname")
+    val nickname: String,
+
     @Schema(description = "openapi.user.username")
     val username: String,
 

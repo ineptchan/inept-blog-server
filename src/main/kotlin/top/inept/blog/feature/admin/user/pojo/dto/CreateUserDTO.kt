@@ -2,11 +2,16 @@ package top.inept.blog.feature.admin.user.pojo.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import top.inept.blog.feature.admin.user.pojo.entity.enums.UserRole
+import top.inept.blog.feature.admin.user.pojo.validated.ValidateUserNickname
 import top.inept.blog.feature.admin.user.pojo.validated.ValidateUserUsername
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserEmail
 import top.inept.blog.feature.admin.user.pojo.validated.ValidatedUserPassword
 
 data class CreateUserDTO(
+    @Schema(description = "openapi.user.nickname")
+    @field:ValidateUserNickname
+    val nickname: String,
+
     @Schema(description = "openapi.user.username")
     @field:ValidateUserUsername
     val username: String,
