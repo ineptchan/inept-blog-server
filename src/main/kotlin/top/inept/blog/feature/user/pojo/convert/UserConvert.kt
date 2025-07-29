@@ -1,7 +1,6 @@
 package top.inept.blog.feature.user.pojo.convert
 
 import top.inept.blog.feature.user.pojo.dto.CreateUserDTO
-import top.inept.blog.feature.user.pojo.dto.UpdateUserDTO
 import top.inept.blog.feature.user.pojo.entity.User
 import top.inept.blog.feature.user.pojo.vo.UserPublicVO
 import top.inept.blog.feature.user.pojo.vo.UserVO
@@ -17,15 +16,6 @@ fun User.toUserVO() = UserVO(
 fun User.toUserPublicVO() = UserPublicVO(
     id = this.id,
     nickname = this.nickname,
-)
-
-fun UpdateUserDTO.toUser() = User(
-    id = this.id,
-    nickname = this.nickname,
-    username = this.username,
-    password = PasswordUtil.encode(this.password),
-    email = this.email,
-    role = this.role,
 )
 
 fun CreateUserDTO.toUser() = User(

@@ -44,7 +44,7 @@ class ArticleServiceImpl(
 
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw Exception("message.common.unknown_user")
+            ?: throw Exception("message.common.missing_user_context")
 
         //根据用户名获取用户
         val user = userService.getUserByUsername(username)
@@ -80,7 +80,7 @@ class ArticleServiceImpl(
 
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw Exception("message.common.unknown_user")
+            ?: throw Exception("message.common.missing_user_context")
 
         //根据用户名获取用户
         val user = userService.getUserByUsername(username)
