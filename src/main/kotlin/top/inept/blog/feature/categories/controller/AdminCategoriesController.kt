@@ -13,10 +13,10 @@ import top.inept.blog.feature.categories.pojo.vo.CategoriesVO
 import top.inept.blog.feature.categories.service.CategoriesService
 
 @Tag(name = "管理员分类接口")
-@RestController("adminCategoriesController")
+@RestController
 @RequestMapping("/admin/categories")
 @Validated
-class CategoriesController(
+class AdminCategoriesController(
     private val categoriesService: CategoriesService
 ) {
     @Operation(summary = "获取分类列表")
