@@ -67,6 +67,7 @@ class ArticleServiceImpl(
         )
     }
 
+    //TODO 考虑是否要更新author
     override fun updateArticle(updateArticleDTO: UpdateArticleDTO): Article {
         //根据id查找文章
         val dbArticle = articleRepository.findByIdOrNull(updateArticleDTO.id)
