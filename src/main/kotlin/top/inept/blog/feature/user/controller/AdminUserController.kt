@@ -22,8 +22,7 @@ class AdminUserController(
     @Operation(summary = "获取用户列表")
     @GetMapping
     fun getUsers(): ApiResponse<List<UserVO>> {
-        val users = userService.getUsers().map { it.toUserVO() }
-        return ApiResponse.success(users)
+        return ApiResponse.success(userService.getUsers().map { it.toUserVO() })
     }
 
     @Operation(summary = "根据id获取用户")
@@ -35,8 +34,7 @@ class AdminUserController(
     @Operation(summary = "创建用户")
     @PostMapping
     fun createUser(@Valid @RequestBody createUserDTO: CreateUserDTO): ApiResponse<UserVO> {
-        val user = userService.createUser(createUserDTO)
-        return ApiResponse.success(user.toUserVO())
+        return ApiResponse.success(userService.createUser(createUserDTO).toUserVO())
     }
 
     @Operation(summary = "更新用户")
