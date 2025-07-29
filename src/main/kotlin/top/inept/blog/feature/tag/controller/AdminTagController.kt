@@ -13,10 +13,10 @@ import top.inept.blog.feature.tag.pojo.vo.TagVO
 import top.inept.blog.feature.tag.service.TagService
 
 @Tag(name = "管理员标签接口")
-@RestController("adminTagController")
+@RestController
 @RequestMapping("/admin/tag")
 @Validated
-class TagController(
+class AdminTagController(
     private val tagService: TagService,
 ) {
     @Operation(summary = "获取标签列表")
