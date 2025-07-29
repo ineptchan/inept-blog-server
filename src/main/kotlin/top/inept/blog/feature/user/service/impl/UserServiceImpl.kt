@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
@@ -93,8 +92,7 @@ class UserServiceImpl(
         if (dbUser == null) throw NotFoundException(messages["message.user.user_not_found"])
 
         //校验密码
-        val bCryptPasswordEncoder = BCryptPasswordEncoder()
-        if (!bCryptPasswordEncoder.matches(userLoginDTO.password, dbUser.password))
+        if (!PasswordUtil.matches(userLoginDTO.password, dbUser.password))
             throw Exception(messages["message.user.username_or_password_error"])
 
         //生成token
