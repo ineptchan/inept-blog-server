@@ -6,10 +6,12 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
+import top.inept.blog.feature.article.pojo.convert.toArticleSummaryVO
 import top.inept.blog.feature.article.pojo.convert.toArticleVO
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
+import top.inept.blog.feature.article.pojo.vo.ArticleSummaryVO
 import top.inept.blog.feature.article.pojo.vo.ArticleVO
 import top.inept.blog.feature.article.service.ArticleService
 
@@ -22,8 +24,8 @@ class ArticleController(
 ) {
     @Operation(summary = "获取文章列表")
     @GetMapping
-    fun getArticles(): ApiResponse<List<ArticleVO>> {
-        return ApiResponse.success(articleService.getArticles().map { it.toArticleVO() })
+    fun getArticles(): ApiResponse<List<ArticleSummaryVO>> {
+        return ApiResponse.success(articleService.getArticles().map { it.toArticleSummaryVO() })
     }
 
     @Operation(summary = "根据id获取文章")

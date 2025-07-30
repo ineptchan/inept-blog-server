@@ -5,6 +5,7 @@ import top.inept.blog.feature.comment.pojo.entity.Comment
 import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
 import top.inept.blog.feature.comment.pojo.vo.CommentSummaryVO
 import top.inept.blog.feature.comment.pojo.vo.CommentVO
+import top.inept.blog.feature.comment.pojo.vo.TopCommentVO
 import top.inept.blog.feature.user.pojo.convert.toUserPublicVO
 
 fun Comment.toCommentVO(articleTitleVO: ArticleTitleVO) = CommentVO(
@@ -26,5 +27,13 @@ fun Comment.toCommentReplyVO() = CommentReplyVO(
     id = this.id,
     content = this.content,
     user = this.user.toUserPublicVO(),
+    createdAt = this.createdAt,
+)
+
+fun Comment.toTopCommentVO(replyTotal: Long) = TopCommentVO(
+    id = this.id,
+    content = this.content,
+    user = this.user.toUserPublicVO(),
+    replyTotal = replyTotal,
     createdAt = this.createdAt,
 )

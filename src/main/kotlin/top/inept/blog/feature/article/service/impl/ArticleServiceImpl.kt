@@ -140,7 +140,7 @@ class ArticleServiceImpl(
     }
 
     override fun existsArticleById(id: Long): Boolean {
-        if (articleRepository.existsById(id)) throw NotFoundException(messages["message.articles.articles_not_found"])
+        if (!articleRepository.existsById(id)) throw NotFoundException(messages["message.articles.articles_not_found"])
         return true
     }
 }

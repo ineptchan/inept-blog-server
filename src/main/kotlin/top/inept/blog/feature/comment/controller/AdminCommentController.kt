@@ -14,10 +14,10 @@ import top.inept.blog.feature.comment.pojo.vo.CommentVO
 import top.inept.blog.feature.comment.service.CommentService
 
 @Tag(name = "管理员评论接口")
-@RestController("adminCommentController")
+@RestController
 @RequestMapping("/admin/comment")
 @Validated
-class CommentController(
+class AdminCommentController(
     private val commentService: CommentService
 ) {
     @Operation(summary = "获取评论列表")
