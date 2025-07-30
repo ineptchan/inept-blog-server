@@ -13,6 +13,6 @@ interface CommentService {
     fun createComment(createCommentDTO: CreateCommentDTO): CommentVO
     fun updateComment(updateCommentDTO: UpdateCommentDTO): CommentSummaryVO
     fun deleteComment(id: Long)
-    fun getCommentReplies(id: Long): List<CommentReplyVO>
+    fun getCommentReplies(articleId: Long): List<CommentReplyVO>
     fun getTopComments(articleId: Long): List<TopCommentVO>
 }

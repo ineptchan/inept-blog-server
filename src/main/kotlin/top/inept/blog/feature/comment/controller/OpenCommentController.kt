@@ -37,8 +37,8 @@ class OpenCommentController(
     }
 
     @Operation(summary = "获得评论回复列表")
-    @GetMapping("/{id}/replies")
-    fun getCommentReplies(@PathVariable id: Long): ApiResponse<List<CommentReplyVO>> {
-        return ApiResponse.success(commentService.getCommentReplies(id))
+    @GetMapping("/{articleId}/replies")
+    fun getCommentReplies(@PathVariable articleId: Long): ApiResponse<List<CommentReplyVO>> {
+        return ApiResponse.success(commentService.getCommentReplies(articleId))
     }
 }

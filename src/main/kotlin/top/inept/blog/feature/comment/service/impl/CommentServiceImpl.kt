@@ -127,9 +127,9 @@ class CommentServiceImpl(
         commentRepository.deleteById(id)
     }
 
-    override fun getCommentReplies(id: Long): List<CommentReplyVO> {
+    override fun getCommentReplies(articleId: Long): List<CommentReplyVO> {
         //根据id查找评论
-        val comment = commentRepository.findByIdOrNull(id)
+        val comment = commentRepository.findByIdOrNull(articleId)
 
         //判断评论是否存在
         if (comment == null) throw NotFoundException(messages["message.comment.comment_not_found"])
