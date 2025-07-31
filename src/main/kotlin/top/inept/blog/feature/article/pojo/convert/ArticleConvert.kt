@@ -4,6 +4,7 @@ import top.inept.blog.feature.article.pojo.entity.Article
 import top.inept.blog.feature.article.pojo.vo.ArticleSummaryVO
 import top.inept.blog.feature.article.pojo.vo.ArticleTitleVO
 import top.inept.blog.feature.article.pojo.vo.ArticleVO
+import top.inept.blog.feature.article.pojo.vo.HomeArticleVO
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.categories.pojo.convert.toCategoriesVO
 import top.inept.blog.feature.tag.pojo.convert.toTagVO
@@ -38,4 +39,14 @@ fun ArticleTitleDTO.toArticleTitleVO() = ArticleTitleVO(
 fun Article.toArticleTitleVO() = ArticleTitleVO(
     id = this.id,
     title = this.title,
+)
+
+fun Article.toHomeArticleVO() = HomeArticleVO(
+    id = this.id,
+    title = this.title,
+    slug = this.slug,
+    homeContent = this.content.take(100),
+    author = this.author.toUserPublicVO(),
+    category = this.category.toCategoriesVO(),
+    tags = this.tags.map { it.toTagVO() },
 )

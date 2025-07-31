@@ -1,16 +1,24 @@
 package top.inept.blog.feature.article.service.impl
 
 import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
+import top.inept.blog.extensions.toPageResponse
+import top.inept.blog.feature.article.pojo.convert.toHomeArticleVO
+import top.inept.blog.feature.article.pojo.dto.ArticleQueryDTO
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.pojo.entity.Article
+import top.inept.blog.feature.article.pojo.vo.HomeArticleVO
 import top.inept.blog.feature.article.repository.ArticleRepository
+import top.inept.blog.feature.article.repository.ArticleSpecs
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.categories.service.CategoriesService
@@ -142,5 +150,18 @@ class ArticleServiceImpl(
     override fun existsArticleById(id: Long): Boolean {
         if (!articleRepository.existsById(id)) throw NotFoundException(messages["message.articles.articles_not_found"])
         return true
+    }
+
+    override fun getHomeArticles(articleQueryDTO: ArticleQueryDTO): Page<Article> {
+        val pageRequest = PageRequest.of(articleQueryDTO.page - 1, articleQueryDTO.size)
+
+        val specs = QueryBuilder<Article>()
+            .and(ArticleSpecs.hasCategory(articleQueryDTO.category))
+            .and(ArticleSpecs.hasTags(articleQueryDTO.tagIds))
+            .and(ArticleSpecs.titleOrContentContains(articleQueryDTO.title, articleQueryDTO.content))
+            .and(ArticleSpecs.hasArticleStatus(articleQueryDTO.articleStatus))
+            .buildSpec()
+
+        return articleRepository.findAll(specs, pageRequest)
     }
 }

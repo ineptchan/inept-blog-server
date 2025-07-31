@@ -45,6 +45,7 @@ class Article(
     )
     var tags: MutableSet<Tag> = mutableSetOf(),
 
+    //TODO EnumType.STRING
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     var articleStatus: ArticleStatus = ArticleStatus.Draft,

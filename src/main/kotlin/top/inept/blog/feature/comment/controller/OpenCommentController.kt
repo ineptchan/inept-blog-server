@@ -30,6 +30,7 @@ class OpenCommentController(
         return ApiResponse.success(commentService.getTopComments(articleId))
     }
 
+    //TODO 登录用户
     @Operation(summary = "创建评论")
     @PostMapping
     fun createComment(@Valid @RequestBody createCommentDTO: CreateCommentDTO): ApiResponse<CommentVO> {

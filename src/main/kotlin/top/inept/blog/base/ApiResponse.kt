@@ -1,11 +1,17 @@
 package top.inept.blog.base
 
+import io.swagger.v3.oas.annotations.media.Schema
 import java.io.Serializable
 
 data class ApiResponse<T>(
-    var code: Int = 0,      // 编码：0 成功，1 和其它数字为失败
-    var msg: String? = null, // 错误信息
-    var data: T? = null     // 数据
+    @Schema(description = "openapi.response.code")
+    val code: Int = 0,
+
+    @Schema(description = "openapi.response.msg")
+    val msg: String? = null,
+
+    @Schema(description = "openapi.response.data")
+    val data: T? = null
 ) : Serializable {
 
     companion object {
