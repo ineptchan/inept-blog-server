@@ -9,14 +9,11 @@ import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
-import top.inept.blog.extensions.toPageResponse
-import top.inept.blog.feature.article.pojo.convert.toHomeArticleVO
 import top.inept.blog.feature.article.pojo.dto.ArticleQueryDTO
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.pojo.entity.Article
-import top.inept.blog.feature.article.pojo.vo.HomeArticleVO
 import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.article.repository.ArticleSpecs
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
@@ -121,16 +118,9 @@ class ArticleServiceImpl(
         articleRepository.deleteById(id)
     }
 
-    override fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Article {
-        //根据id查找文章
-        val dbArticle = articleRepository.findByIdOrNull(updateArticleStatusDTO.id)
-
-        //判断文章是否存在
-        if (dbArticle == null) throw NotFoundException(messages["message.articles.articles_not_found"])
-
-        dbArticle.articleStatus = updateArticleStatusDTO.articleStatus
-
-        return articleRepository.save(dbArticle)
+    override fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO) {
+        //批量更新文章状态
+        articleRepository.updateStatusByIds(updateArticleStatusDTO.articleStatus, updateArticleStatusDTO.articleIds)
     }
 
     override fun getArticleTitleById(articleIds: List<Long>): List<ArticleTitleDTO> {

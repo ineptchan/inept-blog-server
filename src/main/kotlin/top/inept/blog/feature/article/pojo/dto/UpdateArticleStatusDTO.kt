@@ -6,8 +6,7 @@ import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
 
 data class UpdateArticleStatusDTO(
     @Schema(description = "openapi.article.id")
-    @field:PositiveOrZero(message = "valid.common.id")
-    val id: Long,
+    val articleIds: List<Long>,
 
     @Schema(description = "openapi.article.article_status")
     val articleStatus: ArticleStatus,

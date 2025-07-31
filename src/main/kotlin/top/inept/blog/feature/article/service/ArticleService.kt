@@ -15,7 +15,7 @@ interface ArticleService {
     fun createArticle(createArticleDTO: CreateArticleDTO): Article
     fun updateArticle(updateArticleDTO: UpdateArticleDTO): Article
     fun deleteArticle(id: Long)
-    fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO): Article
+    fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO)
     fun getArticleTitleById(articleIds: List<Long>): List<ArticleTitleDTO>
     fun getArticleTitleById(articleId: Long): ArticleTitleDTO
     fun existsArticleById(id: Long): Boolean

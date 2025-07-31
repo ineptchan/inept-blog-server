@@ -58,10 +58,10 @@ class AdminArticleController(
         return ApiResponse.success(true)
     }
 
-    //TODO 改为批量
-    @Operation(summary = "更新文章状态")
+    @Operation(summary = "批量更新文章状态")
     @PutMapping("/status")
-    fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ApiResponse<ArticleVO> {
-        return ApiResponse.success(articleService.updateArticleStatus(updateArticleStatusDTO).toArticleVO())
+    fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ApiResponse<Boolean> {
+        articleService.updateArticleStatus(updateArticleStatusDTO)
+        return ApiResponse.success(true)
     }
 }
