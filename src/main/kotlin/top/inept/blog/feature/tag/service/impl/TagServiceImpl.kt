@@ -1,15 +1,20 @@
 package top.inept.blog.feature.tag.service.impl
 
 import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.tag.pojo.convert.toTag
 import top.inept.blog.feature.tag.pojo.dto.CreateTagDTO
+import top.inept.blog.feature.tag.pojo.dto.TagQueryDTO
 import top.inept.blog.feature.tag.pojo.dto.UpdateTagDTO
 import top.inept.blog.feature.tag.pojo.entity.Tag
 import top.inept.blog.feature.tag.repository.TagRepository
+import top.inept.blog.feature.tag.repository.TagSpecs
 import top.inept.blog.feature.tag.service.TagService
 
 @Service
@@ -17,7 +22,15 @@ class TagServiceImpl(
     private val tagRepository: TagRepository,
     private val messages: MessageSourceAccessor,
 ) : TagService {
-    override fun getTags(): List<Tag> = tagRepository.findAll()
+    override fun getTags(tagQueryDTO: TagQueryDTO): Page<Tag> {
+        val pageRequest = PageRequest.of(tagQueryDTO.page - 1, tagQueryDTO.size)
+
+        val specs = QueryBuilder<Tag>()
+            .and(TagSpecs.nameOrSlugContains(tagQueryDTO.keyword))
+            .buildSpec()
+
+        return tagRepository.findAll(specs, pageRequest)
+    }
 
     override fun getTagById(id: Long): Tag {
         //根据id查找标签

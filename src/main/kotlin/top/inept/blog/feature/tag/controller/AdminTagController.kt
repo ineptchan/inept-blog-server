@@ -6,8 +6,12 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
+import top.inept.blog.base.PageResponse
+import top.inept.blog.extensions.toApiResponse
+import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.tag.pojo.convert.toTagVO
 import top.inept.blog.feature.tag.pojo.dto.CreateTagDTO
+import top.inept.blog.feature.tag.pojo.dto.TagQueryDTO
 import top.inept.blog.feature.tag.pojo.dto.UpdateTagDTO
 import top.inept.blog.feature.tag.pojo.vo.TagVO
 import top.inept.blog.feature.tag.service.TagService
@@ -21,8 +25,11 @@ class AdminTagController(
 ) {
     @Operation(summary = "获取标签列表")
     @GetMapping()
-    fun getTags(): ApiResponse<List<TagVO>> {
-        return ApiResponse.success(tagService.getTags().map { it.toTagVO() })
+    fun getTags(@Valid tagQueryDTO: TagQueryDTO): ApiResponse<PageResponse<TagVO>> {
+        return tagService
+            .getTags(tagQueryDTO)
+            .toPageResponse { it.toTagVO() }
+            .toApiResponse()
     }
 
     @Operation(summary = "根据id获取标签")

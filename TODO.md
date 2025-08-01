@@ -1,5 +1,5 @@
 注意open接口的VO
-创建article时的author改成当前登录的用户
+解决Specs字段问题
 
 ```kotlin
     @Operation(summary = "获取顶级评论列表")
