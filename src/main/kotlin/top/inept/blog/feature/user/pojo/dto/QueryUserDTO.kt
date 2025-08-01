@@ -13,9 +13,6 @@ data class QueryUserDTO (
     @field:Range(min = 1, max = 100, message = "valid.common.query.size")
     val size: Int = 30,
 
-    /**
-     * nickname username email
-     */
-    @Schema(description = "openapi.query.keyword")
+    @Schema(description = "openapi.user.query_keyword")
     val keyword: String?,
 )

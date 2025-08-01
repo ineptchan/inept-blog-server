@@ -20,14 +20,4 @@ object CategoriesSpecs {
             }
         }
     }
-
-    fun nameOrSlugContains(keyword: String?): Specification<Categories>? {
-        val nameSpec = nameContains(keyword)
-        val slugSpec = slugContains(keyword)
-
-        return when {
-            nameSpec != null && slugSpec != null -> nameSpec.or(slugSpec)
-            else -> nameSpec ?: slugSpec
-        }
-    }
 }

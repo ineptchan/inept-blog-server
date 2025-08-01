@@ -16,11 +16,8 @@ data class ArticleQueryDTO(
 
     @Schema(description = "openapi.article.category")
     val category: Long?,
-
-    /**
-     * 标题与内容
-     */
-    @Schema(description = "openapi.query.keyword")
+    
+    @Schema(description = "openapi.article.query_keyword")
     val keyword: String?,
 
     @Schema(description = "openapi.article.tags")

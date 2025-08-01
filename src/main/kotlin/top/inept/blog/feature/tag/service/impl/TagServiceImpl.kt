@@ -26,7 +26,10 @@ class TagServiceImpl(
         val pageRequest = PageRequest.of(tagQueryDTO.page - 1, tagQueryDTO.size)
 
         val specs = QueryBuilder<Tag>()
-            .and(TagSpecs.nameOrSlugContains(tagQueryDTO.keyword))
+            .or(
+                TagSpecs.nameContains(tagQueryDTO.keyword),
+                TagSpecs.slugContains(tagQueryDTO.keyword)
+            )
             .buildSpec()
 
         return tagRepository.findAll(specs, pageRequest)

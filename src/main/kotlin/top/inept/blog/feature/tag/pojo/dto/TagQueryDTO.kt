@@ -13,6 +13,6 @@ data class TagQueryDTO(
     @field:Range(min = 1, max = 100, message = "valid.common.query.size")
     val size: Int = 30,
 
-    @Schema(description = "openapi.query.keyword")
+    @Schema(description = "openapi.tag.query_keyword")
     val keyword: String?,
 )

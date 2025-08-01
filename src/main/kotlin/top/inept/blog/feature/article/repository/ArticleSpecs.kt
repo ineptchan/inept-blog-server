@@ -52,13 +52,11 @@ object ArticleSpecs {
         }
     }
 
-    fun titleOrContentContains(keyword: String?): Specification<Article>? {
-        val titleSpec = titleContains(keyword)
-        val contentSpec = contentContains(keyword)
-
-        return when {
-            titleSpec != null && contentSpec != null -> titleSpec.or(contentSpec)
-            else -> titleSpec ?: contentSpec
+    fun slugContains(keyword: String?): Specification<Article>? {
+        return keyword?.takeIf { it.isNotBlank() }?.let {
+            Specification { root, _, cb ->
+                cb.like(cb.lower(root.get(Article_.slug)), "%${it.lowercase()}%")
+            }
         }
     }
 }

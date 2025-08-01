@@ -26,7 +26,10 @@ class CategoriesServiceImpl(
         val pageRequest = PageRequest.of(categoriesQueryDTO.page - 1, categoriesQueryDTO.size)
 
         val specs = QueryBuilder<Categories>()
-            .and(CategoriesSpecs.nameOrSlugContains(categoriesQueryDTO.keyword))
+            .or(
+                CategoriesSpecs.nameContains(categoriesQueryDTO.keyword),
+                CategoriesSpecs.slugContains(categoriesQueryDTO.keyword),
+            )
             .buildSpec()
 
         return categoriesRepository.findAll(specs, pageRequest)
