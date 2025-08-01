@@ -2,15 +2,18 @@ package top.inept.blog.feature.article.repository
 
 import org.springframework.data.jpa.domain.Specification
 import top.inept.blog.feature.article.pojo.entity.Article
+import top.inept.blog.feature.article.pojo.entity.Article_
 import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.pojo.entity.Categories
+import top.inept.blog.feature.categories.pojo.entity.Categories_
 import top.inept.blog.feature.tag.pojo.entity.Tag
+import top.inept.blog.feature.tag.pojo.entity.Tag_
 
 object ArticleSpecs {
     fun hasCategory(category: Long?): Specification<Article>? {
         return category?.let {
             Specification<Article> { root, _, cb ->
-                cb.equal(root.get<Categories>("category").get<Long>("id"), it)
+                cb.equal(root.get<Categories>(Article_.category).get<Long>(Categories_.id), it)
             }
         }
     }
@@ -19,8 +22,8 @@ object ArticleSpecs {
         return tags.takeIf { it != null && it.isNotEmpty() }?.let {
             Specification { root, query, cb ->
                 query?.distinct(true)
-                val tagsJoin = root.join<Article, Tag>("tags")
-                tagsJoin.get<Long>("id").`in`(it)
+                val tagsJoin = root.join<Article, Tag>("${Article_.tags}")
+                tagsJoin.get<Long>(Tag_.id).`in`(it)
             }
         }
     }
@@ -28,7 +31,7 @@ object ArticleSpecs {
     fun hasArticleStatus(articleStatus: ArticleStatus?): Specification<Article>? {
         return articleStatus?.let {
             Specification { root, _, cb ->
-                cb.equal(root.get<ArticleStatus>("articleStatus"), articleStatus)
+                cb.equal(root.get<ArticleStatus>(Article_.articleStatus), articleStatus)
             }
         }
     }
@@ -36,7 +39,7 @@ object ArticleSpecs {
     fun titleContains(keyword: String?): Specification<Article>? {
         return keyword?.takeIf { it.isNotBlank() }?.let {
             Specification { root, _, cb ->
-                cb.like(cb.lower(root.get("title")), "%${it.lowercase()}%")
+                cb.like(cb.lower(root.get(Article_.title)), "%${it.lowercase()}%")
             }
         }
     }
@@ -44,7 +47,7 @@ object ArticleSpecs {
     fun contentContains(keyword: String?): Specification<Article>? {
         return keyword?.takeIf { it.isNotBlank() }?.let {
             Specification { root, _, cb ->
-                cb.like(cb.lower(root.get("content")), "%${it.lowercase()}%")
+                cb.like(cb.lower(root.get(Article_.content)), "%${it.lowercase()}%")
             }
         }
     }

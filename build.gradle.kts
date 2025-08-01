@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
+    id("org.jetbrains.kotlin.kapt") version "1.9.25"
 }
 
 group = "top.inept"
@@ -35,6 +36,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt:0.12.6")
     implementation("commons-io:commons-io:2.16.1")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
+    kapt("org.hibernate.orm:hibernate-jpamodelgen:6.4.4.Final")
 }
 
 kotlin {

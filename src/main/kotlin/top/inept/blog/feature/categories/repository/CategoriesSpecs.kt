@@ -2,12 +2,13 @@ package top.inept.blog.feature.categories.repository
 
 import org.springframework.data.jpa.domain.Specification
 import top.inept.blog.feature.categories.pojo.entity.Categories
+import top.inept.blog.feature.categories.pojo.entity.Categories_
 
 object CategoriesSpecs {
     fun nameContains(keyword: String?): Specification<Categories>? {
         return keyword?.takeIf { it.isNotBlank() }?.let {
             Specification { root, _, cb ->
-                cb.like(cb.lower(root.get("name")), "%${it.lowercase()}%")
+                cb.like(cb.lower(root.get(Categories_.name)), "%${it.lowercase()}%")
             }
         }
     }
@@ -15,7 +16,7 @@ object CategoriesSpecs {
     fun slugContains(keyword: String?): Specification<Categories>? {
         return keyword?.takeIf { it.isNotBlank() }?.let {
             Specification { root, _, cb ->
-                cb.like(cb.lower(root.get("slug")), "%${it.lowercase()}%")
+                cb.like(cb.lower(root.get(Categories_.slug)), "%${it.lowercase()}%")
             }
         }
     }
