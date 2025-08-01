@@ -49,9 +49,9 @@ object ArticleSpecs {
         }
     }
 
-    fun titleOrContentContains(titleKeyword: String?, contentKeyword: String?): Specification<Article>? {
-        val titleSpec = titleContains(titleKeyword)
-        val contentSpec = contentContains(contentKeyword)
+    fun titleOrContentContains(keyword: String?): Specification<Article>? {
+        val titleSpec = titleContains(keyword)
+        val contentSpec = contentContains(keyword)
 
         return when {
             titleSpec != null && contentSpec != null -> titleSpec.or(contentSpec)

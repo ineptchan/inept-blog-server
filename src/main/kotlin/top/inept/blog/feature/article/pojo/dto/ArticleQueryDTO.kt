@@ -17,11 +17,11 @@ data class ArticleQueryDTO(
     @Schema(description = "openapi.article.category")
     val category: Long?,
 
-    @Schema(description = "openapi.article.title")
-    val title: String?,
-
-    @Schema(description = "openapi.article.content")
-    val content: String?,
+    /**
+     * 标题与内容
+     */
+    @Schema(description = "openapi.query.keyword")
+    val keyword: String?,
 
     @Schema(description = "openapi.article.tags")
     val tagIds: List<Long>?,

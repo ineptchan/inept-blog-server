@@ -150,7 +150,7 @@ class ArticleServiceImpl(
         val specs = QueryBuilder<Article>()
             .and(ArticleSpecs.hasCategory(articleQueryDTO.category))
             .and(ArticleSpecs.hasTags(articleQueryDTO.tagIds))
-            .and(ArticleSpecs.titleOrContentContains(articleQueryDTO.title, articleQueryDTO.content))
+            .and(ArticleSpecs.titleOrContentContains(articleQueryDTO.keyword))
             .and(ArticleSpecs.hasArticleStatus(articleQueryDTO.articleStatus))
             .buildSpec()
 
