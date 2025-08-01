@@ -1,5 +1,6 @@
 package top.inept.blog.feature.comment.service
 
+import top.inept.blog.feature.comment.pojo.dto.CreateAnonymousCommentDTO
 import top.inept.blog.feature.comment.pojo.dto.CreateCommentDTO
 import top.inept.blog.feature.comment.pojo.dto.UpdateCommentDTO
 import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
@@ -15,4 +16,5 @@ interface CommentService {
     fun deleteComment(id: Long)
     fun getCommentReplies(articleId: Long): List<CommentReplyVO>
     fun getTopComments(articleId: Long): List<TopCommentVO>
+    fun createAnonymousComment(createAnonymousCommentDTO: CreateAnonymousCommentDTO): CommentVO
 }

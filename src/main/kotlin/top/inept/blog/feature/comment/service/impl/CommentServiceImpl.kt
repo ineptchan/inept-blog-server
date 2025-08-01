@@ -14,6 +14,7 @@ import top.inept.blog.feature.comment.pojo.convert.toCommentReplyVO
 import top.inept.blog.feature.comment.pojo.convert.toCommentSummaryVO
 import top.inept.blog.feature.comment.pojo.convert.toCommentVO
 import top.inept.blog.feature.comment.pojo.convert.toTopCommentVO
+import top.inept.blog.feature.comment.pojo.dto.CreateAnonymousCommentDTO
 import top.inept.blog.feature.comment.pojo.dto.CreateCommentDTO
 import top.inept.blog.feature.comment.pojo.dto.UpdateCommentDTO
 import top.inept.blog.feature.comment.pojo.entity.Comment
@@ -152,5 +153,9 @@ class CommentServiceImpl(
             val replyCount = commentRepository.countByParentCommentId(it.id)
             it.toTopCommentVO(replyCount)
         }
+    }
+
+    override fun createAnonymousComment(createAnonymousCommentDTO: CreateAnonymousCommentDTO): CommentVO {
+        TODO("Not yet implemented")
     }
 }
