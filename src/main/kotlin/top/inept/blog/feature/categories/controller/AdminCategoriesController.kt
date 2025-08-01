@@ -6,9 +6,13 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
+import top.inept.blog.base.PageResponse
+import top.inept.blog.extensions.toApiResponse
+import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.categories.pojo.convert.toCategoriesVO
-import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
+import top.inept.blog.feature.categories.pojo.dto.CategoriesQueryDTO
 import top.inept.blog.feature.categories.pojo.dto.CreateCategoriesDTO
+import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.pojo.vo.CategoriesVO
 import top.inept.blog.feature.categories.service.CategoriesService
 
@@ -21,8 +25,11 @@ class AdminCategoriesController(
 ) {
     @Operation(summary = "获取分类列表")
     @GetMapping
-    fun getCategories(): ApiResponse<List<CategoriesVO>> {
-        return ApiResponse.success(categoriesService.getCategories().map { it.toCategoriesVO() })
+    fun getCategories(@Valid categoriesQueryDTO: CategoriesQueryDTO): ApiResponse<PageResponse<CategoriesVO>> {
+        return categoriesService
+            .getCategories(categoriesQueryDTO)
+            .toPageResponse { it.toCategoriesVO() }
+            .toApiResponse()
     }
 
     @Operation(summary = "根据id获取分类")

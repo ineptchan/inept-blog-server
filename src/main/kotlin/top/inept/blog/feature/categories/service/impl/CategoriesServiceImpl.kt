@@ -1,15 +1,20 @@
 package top.inept.blog.feature.categories.service.impl
 
 import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.categories.pojo.convert.toCategories
-import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
+import top.inept.blog.feature.categories.pojo.dto.CategoriesQueryDTO
 import top.inept.blog.feature.categories.pojo.dto.CreateCategoriesDTO
+import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.pojo.entity.Categories
 import top.inept.blog.feature.categories.repository.CategoriesRepository
+import top.inept.blog.feature.categories.repository.CategoriesSpecs
 import top.inept.blog.feature.categories.service.CategoriesService
 
 @Service
@@ -17,7 +22,15 @@ class CategoriesServiceImpl(
     private val categoriesRepository: CategoriesRepository,
     private val messages: MessageSourceAccessor,
 ) : CategoriesService {
-    override fun getCategories(): List<Categories> = categoriesRepository.findAll()
+    override fun getCategories(categoriesQueryDTO: CategoriesQueryDTO): Page<Categories> {
+        val pageRequest = PageRequest.of(categoriesQueryDTO.page - 1, categoriesQueryDTO.size)
+
+        val specs = QueryBuilder<Categories>()
+            .and(CategoriesSpecs.nameOrSlugContains(categoriesQueryDTO.keyword))
+            .buildSpec()
+
+        return categoriesRepository.findAll(specs, pageRequest)
+    }
 
     override fun getCategoriesById(id: Long): Categories {
         //根据id查找分类
