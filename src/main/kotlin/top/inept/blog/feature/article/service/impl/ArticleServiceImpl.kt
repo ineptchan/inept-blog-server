@@ -72,7 +72,6 @@ class ArticleServiceImpl(
         )
     }
 
-    //TODO 考虑是否要更新author
     override fun updateArticle(updateArticleDTO: UpdateArticleDTO): Article {
         //根据id查找文章
         val dbArticle = articleRepository.findByIdOrNull(updateArticleDTO.id)
@@ -90,6 +89,9 @@ class ArticleServiceImpl(
 
         //根据用户名获取用户
         val user = userService.getUserByUsername(username)
+
+        //判断所属用户
+        if (dbArticle.author.id != user.id) throw Exception(messages["message.articles.permission_denied"])
 
         //根据id查找分类
         val categories = categoriesService.getCategoriesById(updateArticleDTO.categoryId)
