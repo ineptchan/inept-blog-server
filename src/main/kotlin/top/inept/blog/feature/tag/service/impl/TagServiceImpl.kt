@@ -10,7 +10,7 @@ import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.tag.pojo.convert.toTag
 import top.inept.blog.feature.tag.pojo.dto.CreateTagDTO
-import top.inept.blog.feature.tag.pojo.dto.TagQueryDTO
+import top.inept.blog.feature.tag.pojo.dto.QueryTagDTO
 import top.inept.blog.feature.tag.pojo.dto.UpdateTagDTO
 import top.inept.blog.feature.tag.pojo.entity.Tag
 import top.inept.blog.feature.tag.repository.TagRepository
@@ -22,13 +22,13 @@ class TagServiceImpl(
     private val tagRepository: TagRepository,
     private val messages: MessageSourceAccessor,
 ) : TagService {
-    override fun getTags(tagQueryDTO: TagQueryDTO): Page<Tag> {
-        val pageRequest = PageRequest.of(tagQueryDTO.page - 1, tagQueryDTO.size)
+    override fun getTags(queryTagDTO: QueryTagDTO): Page<Tag> {
+        val pageRequest = PageRequest.of(queryTagDTO.page - 1, queryTagDTO.size)
 
         val specs = QueryBuilder<Tag>()
             .or(
-                TagSpecs.nameContains(tagQueryDTO.keyword),
-                TagSpecs.slugContains(tagQueryDTO.keyword)
+                TagSpecs.nameContains(queryTagDTO.keyword),
+                TagSpecs.slugContains(queryTagDTO.keyword)
             )
             .buildSpec()
 

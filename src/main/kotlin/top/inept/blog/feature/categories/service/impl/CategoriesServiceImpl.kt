@@ -9,7 +9,7 @@ import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.categories.pojo.convert.toCategories
-import top.inept.blog.feature.categories.pojo.dto.CategoriesQueryDTO
+import top.inept.blog.feature.categories.pojo.dto.QueryCategoriesDTO
 import top.inept.blog.feature.categories.pojo.dto.CreateCategoriesDTO
 import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.pojo.entity.Categories
@@ -22,13 +22,13 @@ class CategoriesServiceImpl(
     private val categoriesRepository: CategoriesRepository,
     private val messages: MessageSourceAccessor,
 ) : CategoriesService {
-    override fun getCategories(categoriesQueryDTO: CategoriesQueryDTO): Page<Categories> {
-        val pageRequest = PageRequest.of(categoriesQueryDTO.page - 1, categoriesQueryDTO.size)
+    override fun getCategories(queryCategoriesDTO: QueryCategoriesDTO): Page<Categories> {
+        val pageRequest = PageRequest.of(queryCategoriesDTO.page - 1, queryCategoriesDTO.size)
 
         val specs = QueryBuilder<Categories>()
             .or(
-                CategoriesSpecs.nameContains(categoriesQueryDTO.keyword),
-                CategoriesSpecs.slugContains(categoriesQueryDTO.keyword),
+                CategoriesSpecs.nameContains(queryCategoriesDTO.keyword),
+                CategoriesSpecs.slugContains(queryCategoriesDTO.keyword),
             )
             .buildSpec()
 

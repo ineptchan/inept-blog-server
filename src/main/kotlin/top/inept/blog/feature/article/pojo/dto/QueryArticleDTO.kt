@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Positive
 import org.hibernate.validator.constraints.Range
 import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
 
-data class ArticleQueryDTO(
+data class QueryArticleDTO(
     @Schema(description = "openapi.query.page")
     @field:Positive(message = "valid.common.query.page")
     val page: Int = 1,
@@ -16,7 +16,7 @@ data class ArticleQueryDTO(
 
     @Schema(description = "openapi.article.category")
     val category: Long?,
-    
+
     @Schema(description = "openapi.article.query_keyword")
     val keyword: String?,
 

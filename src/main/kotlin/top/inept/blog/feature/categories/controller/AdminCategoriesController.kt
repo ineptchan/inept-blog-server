@@ -10,7 +10,7 @@ import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.categories.pojo.convert.toCategoriesVO
-import top.inept.blog.feature.categories.pojo.dto.CategoriesQueryDTO
+import top.inept.blog.feature.categories.pojo.dto.QueryCategoriesDTO
 import top.inept.blog.feature.categories.pojo.dto.CreateCategoriesDTO
 import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.pojo.vo.CategoriesVO
@@ -25,9 +25,9 @@ class AdminCategoriesController(
 ) {
     @Operation(summary = "获取分类列表")
     @GetMapping
-    fun getCategories(@Valid categoriesQueryDTO: CategoriesQueryDTO): ApiResponse<PageResponse<CategoriesVO>> {
+    fun getCategories(@Valid queryCategoriesDTO: QueryCategoriesDTO): ApiResponse<PageResponse<CategoriesVO>> {
         return categoriesService
-            .getCategories(categoriesQueryDTO)
+            .getCategories(queryCategoriesDTO)
             .toPageResponse { it.toCategoriesVO() }
             .toApiResponse()
     }

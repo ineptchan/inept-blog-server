@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
-import top.inept.blog.feature.article.pojo.dto.ArticleQueryDTO
+import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
@@ -144,18 +144,18 @@ class ArticleServiceImpl(
         return true
     }
 
-    override fun getHomeArticles(articleQueryDTO: ArticleQueryDTO): Page<Article> {
-        val pageRequest = PageRequest.of(articleQueryDTO.page - 1, articleQueryDTO.size)
+    override fun getHomeArticles(queryArticleDTO: QueryArticleDTO): Page<Article> {
+        val pageRequest = PageRequest.of(queryArticleDTO.page - 1, queryArticleDTO.size)
 
         val specs = QueryBuilder<Article>()
-            .and(ArticleSpecs.hasCategory(articleQueryDTO.category))
-            .and(ArticleSpecs.hasTags(articleQueryDTO.tagIds))
+            .and(ArticleSpecs.hasCategory(queryArticleDTO.category))
+            .and(ArticleSpecs.hasTags(queryArticleDTO.tagIds))
             .or(
-                ArticleSpecs.titleContains(articleQueryDTO.keyword),
-                ArticleSpecs.contentContains(articleQueryDTO.keyword),
-                ArticleSpecs.slugContains(articleQueryDTO.keyword),
+                ArticleSpecs.titleContains(queryArticleDTO.keyword),
+                ArticleSpecs.contentContains(queryArticleDTO.keyword),
+                ArticleSpecs.slugContains(queryArticleDTO.keyword),
             )
-            .and(ArticleSpecs.hasArticleStatus(articleQueryDTO.articleStatus))
+            .and(ArticleSpecs.hasArticleStatus(queryArticleDTO.articleStatus))
             .buildSpec()
 
         return articleRepository.findAll(specs, pageRequest)

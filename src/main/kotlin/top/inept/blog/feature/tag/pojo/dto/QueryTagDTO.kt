@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Positive
 import org.hibernate.validator.constraints.Range
 
-data class TagQueryDTO(
+data class QueryTagDTO(
     @Schema(description = "openapi.query.page")
     @field:Positive(message = "valid.common.query.page")
     val page: Int = 1,

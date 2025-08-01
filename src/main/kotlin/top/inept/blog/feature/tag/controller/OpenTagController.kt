@@ -12,7 +12,7 @@ import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.tag.pojo.convert.toTagVO
-import top.inept.blog.feature.tag.pojo.dto.TagQueryDTO
+import top.inept.blog.feature.tag.pojo.dto.QueryTagDTO
 import top.inept.blog.feature.tag.pojo.vo.TagVO
 import top.inept.blog.feature.tag.service.TagService
 
@@ -25,9 +25,9 @@ class OpenTagController(
 ) {
     @Operation(summary = "获取标签列表")
     @GetMapping()
-    fun getTags(@Valid tagQueryDTO: TagQueryDTO): ApiResponse<PageResponse<TagVO>> {
+    fun getTags(@Valid queryTagDTO: QueryTagDTO): ApiResponse<PageResponse<TagVO>> {
         return tagService
-            .getTags(tagQueryDTO)
+            .getTags(queryTagDTO)
             .toPageResponse { it.toTagVO() }
             .toApiResponse()
     }

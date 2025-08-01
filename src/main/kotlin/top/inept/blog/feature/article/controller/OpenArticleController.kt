@@ -12,7 +12,7 @@ import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.article.pojo.convert.toHomeArticleVO
-import top.inept.blog.feature.article.pojo.dto.ArticleQueryDTO
+import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
 import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
 import top.inept.blog.feature.article.pojo.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
@@ -26,8 +26,8 @@ class OpenArticleController(
 ) {
     @Operation(summary = "获取主页文章列表")
     @GetMapping
-    fun getHomeArticles(@Valid articleQueryDTO: ArticleQueryDTO): ApiResponse<PageResponse<HomeArticleVO>> {
-        val articlePage = articleService.getHomeArticles(articleQueryDTO.copy(articleStatus = ArticleStatus.Published))
+    fun getHomeArticles(@Valid queryArticleDTO: QueryArticleDTO): ApiResponse<PageResponse<HomeArticleVO>> {
+        val articlePage = articleService.getHomeArticles(queryArticleDTO.copy(articleStatus = ArticleStatus.Published))
         return articlePage.toPageResponse { it.toHomeArticleVO() }.toApiResponse()
     }
 }

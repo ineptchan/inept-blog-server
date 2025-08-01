@@ -11,7 +11,7 @@ import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.article.pojo.convert.toArticleVO
 import top.inept.blog.feature.article.pojo.convert.toHomeArticleVO
-import top.inept.blog.feature.article.pojo.dto.ArticleQueryDTO
+import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
@@ -28,8 +28,8 @@ class AdminArticleController(
 ) {
     @Operation(summary = "获取文章列表")
     @GetMapping
-    fun getArticles(@Valid articleQueryDTO: ArticleQueryDTO): ApiResponse<PageResponse<HomeArticleVO>> {
-        val articlePage = articleService.getHomeArticles(articleQueryDTO)
+    fun getArticles(@Valid queryArticleDTO: QueryArticleDTO): ApiResponse<PageResponse<HomeArticleVO>> {
+        val articlePage = articleService.getHomeArticles(queryArticleDTO)
         return articlePage.toPageResponse { it.toHomeArticleVO() }.toApiResponse()
     }
 
