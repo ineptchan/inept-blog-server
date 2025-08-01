@@ -6,8 +6,12 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
+import top.inept.blog.base.PageResponse
+import top.inept.blog.extensions.toApiResponse
+import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.user.pojo.convert.toUserVO
 import top.inept.blog.feature.user.pojo.dto.CreateUserDTO
+import top.inept.blog.feature.user.pojo.dto.QueryUserDTO
 import top.inept.blog.feature.user.pojo.dto.UpdateUserDTO
 import top.inept.blog.feature.user.pojo.vo.UserVO
 import top.inept.blog.feature.user.service.UserService
@@ -21,8 +25,11 @@ class AdminUserController(
 ) {
     @Operation(summary = "获取用户列表")
     @GetMapping
-    fun getUsers(): ApiResponse<List<UserVO>> {
-        return ApiResponse.success(userService.getUsers().map { it.toUserVO() })
+    fun getUsers(@Valid queryUserDTO: QueryUserDTO): ApiResponse<PageResponse<UserVO>> {
+        return userService
+            .getUsers(queryUserDTO)
+            .toPageResponse { it.toUserVO() }
+            .toApiResponse()
     }
 
     @Operation(summary = "根据id获取用户")

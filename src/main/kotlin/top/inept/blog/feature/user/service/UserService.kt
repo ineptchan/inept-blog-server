@@ -1,14 +1,16 @@
 package top.inept.blog.feature.user.service
 
+import org.springframework.data.domain.Page
 import top.inept.blog.feature.user.pojo.dto.CreateUserDTO
 import top.inept.blog.feature.user.pojo.dto.LoginUserDTO
+import top.inept.blog.feature.user.pojo.dto.QueryUserDTO
 import top.inept.blog.feature.user.pojo.dto.UpdateUserDTO
 import top.inept.blog.feature.user.pojo.dto.UpdateUserProfileDTO
 import top.inept.blog.feature.user.pojo.entity.User
 import top.inept.blog.feature.user.pojo.vo.LoginUserVO
 
 interface UserService {
-    fun getUsers(): List<User>
+    fun getUsers(queryUserDTO: QueryUserDTO): Page<User>
     fun getUserById(id: Long): User
     fun getUserByUsername(username: String): User
     fun createUser(createUserDTO: CreateUserDTO): User

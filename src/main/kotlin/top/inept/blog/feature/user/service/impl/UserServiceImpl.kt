@@ -2,19 +2,20 @@ package top.inept.blog.feature.user.service.impl
 
 import org.slf4j.LoggerFactory
 import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.feature.user.pojo.convert.toUser
-import top.inept.blog.feature.user.pojo.dto.CreateUserDTO
-import top.inept.blog.feature.user.pojo.dto.LoginUserDTO
-import top.inept.blog.feature.user.pojo.dto.UpdateUserDTO
-import top.inept.blog.feature.user.pojo.dto.UpdateUserProfileDTO
+import top.inept.blog.feature.user.pojo.dto.*
 import top.inept.blog.feature.user.pojo.entity.User
 import top.inept.blog.feature.user.pojo.vo.LoginUserVO
 import top.inept.blog.feature.user.repository.UserRepository
+import top.inept.blog.feature.user.repository.UserSpecs
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.properties.JwtProperties
 import top.inept.blog.utils.JwtUtil
@@ -30,7 +31,18 @@ class UserServiceImpl(
 ) : UserService {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    override fun getUsers() = userRepository.findAll()
+    override fun getUsers(queryUserDTO: QueryUserDTO): Page<User> {
+        val pageRequest = PageRequest.of(queryUserDTO.page - 1, queryUserDTO.size)
+
+        val specs = QueryBuilder<User>()
+            .or(
+                UserSpecs.nicknameContains(queryUserDTO.keyword),
+                UserSpecs.usernameContains(queryUserDTO.keyword),
+                UserSpecs.emailContains(queryUserDTO.keyword)
+            ).buildSpec()
+
+        return userRepository.findAll(specs, pageRequest)
+    }
 
     override fun getUserById(id: Long): User {
         //根据id查找用户

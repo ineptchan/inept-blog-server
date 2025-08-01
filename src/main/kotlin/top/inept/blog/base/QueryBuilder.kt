@@ -13,6 +13,12 @@ data class QueryBuilder<T>(
         return this
     }
 
+    fun or(vararg spec: Specification<T>?): QueryBuilder<T> {
+        val orSpecs = spec.filterNotNull().reduceOrNull { spec1, spec2 -> spec1.or(spec2) }
+        orSpecs?.let { specs.add(it) }
+        return this
+    }
+
     fun orderByAsc(field: String): QueryBuilder<T> {
         sort = Sort.by(Sort.Direction.ASC, field)
         return this

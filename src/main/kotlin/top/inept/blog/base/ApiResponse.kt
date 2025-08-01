@@ -21,7 +21,7 @@ data class ApiResponse<T>(
         /**
          * 只返回成功，不带数据
          */
-        fun <T> success(data: T): ApiResponse<T> = ApiResponse(code = SUCCESS, data = data)
+        fun <T> success(data: T): ApiResponse<T> = ApiResponse(code = SUCCESS, data = data, msg = "success")
 
         /**
          * 只返回错误信息
