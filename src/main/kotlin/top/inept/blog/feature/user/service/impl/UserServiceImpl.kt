@@ -3,13 +3,13 @@ package top.inept.blog.feature.user.service.impl
 import org.slf4j.LoggerFactory
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
+import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.user.pojo.convert.toUser
 import top.inept.blog.feature.user.pojo.dto.*
 import top.inept.blog.feature.user.pojo.entity.User
@@ -32,7 +32,7 @@ class UserServiceImpl(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun getUsers(queryUserDTO: QueryUserDTO): Page<User> {
-        val pageRequest = PageRequest.of(queryUserDTO.page - 1, queryUserDTO.size)
+        val pageRequest = queryUserDTO.toPageRequest()
 
         val specs = QueryBuilder<User>()
             .or(

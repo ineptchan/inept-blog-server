@@ -2,15 +2,15 @@ package top.inept.blog.feature.article.service.impl
 
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
-import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
+import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
+import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.pojo.entity.Article
@@ -145,7 +145,7 @@ class ArticleServiceImpl(
     }
 
     override fun getHomeArticles(queryArticleDTO: QueryArticleDTO): Page<Article> {
-        val pageRequest = PageRequest.of(queryArticleDTO.page - 1, queryArticleDTO.size)
+        val pageRequest = queryArticleDTO.toPageRequest()
 
         val specs = QueryBuilder<Article>()
             .and(ArticleSpecs.byCategoryId(queryArticleDTO.category))

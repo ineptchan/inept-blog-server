@@ -2,12 +2,12 @@ package top.inept.blog.feature.tag.service.impl
 
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
+import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.tag.pojo.convert.toTag
 import top.inept.blog.feature.tag.pojo.dto.CreateTagDTO
 import top.inept.blog.feature.tag.pojo.dto.QueryTagDTO
@@ -23,7 +23,7 @@ class TagServiceImpl(
     private val messages: MessageSourceAccessor,
 ) : TagService {
     override fun getTags(queryTagDTO: QueryTagDTO): Page<Tag> {
-        val pageRequest = PageRequest.of(queryTagDTO.page - 1, queryTagDTO.size)
+        val pageRequest = queryTagDTO.toPageRequest()
 
         val specs = QueryBuilder<Tag>()
             .or(
