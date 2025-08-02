@@ -10,7 +10,7 @@ import top.inept.blog.feature.tag.pojo.entity.Tag
 import top.inept.blog.feature.tag.pojo.entity.Tag_
 
 object ArticleSpecs {
-    fun hasCategory(category: Long?): Specification<Article>? {
+    fun byCategoryId(category: Long?): Specification<Article>? {
         return category?.let {
             Specification<Article> { root, _, cb ->
                 cb.equal(root.get<Categories>(Article_.category).get<Long>(Categories_.id), it)
@@ -18,7 +18,7 @@ object ArticleSpecs {
         }
     }
 
-    fun hasTags(tags: List<Long>?): Specification<Article>? {
+    fun byTagIds(tags: List<Long>?): Specification<Article>? {
         return tags.takeIf { it != null && it.isNotEmpty() }?.let {
             Specification { root, query, cb ->
                 query?.distinct(true)
@@ -28,7 +28,7 @@ object ArticleSpecs {
         }
     }
 
-    fun hasArticleStatus(articleStatus: ArticleStatus?): Specification<Article>? {
+    fun byArticleStatus(articleStatus: ArticleStatus?): Specification<Article>? {
         return articleStatus?.let {
             Specification { root, _, cb ->
                 cb.equal(root.get<ArticleStatus>(Article_.articleStatus), articleStatus)

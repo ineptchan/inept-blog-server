@@ -148,14 +148,14 @@ class ArticleServiceImpl(
         val pageRequest = PageRequest.of(queryArticleDTO.page - 1, queryArticleDTO.size)
 
         val specs = QueryBuilder<Article>()
-            .and(ArticleSpecs.hasCategory(queryArticleDTO.category))
-            .and(ArticleSpecs.hasTags(queryArticleDTO.tagIds))
+            .and(ArticleSpecs.byCategoryId(queryArticleDTO.category))
+            .and(ArticleSpecs.byTagIds(queryArticleDTO.tagIds))
             .or(
                 ArticleSpecs.titleContains(queryArticleDTO.keyword),
                 ArticleSpecs.contentContains(queryArticleDTO.keyword),
                 ArticleSpecs.slugContains(queryArticleDTO.keyword),
             )
-            .and(ArticleSpecs.hasArticleStatus(queryArticleDTO.articleStatus))
+            .and(ArticleSpecs.byArticleStatus(queryArticleDTO.articleStatus))
             .buildSpec()
 
         return articleRepository.findAll(specs, pageRequest)
