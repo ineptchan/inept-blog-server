@@ -31,6 +31,7 @@ class Comment(
     @JoinColumn(name = "parent_comment_id")
     var parentComment: Comment? = null,
 
+    // TODO 修改字段 parent_comment
     @OneToMany(
         mappedBy = "parentComment",
         cascade = [CascadeType.ALL],

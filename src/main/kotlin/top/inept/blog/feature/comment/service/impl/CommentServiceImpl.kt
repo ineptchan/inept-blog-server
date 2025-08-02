@@ -5,8 +5,14 @@ import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import top.inept.blog.base.BaseQueryDTO
+import top.inept.blog.base.PageResponse
+import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
+import top.inept.blog.extensions.toPageRequest
+import top.inept.blog.extensions.toPageResponse
+import top.inept.blog.extensions.toPageResponseTransformNotNull
 import top.inept.blog.feature.article.pojo.convert.toArticleTitleVO
 import top.inept.blog.feature.article.pojo.entity.Article
 import top.inept.blog.feature.article.service.ArticleService
@@ -16,6 +22,7 @@ import top.inept.blog.feature.comment.pojo.convert.toCommentVO
 import top.inept.blog.feature.comment.pojo.convert.toTopCommentVO
 import top.inept.blog.feature.comment.pojo.dto.CreateAnonymousCommentDTO
 import top.inept.blog.feature.comment.pojo.dto.CreateCommentDTO
+import top.inept.blog.feature.comment.pojo.dto.QueryCommentDTO
 import top.inept.blog.feature.comment.pojo.dto.UpdateCommentDTO
 import top.inept.blog.feature.comment.pojo.entity.Comment
 import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
@@ -23,6 +30,7 @@ import top.inept.blog.feature.comment.pojo.vo.CommentSummaryVO
 import top.inept.blog.feature.comment.pojo.vo.CommentVO
 import top.inept.blog.feature.comment.pojo.vo.TopCommentVO
 import top.inept.blog.feature.comment.repository.CommentRepository
+import top.inept.blog.feature.comment.repository.CommentSpecs
 import top.inept.blog.feature.comment.service.CommentService
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.SecurityUtil
@@ -35,25 +43,30 @@ class CommentServiceImpl(
     private val entityManager: EntityManager,
     private val messages: MessageSourceAccessor,
 ) : CommentService {
-    override fun getComments(): List<CommentVO> {
+    override fun getComments(queryCommentDTO: QueryCommentDTO): PageResponse<CommentVO> {
+        val pageRequest = queryCommentDTO.toPageRequest()
+
+        val specs = QueryBuilder<Comment>()
+            .and(CommentSpecs.contentContains(queryCommentDTO.keyword))
+            .buildSpec()
+
         //获取全部评论
-        val comments = commentRepository.findAll()
+        val comments = commentRepository.findAll(specs, pageRequest)
 
         //获取文章id列表
         val articleIds = comments.map { it.article.id }.distinct()
 
         // 获取文章标题信息并构建id -> 标题的映射
-        val articleTitleMap = articleService
-            .getArticleTitleById(articleIds)
-            .associateBy { it.id }
+        val articleTitleMap = articleService.getArticleTitleById(articleIds).associateBy { it.id }
 
         //构建VO
-        return comments.mapNotNull { comment ->
+        return comments.toPageResponseTransformNotNull { comment ->
             val articleTitle = articleTitleMap[comment.article.id]
             if (articleTitle != null) {
                 comment.toCommentVO(articleTitle.toArticleTitleVO())
+
             } else {
-                null // 跳过找不到文章标题的评论
+                null
             }
         }
     }
@@ -128,30 +141,39 @@ class CommentServiceImpl(
         commentRepository.deleteById(id)
     }
 
-    override fun getCommentReplies(articleId: Long): List<CommentReplyVO> {
+    override fun getCommentReplies(commentId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<CommentReplyVO> {
         //根据id查找评论
-        val comment = commentRepository.findByIdOrNull(articleId)
+        val comment = commentRepository.findByIdOrNull(commentId)
 
         //判断评论是否存在
         if (comment == null) throw NotFoundException(messages["message.comment.comment_not_found"])
 
-        //从数据库获取回复
-        val replies = comment.replies
+        val pageRequest = baseQueryDTO.toPageRequest()
 
-        //构建VO
-        return replies.map { it.toCommentReplyVO() }
+        val specs = QueryBuilder<Comment>()
+            .and(CommentSpecs.byParentComment(comment))
+            .buildSpec()
+
+        return commentRepository.findAll(specs, pageRequest).toPageResponse { it.toCommentReplyVO() }
     }
 
-    override fun getTopComments(articleId: Long): List<TopCommentVO> {
+    override fun getTopComments(articleId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<TopCommentVO> {
         //根据id获得文章
         articleService.existsArticleById(articleId)
 
         //根据文章id获取顶级评论
-        val comments = commentRepository.findByArticle_IdAndParentCommentNull(articleId)
+        val pageRequest = baseQueryDTO.toPageRequest()
 
-        return comments.map {
-            val replyCount = commentRepository.countByParentCommentId(it.id)
-            it.toTopCommentVO(replyCount)
+        val specs = QueryBuilder<Comment>()
+            .and(CommentSpecs.byArticleId(articleId))
+            .and(CommentSpecs.isRootComment())
+            .buildSpec()
+
+        val comments = commentRepository.findAll(specs, pageRequest)
+
+        return comments.toPageResponse {
+            //获得子评论数
+            it.toTopCommentVO(commentRepository.countByParentCommentId(it.id))
         }
     }
 

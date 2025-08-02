@@ -6,7 +6,11 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
+import top.inept.blog.base.BaseQueryDTO
+import top.inept.blog.base.PageResponse
+import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.feature.comment.pojo.dto.CreateCommentDTO
+import top.inept.blog.feature.comment.pojo.dto.QueryCommentDTO
 import top.inept.blog.feature.comment.pojo.dto.UpdateCommentDTO
 import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
 import top.inept.blog.feature.comment.pojo.vo.CommentSummaryVO
@@ -22,8 +26,8 @@ class AdminCommentController(
 ) {
     @Operation(summary = "获取评论列表")
     @GetMapping
-    fun getComments(): ApiResponse<List<CommentVO>> {
-        return ApiResponse.success(commentService.getComments())
+    fun getComments(@Valid queryCommentDTO: QueryCommentDTO): ApiResponse<PageResponse<CommentVO>> {
+        return commentService.getComments(queryCommentDTO).toApiResponse()
     }
 
     @Operation(summary = "根据id获取评论")
@@ -52,8 +56,11 @@ class AdminCommentController(
     }
 
     @Operation(summary = "获得评论回复列表")
-    @GetMapping("/{id}/replies")
-    fun getCommentReplies(@PathVariable id: Long): ApiResponse<List<CommentReplyVO>> {
-        return ApiResponse.success(commentService.getCommentReplies(id))
+    @GetMapping("/{commentId}/replies")
+    fun getCommentReplies(
+        @PathVariable commentId: Long,
+        @Valid baseQueryDTO: BaseQueryDTO
+    ): ApiResponse<PageResponse<CommentReplyVO>> {
+        return commentService.getCommentReplies(commentId, baseQueryDTO).toApiResponse()
     }
 }

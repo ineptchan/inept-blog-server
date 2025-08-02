@@ -31,3 +31,13 @@ fun <E, V> Page<E>.toPageResponse(transform: (E) -> V): PageResponse<V> {
         totalPages = this.totalPages
     )
 }
+
+fun <E, V> Page<E>.toPageResponseTransformNotNull(transform: (E) -> V?): PageResponse<V> {
+    return PageResponse(
+        content = this.content.mapNotNull(transform),
+        page = this.number + 1,
+        size = this.size,
+        totalElements = this.totalElements,
+        totalPages = this.totalPages
+    )
+}
