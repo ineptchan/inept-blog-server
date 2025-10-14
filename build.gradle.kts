@@ -34,7 +34,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     implementation("io.jsonwebtoken:jjwt:0.12.6")
-    implementation("commons-io:commons-io:2.16.1")
+  //  implementation("commons-io:commons-io:2.16.1")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
     kapt("org.hibernate.orm:hibernate-jpamodelgen:6.4.4.Final")
 }
