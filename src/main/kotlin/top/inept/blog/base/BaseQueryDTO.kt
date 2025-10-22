@@ -7,9 +7,9 @@ import org.hibernate.validator.constraints.Range
 open class BaseQueryDTO(
     @Schema(description = "openapi.query.page")
     @field:Positive(message = "valid.common.query.page")
-    val page: Int = 1,
+    open var page: Int = 1,
 
     @Schema(description = "openapi.query.size")
     @field:Range(min = 1, max = 100, message = "valid.common.query.size")
-    val size: Int = 30
+    open var size: Int = 30
 )
