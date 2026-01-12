@@ -4,8 +4,8 @@ import org.springframework.data.jpa.domain.Specification
 import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.article.model.entity.Article_
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
-import top.inept.blog.feature.categories.pojo.entity.Categories
-import top.inept.blog.feature.categories.pojo.entity.Categories_
+import top.inept.blog.feature.categories.model.entity.Categories
+import top.inept.blog.feature.categories.model.entity.Categories_
 import top.inept.blog.feature.tag.pojo.entity.Tag
 import top.inept.blog.feature.tag.pojo.entity.Tag_
 

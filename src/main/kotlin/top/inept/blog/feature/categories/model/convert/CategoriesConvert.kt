@@ -1,9 +1,9 @@
-package top.inept.blog.feature.categories.pojo.convert
+package top.inept.blog.feature.categories.model.convert
 
-import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
-import top.inept.blog.feature.categories.pojo.dto.CreateCategoriesDTO
-import top.inept.blog.feature.categories.pojo.entity.Categories
-import top.inept.blog.feature.categories.pojo.vo.CategoriesVO
+import top.inept.blog.feature.categories.model.dto.UpdateCategoriesDTO
+import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
+import top.inept.blog.feature.categories.model.entity.Categories
+import top.inept.blog.feature.categories.model.vo.CategoriesVO
 
 fun Categories.toCategoriesVO() = CategoriesVO(
     id = this.id,

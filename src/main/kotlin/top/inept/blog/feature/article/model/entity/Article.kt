@@ -6,7 +6,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
-import top.inept.blog.feature.categories.pojo.entity.Categories
+import top.inept.blog.feature.categories.model.entity.Categories
 import top.inept.blog.feature.tag.pojo.entity.Tag
 import top.inept.blog.feature.user.pojo.entity.User
 import java.time.LocalDateTime

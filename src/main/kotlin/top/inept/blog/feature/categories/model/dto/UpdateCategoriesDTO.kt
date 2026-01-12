@@ -1,9 +1,9 @@
-package top.inept.blog.feature.categories.pojo.dto
+package top.inept.blog.feature.categories.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.PositiveOrZero
-import top.inept.blog.feature.categories.pojo.validated.ValidatedCategoriesName
-import top.inept.blog.feature.categories.pojo.validated.ValidatedCategoriesSlug
+import top.inept.blog.feature.categories.model.validated.ValidatedCategoriesName
+import top.inept.blog.feature.categories.model.validated.ValidatedCategoriesSlug
 
 data class UpdateCategoriesDTO(
     @Schema(description = "openapi.categories.id")

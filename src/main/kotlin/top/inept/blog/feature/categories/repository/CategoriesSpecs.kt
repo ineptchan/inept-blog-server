@@ -1,8 +1,8 @@
 package top.inept.blog.feature.categories.repository
 
 import org.springframework.data.jpa.domain.Specification
-import top.inept.blog.feature.categories.pojo.entity.Categories
-import top.inept.blog.feature.categories.pojo.entity.Categories_
+import top.inept.blog.feature.categories.model.entity.Categories
+import top.inept.blog.feature.categories.model.entity.Categories_
 
 object CategoriesSpecs {
     fun nameContains(keyword: String?): Specification<Categories>? {

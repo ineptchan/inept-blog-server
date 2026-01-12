@@ -1,10 +1,10 @@
 package top.inept.blog.feature.categories.service
 
 import org.springframework.data.domain.Page
-import top.inept.blog.feature.categories.pojo.dto.QueryCategoriesDTO
-import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
-import top.inept.blog.feature.categories.pojo.dto.CreateCategoriesDTO
-import top.inept.blog.feature.categories.pojo.entity.Categories
+import top.inept.blog.feature.categories.model.dto.QueryCategoriesDTO
+import top.inept.blog.feature.categories.model.dto.UpdateCategoriesDTO
+import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
+import top.inept.blog.feature.categories.model.entity.Categories
 
 interface CategoriesService {
     fun getCategories(queryCategoriesDTO: QueryCategoriesDTO): Page<Categories>

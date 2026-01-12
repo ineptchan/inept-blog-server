@@ -11,9 +11,9 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
-import top.inept.blog.feature.categories.pojo.convert.toCategoriesVO
-import top.inept.blog.feature.categories.pojo.dto.QueryCategoriesDTO
-import top.inept.blog.feature.categories.pojo.vo.CategoriesVO
+import top.inept.blog.feature.categories.model.convert.toCategoriesVO
+import top.inept.blog.feature.categories.model.dto.QueryCategoriesDTO
+import top.inept.blog.feature.categories.model.vo.CategoriesVO
 import top.inept.blog.feature.categories.service.CategoriesService
 
 @Tag(name = "公开分类接口")

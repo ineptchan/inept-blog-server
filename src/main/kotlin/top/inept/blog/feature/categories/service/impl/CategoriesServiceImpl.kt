@@ -8,11 +8,11 @@ import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
-import top.inept.blog.feature.categories.pojo.convert.toCategories
-import top.inept.blog.feature.categories.pojo.dto.CreateCategoriesDTO
-import top.inept.blog.feature.categories.pojo.dto.QueryCategoriesDTO
-import top.inept.blog.feature.categories.pojo.dto.UpdateCategoriesDTO
-import top.inept.blog.feature.categories.pojo.entity.Categories
+import top.inept.blog.feature.categories.model.convert.toCategories
+import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
+import top.inept.blog.feature.categories.model.dto.QueryCategoriesDTO
+import top.inept.blog.feature.categories.model.dto.UpdateCategoriesDTO
+import top.inept.blog.feature.categories.model.entity.Categories
 import top.inept.blog.feature.categories.repository.CategoriesRepository
 import top.inept.blog.feature.categories.repository.CategoriesSpecs
 import top.inept.blog.feature.categories.service.CategoriesService
