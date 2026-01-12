@@ -8,7 +8,7 @@ import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.categories.model.convert.toCategoriesVO
 import top.inept.blog.feature.tag.model.convert.toTagVO
-import top.inept.blog.feature.user.pojo.convert.toUserPublicVO
+import top.inept.blog.feature.user.model.convert.toUserPublicVO
 
 fun Article.toArticleVO() = ArticleVO(
     id = this.id,

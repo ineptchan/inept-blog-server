@@ -1,13 +1,13 @@
 package top.inept.blog.feature.user.service
 
 import org.springframework.data.domain.Page
-import top.inept.blog.feature.user.pojo.dto.CreateUserDTO
-import top.inept.blog.feature.user.pojo.dto.LoginUserDTO
-import top.inept.blog.feature.user.pojo.dto.QueryUserDTO
-import top.inept.blog.feature.user.pojo.dto.UpdateUserDTO
-import top.inept.blog.feature.user.pojo.dto.UpdateUserProfileDTO
-import top.inept.blog.feature.user.pojo.entity.User
-import top.inept.blog.feature.user.pojo.vo.LoginUserVO
+import top.inept.blog.feature.user.model.dto.CreateUserDTO
+import top.inept.blog.feature.user.model.dto.LoginUserDTO
+import top.inept.blog.feature.user.model.dto.QueryUserDTO
+import top.inept.blog.feature.user.model.dto.UpdateUserDTO
+import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
+import top.inept.blog.feature.user.model.entity.User
+import top.inept.blog.feature.user.model.vo.LoginUserVO
 
 interface UserService {
     fun getUsers(queryUserDTO: QueryUserDTO): Page<User>

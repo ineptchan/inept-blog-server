@@ -1,7 +1,7 @@
 package top.inept.blog.feature.comment.model.vo
 
 import io.swagger.v3.oas.annotations.media.Schema
-import top.inept.blog.feature.user.pojo.vo.UserPublicVO
+import top.inept.blog.feature.user.model.vo.UserPublicVO
 
 data class CommentSummaryVO(
     @Schema(description = "openapi.comment.id")

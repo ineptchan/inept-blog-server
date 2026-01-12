@@ -1,4 +1,4 @@
-package top.inept.blog.feature.user.pojo.entity.enums
+package top.inept.blog.feature.user.model.entity.enums
 
 import org.springframework.security.core.GrantedAuthority
 

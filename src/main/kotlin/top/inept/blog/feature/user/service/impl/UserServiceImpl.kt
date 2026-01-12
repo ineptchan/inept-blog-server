@@ -10,10 +10,10 @@ import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
-import top.inept.blog.feature.user.pojo.convert.toUser
-import top.inept.blog.feature.user.pojo.dto.*
-import top.inept.blog.feature.user.pojo.entity.User
-import top.inept.blog.feature.user.pojo.vo.LoginUserVO
+import top.inept.blog.feature.user.model.convert.toUser
+import top.inept.blog.feature.user.model.dto.*
+import top.inept.blog.feature.user.model.entity.User
+import top.inept.blog.feature.user.model.vo.LoginUserVO
 import top.inept.blog.feature.user.repository.UserRepository
 import top.inept.blog.feature.user.repository.UserSpecs
 import top.inept.blog.feature.user.service.UserService

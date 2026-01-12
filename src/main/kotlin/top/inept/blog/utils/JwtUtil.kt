@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import top.inept.blog.constant.JwtClaimsConstant
 import top.inept.blog.exception.JwtInvalidException
 import top.inept.blog.extensions.get
-import top.inept.blog.feature.user.pojo.entity.enums.UserRole
+import top.inept.blog.feature.user.model.entity.enums.UserRole
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 

@@ -9,11 +9,11 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
-import top.inept.blog.feature.user.pojo.convert.toUserVO
-import top.inept.blog.feature.user.pojo.dto.CreateUserDTO
-import top.inept.blog.feature.user.pojo.dto.QueryUserDTO
-import top.inept.blog.feature.user.pojo.dto.UpdateUserDTO
-import top.inept.blog.feature.user.pojo.vo.UserVO
+import top.inept.blog.feature.user.model.convert.toUserVO
+import top.inept.blog.feature.user.model.dto.CreateUserDTO
+import top.inept.blog.feature.user.model.dto.QueryUserDTO
+import top.inept.blog.feature.user.model.dto.UpdateUserDTO
+import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.feature.user.service.UserService
 
 @Tag(name = "管理员用户接口")

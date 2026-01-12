@@ -1,8 +1,6 @@
-package top.inept.blog.feature.user.pojo.dto
+package top.inept.blog.feature.user.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.validation.constraints.Positive
-import org.hibernate.validator.constraints.Range
 import top.inept.blog.base.BaseQueryDTO
 
 data class QueryUserDTO (

@@ -1,8 +1,8 @@
 package top.inept.blog.feature.user.repository
 
 import org.springframework.data.jpa.domain.Specification
-import top.inept.blog.feature.user.pojo.entity.User
-import top.inept.blog.feature.user.pojo.entity.User_
+import top.inept.blog.feature.user.model.entity.User
+import top.inept.blog.feature.user.model.entity.User_
 
 object UserSpecs {
     fun nicknameContains(keyword: String?): Specification<User>? {

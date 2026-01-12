@@ -1,4 +1,4 @@
-package top.inept.blog.feature.user.pojo.validated
+package top.inept.blog.feature.user.model.validated
 
 import jakarta.validation.Constraint
 import jakarta.validation.Payload

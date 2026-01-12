@@ -1,11 +1,11 @@
-package top.inept.blog.feature.user.pojo.dto
+package top.inept.blog.feature.user.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import top.inept.blog.feature.user.pojo.entity.enums.UserRole
-import top.inept.blog.feature.user.pojo.validated.ValidateUserNickname
-import top.inept.blog.feature.user.pojo.validated.ValidateUserUsername
-import top.inept.blog.feature.user.pojo.validated.ValidatedUserEmail
-import top.inept.blog.feature.user.pojo.validated.ValidatedUserPassword
+import top.inept.blog.feature.user.model.entity.enums.UserRole
+import top.inept.blog.feature.user.model.validated.ValidateUserNickname
+import top.inept.blog.feature.user.model.validated.ValidateUserUsername
+import top.inept.blog.feature.user.model.validated.ValidatedUserEmail
+import top.inept.blog.feature.user.model.validated.ValidatedUserPassword
 
 data class CreateUserDTO(
     @Schema(description = "openapi.user.nickname")

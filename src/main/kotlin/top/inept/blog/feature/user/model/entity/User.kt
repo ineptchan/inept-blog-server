@@ -1,11 +1,11 @@
-package top.inept.blog.feature.user.pojo.entity
+package top.inept.blog.feature.user.model.entity
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import top.inept.blog.feature.user.pojo.entity.enums.UserRole
+import top.inept.blog.feature.user.model.entity.enums.UserRole
 import java.time.LocalDateTime
 
 /**

@@ -1,9 +1,9 @@
-package top.inept.blog.feature.user.pojo.convert
+package top.inept.blog.feature.user.model.convert
 
-import top.inept.blog.feature.user.pojo.dto.CreateUserDTO
-import top.inept.blog.feature.user.pojo.entity.User
-import top.inept.blog.feature.user.pojo.vo.UserPublicVO
-import top.inept.blog.feature.user.pojo.vo.UserVO
+import top.inept.blog.feature.user.model.dto.CreateUserDTO
+import top.inept.blog.feature.user.model.entity.User
+import top.inept.blog.feature.user.model.vo.UserPublicVO
+import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.utils.PasswordUtil
 
 fun User.toUserVO() = UserVO(

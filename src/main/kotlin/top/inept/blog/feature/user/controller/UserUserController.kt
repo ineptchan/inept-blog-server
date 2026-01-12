@@ -6,9 +6,9 @@ import jakarta.validation.Valid
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
-import top.inept.blog.feature.user.pojo.convert.toUserVO
-import top.inept.blog.feature.user.pojo.dto.UpdateUserProfileDTO
-import top.inept.blog.feature.user.pojo.vo.UserVO
+import top.inept.blog.feature.user.model.convert.toUserVO
+import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
+import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.feature.user.service.UserService
 
 @Tag(name = "用户用户接口")

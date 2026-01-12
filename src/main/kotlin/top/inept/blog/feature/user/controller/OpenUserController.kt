@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import top.inept.blog.base.ApiResponse
-import top.inept.blog.feature.user.pojo.dto.LoginUserDTO
-import top.inept.blog.feature.user.pojo.vo.LoginUserVO
+import top.inept.blog.feature.user.model.dto.LoginUserDTO
+import top.inept.blog.feature.user.model.vo.LoginUserVO
 import top.inept.blog.feature.user.service.UserService
 
 @Tag(name = "公开用户接口")

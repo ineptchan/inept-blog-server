@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import top.inept.blog.feature.user.pojo.entity.enums.UserRole
+import top.inept.blog.feature.user.model.entity.enums.UserRole
 import top.inept.blog.filter.JwtAuthFilter
 
 @Configuration

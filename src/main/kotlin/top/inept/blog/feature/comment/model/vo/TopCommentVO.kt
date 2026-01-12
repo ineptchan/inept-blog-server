@@ -2,7 +2,7 @@ package top.inept.blog.feature.comment.model.vo
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.media.Schema
-import top.inept.blog.feature.user.pojo.vo.UserPublicVO
+import top.inept.blog.feature.user.model.vo.UserPublicVO
 import java.time.LocalDateTime
 
 data class TopCommentVO(
