@@ -2,14 +2,14 @@ package top.inept.blog.feature.comment.service
 
 import top.inept.blog.base.BaseQueryDTO
 import top.inept.blog.base.PageResponse
-import top.inept.blog.feature.comment.pojo.dto.CreateAnonymousCommentDTO
-import top.inept.blog.feature.comment.pojo.dto.CreateCommentDTO
-import top.inept.blog.feature.comment.pojo.dto.QueryCommentDTO
-import top.inept.blog.feature.comment.pojo.dto.UpdateCommentDTO
-import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
-import top.inept.blog.feature.comment.pojo.vo.CommentSummaryVO
-import top.inept.blog.feature.comment.pojo.vo.CommentVO
-import top.inept.blog.feature.comment.pojo.vo.TopCommentVO
+import top.inept.blog.feature.comment.model.dto.CreateAnonymousCommentDTO
+import top.inept.blog.feature.comment.model.dto.CreateCommentDTO
+import top.inept.blog.feature.comment.model.dto.QueryCommentDTO
+import top.inept.blog.feature.comment.model.dto.UpdateCommentDTO
+import top.inept.blog.feature.comment.model.vo.CommentReplyVO
+import top.inept.blog.feature.comment.model.vo.CommentSummaryVO
+import top.inept.blog.feature.comment.model.vo.CommentVO
+import top.inept.blog.feature.comment.model.vo.TopCommentVO
 
 interface CommentService {
     fun getComments(queryCommentDTO: QueryCommentDTO): PageResponse<CommentVO>

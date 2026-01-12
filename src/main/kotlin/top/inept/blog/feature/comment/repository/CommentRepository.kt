@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import top.inept.blog.feature.comment.pojo.entity.Comment
+import top.inept.blog.feature.comment.model.entity.Comment
 
 @Repository
 interface CommentRepository : JpaRepository<Comment, Long>, JpaSpecificationExecutor<Comment> {

@@ -12,8 +12,8 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.BaseQueryDTO
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
-import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
-import top.inept.blog.feature.comment.pojo.vo.TopCommentVO
+import top.inept.blog.feature.comment.model.vo.CommentReplyVO
+import top.inept.blog.feature.comment.model.vo.TopCommentVO
 import top.inept.blog.feature.comment.service.CommentService
 
 @Tag(name = "公开评论接口")

@@ -2,8 +2,8 @@ package top.inept.blog.feature.comment.repository
 
 import org.springframework.data.jpa.domain.Specification
 import top.inept.blog.feature.article.model.entity.Article_
-import top.inept.blog.feature.comment.pojo.entity.Comment
-import top.inept.blog.feature.comment.pojo.entity.Comment_
+import top.inept.blog.feature.comment.model.entity.Comment
+import top.inept.blog.feature.comment.model.entity.Comment_
 
 object CommentSpecs {
     fun contentContains(keyword: String?): Specification<Comment>? {

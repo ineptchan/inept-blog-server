@@ -1,4 +1,4 @@
-package top.inept.blog.feature.comment.pojo.entity
+package top.inept.blog.feature.comment.model.entity
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*

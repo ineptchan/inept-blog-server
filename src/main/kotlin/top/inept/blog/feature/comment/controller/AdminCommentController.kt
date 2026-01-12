@@ -9,12 +9,12 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.BaseQueryDTO
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
-import top.inept.blog.feature.comment.pojo.dto.CreateCommentDTO
-import top.inept.blog.feature.comment.pojo.dto.QueryCommentDTO
-import top.inept.blog.feature.comment.pojo.dto.UpdateCommentDTO
-import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
-import top.inept.blog.feature.comment.pojo.vo.CommentSummaryVO
-import top.inept.blog.feature.comment.pojo.vo.CommentVO
+import top.inept.blog.feature.comment.model.dto.CreateCommentDTO
+import top.inept.blog.feature.comment.model.dto.QueryCommentDTO
+import top.inept.blog.feature.comment.model.dto.UpdateCommentDTO
+import top.inept.blog.feature.comment.model.vo.CommentReplyVO
+import top.inept.blog.feature.comment.model.vo.CommentSummaryVO
+import top.inept.blog.feature.comment.model.vo.CommentVO
 import top.inept.blog.feature.comment.service.CommentService
 
 @Tag(name = "管理员评论接口")

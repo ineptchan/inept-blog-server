@@ -1,8 +1,8 @@
-package top.inept.blog.feature.comment.pojo.dto
+package top.inept.blog.feature.comment.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.PositiveOrZero
-import top.inept.blog.feature.comment.pojo.validated.ValidatedCommentContent
+import top.inept.blog.feature.comment.model.validated.ValidatedCommentContent
 
 data class CreateAnonymousCommentDTO(
     @Schema(description = "openapi.comment.content")

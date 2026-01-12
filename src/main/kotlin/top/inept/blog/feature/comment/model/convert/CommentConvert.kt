@@ -1,11 +1,11 @@
-package top.inept.blog.feature.comment.pojo.convert
+package top.inept.blog.feature.comment.model.convert
 
 import top.inept.blog.feature.article.model.vo.ArticleTitleVO
-import top.inept.blog.feature.comment.pojo.entity.Comment
-import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
-import top.inept.blog.feature.comment.pojo.vo.CommentSummaryVO
-import top.inept.blog.feature.comment.pojo.vo.CommentVO
-import top.inept.blog.feature.comment.pojo.vo.TopCommentVO
+import top.inept.blog.feature.comment.model.entity.Comment
+import top.inept.blog.feature.comment.model.vo.CommentReplyVO
+import top.inept.blog.feature.comment.model.vo.CommentSummaryVO
+import top.inept.blog.feature.comment.model.vo.CommentVO
+import top.inept.blog.feature.comment.model.vo.TopCommentVO
 import top.inept.blog.feature.user.pojo.convert.toUserPublicVO
 
 fun Comment.toCommentVO(articleTitleVO: ArticleTitleVO) = CommentVO(

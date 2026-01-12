@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import top.inept.blog.base.ApiResponse
-import top.inept.blog.feature.comment.pojo.dto.CreateCommentDTO
-import top.inept.blog.feature.comment.pojo.vo.CommentVO
+import top.inept.blog.feature.comment.model.dto.CreateCommentDTO
+import top.inept.blog.feature.comment.model.vo.CommentVO
 import top.inept.blog.feature.comment.service.CommentService
 
 @Tag(name = "用户评论接口")
