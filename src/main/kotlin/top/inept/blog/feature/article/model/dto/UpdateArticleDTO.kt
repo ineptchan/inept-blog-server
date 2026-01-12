@@ -1,12 +1,17 @@
-package top.inept.blog.feature.article.pojo.dto
+package top.inept.blog.feature.article.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.PositiveOrZero
-import top.inept.blog.feature.article.pojo.validated.ValidatedArticleContent
-import top.inept.blog.feature.article.pojo.validated.ValidatedArticleSlug
-import top.inept.blog.feature.article.pojo.validated.ValidatedArticleTitle
+import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.validated.ValidatedArticleContent
+import top.inept.blog.feature.article.model.validated.ValidatedArticleSlug
+import top.inept.blog.feature.article.model.validated.ValidatedArticleTitle
 
-data class CreateArticleDTO(
+data class UpdateArticleDTO(
+    @Schema(description = "openapi.article.id")
+    @field:PositiveOrZero(message = "valid.common.id")
+    val id: Long,
+
     @Schema(description = "openapi.article.title")
     @field:ValidatedArticleTitle
     val title: String,
@@ -25,4 +30,7 @@ data class CreateArticleDTO(
 
     @Schema(description = "openapi.article.tags")
     val tagIds: List<Long>,
+
+    @Schema(description = "openapi.article.article_status")
+    val articleStatus: ArticleStatus,
 )

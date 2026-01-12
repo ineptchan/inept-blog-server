@@ -11,10 +11,10 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
-import top.inept.blog.feature.article.pojo.convert.toHomeArticleVO
-import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
-import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
-import top.inept.blog.feature.article.pojo.vo.HomeArticleVO
+import top.inept.blog.feature.article.model.convert.toHomeArticleVO
+import top.inept.blog.feature.article.model.dto.QueryArticleDTO
+import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
 
 @Tag(name = "公开文章接口")

@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import top.inept.blog.feature.article.pojo.entity.Article
-import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 
 @Repository

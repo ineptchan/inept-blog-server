@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import top.inept.blog.feature.article.pojo.entity.Article
+import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.user.pojo.entity.User
 import java.time.LocalDateTime
 

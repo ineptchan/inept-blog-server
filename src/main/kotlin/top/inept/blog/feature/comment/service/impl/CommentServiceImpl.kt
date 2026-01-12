@@ -13,8 +13,8 @@ import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.extensions.toPageResponseTransformNotNull
-import top.inept.blog.feature.article.pojo.convert.toArticleTitleVO
-import top.inept.blog.feature.article.pojo.entity.Article
+import top.inept.blog.feature.article.model.convert.toArticleTitleVO
+import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.comment.pojo.convert.toCommentReplyVO
 import top.inept.blog.feature.comment.pojo.convert.toCommentSummaryVO

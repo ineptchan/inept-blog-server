@@ -9,11 +9,11 @@ import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
-import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
-import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
-import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
-import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
-import top.inept.blog.feature.article.pojo.entity.Article
+import top.inept.blog.feature.article.model.dto.CreateArticleDTO
+import top.inept.blog.feature.article.model.dto.QueryArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
+import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.article.repository.ArticleSpecs
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO

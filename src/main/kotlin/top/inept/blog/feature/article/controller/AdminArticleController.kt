@@ -9,14 +9,14 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
-import top.inept.blog.feature.article.pojo.convert.toArticleVO
-import top.inept.blog.feature.article.pojo.convert.toHomeArticleVO
-import top.inept.blog.feature.article.pojo.dto.QueryArticleDTO
-import top.inept.blog.feature.article.pojo.dto.CreateArticleDTO
-import top.inept.blog.feature.article.pojo.dto.UpdateArticleDTO
-import top.inept.blog.feature.article.pojo.dto.UpdateArticleStatusDTO
-import top.inept.blog.feature.article.pojo.vo.ArticleVO
-import top.inept.blog.feature.article.pojo.vo.HomeArticleVO
+import top.inept.blog.feature.article.model.convert.toArticleVO
+import top.inept.blog.feature.article.model.convert.toHomeArticleVO
+import top.inept.blog.feature.article.model.dto.QueryArticleDTO
+import top.inept.blog.feature.article.model.dto.CreateArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
+import top.inept.blog.feature.article.model.vo.ArticleVO
+import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
 
 @Tag(name = "管理员文章接口")

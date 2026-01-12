@@ -1,4 +1,4 @@
-package top.inept.blog.feature.article.pojo.entity.enums
+package top.inept.blog.feature.article.model.entity.enums
 
 enum class ArticleStatus {
     Draft,

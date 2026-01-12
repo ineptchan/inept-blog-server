@@ -1,12 +1,12 @@
-package top.inept.blog.feature.article.pojo.vo
+package top.inept.blog.feature.article.model.vo
 
 import io.swagger.v3.oas.annotations.media.Schema
-import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.pojo.vo.CategoriesVO
 import top.inept.blog.feature.tag.pojo.vo.TagVO
 import top.inept.blog.feature.user.pojo.vo.UserPublicVO
 
-data class HomeArticleVO(
+data class ArticleVO(
     @Schema(description = "openapi.article.id")
     val id: Long,
 
@@ -16,8 +16,8 @@ data class HomeArticleVO(
     @Schema(description = "openapi.article.slug")
     val slug: String,
 
-    @Schema(description = "openapi.article.home_content")
-    val homeContent: String,
+    @Schema(description = "openapi.article.content")
+    val content: String,
 
     @Schema(description = "openapi.article.author")
     val author: UserPublicVO,
@@ -27,4 +27,7 @@ data class HomeArticleVO(
 
     @Schema(description = "openapi.article.tags")
     val tags: List<TagVO>,
+
+    @Schema(description = "openapi.article.article_status")
+    val articleStatus: ArticleStatus,
 )

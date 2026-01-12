@@ -1,10 +1,10 @@
-package top.inept.blog.feature.article.pojo.convert
+package top.inept.blog.feature.article.model.convert
 
-import top.inept.blog.feature.article.pojo.entity.Article
-import top.inept.blog.feature.article.pojo.vo.ArticleSummaryVO
-import top.inept.blog.feature.article.pojo.vo.ArticleTitleVO
-import top.inept.blog.feature.article.pojo.vo.ArticleVO
-import top.inept.blog.feature.article.pojo.vo.HomeArticleVO
+import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.article.model.vo.ArticleSummaryVO
+import top.inept.blog.feature.article.model.vo.ArticleTitleVO
+import top.inept.blog.feature.article.model.vo.ArticleVO
+import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.categories.pojo.convert.toCategoriesVO
 import top.inept.blog.feature.tag.pojo.convert.toTagVO

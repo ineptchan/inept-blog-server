@@ -1,8 +1,8 @@
-package top.inept.blog.feature.article.pojo.dto
+package top.inept.blog.feature.article.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import top.inept.blog.base.BaseQueryDTO
-import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 
 data class QueryArticleDTO(
     @Schema(description = "openapi.article.category")

@@ -1,6 +1,6 @@
 package top.inept.blog.feature.comment.pojo.convert
 
-import top.inept.blog.feature.article.pojo.vo.ArticleTitleVO
+import top.inept.blog.feature.article.model.vo.ArticleTitleVO
 import top.inept.blog.feature.comment.pojo.entity.Comment
 import top.inept.blog.feature.comment.pojo.vo.CommentReplyVO
 import top.inept.blog.feature.comment.pojo.vo.CommentSummaryVO

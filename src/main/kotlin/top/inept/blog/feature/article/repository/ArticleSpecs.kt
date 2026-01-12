@@ -1,9 +1,9 @@
 package top.inept.blog.feature.article.repository
 
 import org.springframework.data.jpa.domain.Specification
-import top.inept.blog.feature.article.pojo.entity.Article
-import top.inept.blog.feature.article.pojo.entity.Article_
-import top.inept.blog.feature.article.pojo.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.article.model.entity.Article_
+import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.pojo.entity.Categories
 import top.inept.blog.feature.categories.pojo.entity.Categories_
 import top.inept.blog.feature.tag.pojo.entity.Tag
