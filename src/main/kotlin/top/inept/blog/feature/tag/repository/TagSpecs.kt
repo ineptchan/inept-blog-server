@@ -1,8 +1,8 @@
 package top.inept.blog.feature.tag.repository
 
 import org.springframework.data.jpa.domain.Specification
-import top.inept.blog.feature.tag.pojo.entity.Tag
-import top.inept.blog.feature.tag.pojo.entity.Tag_
+import top.inept.blog.feature.tag.model.entity.Tag
+import top.inept.blog.feature.tag.model.entity.Tag_
 
 object TagSpecs {
     fun nameContains(keyword: String?): Specification<Tag>? {

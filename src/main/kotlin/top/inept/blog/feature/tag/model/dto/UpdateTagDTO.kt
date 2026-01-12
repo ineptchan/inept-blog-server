@@ -1,9 +1,9 @@
-package top.inept.blog.feature.tag.pojo.dto
+package top.inept.blog.feature.tag.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.PositiveOrZero
-import top.inept.blog.feature.tag.pojo.validated.ValidatedTagName
-import top.inept.blog.feature.tag.pojo.validated.ValidatedTagSlug
+import top.inept.blog.feature.tag.model.validated.ValidatedTagName
+import top.inept.blog.feature.tag.model.validated.ValidatedTagSlug
 
 data class UpdateTagDTO(
     @Schema(description = "openapi.tag.id")

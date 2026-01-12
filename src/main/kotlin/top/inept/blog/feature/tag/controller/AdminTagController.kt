@@ -9,11 +9,11 @@ import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.extensions.toPageResponse
-import top.inept.blog.feature.tag.pojo.convert.toTagVO
-import top.inept.blog.feature.tag.pojo.dto.CreateTagDTO
-import top.inept.blog.feature.tag.pojo.dto.QueryTagDTO
-import top.inept.blog.feature.tag.pojo.dto.UpdateTagDTO
-import top.inept.blog.feature.tag.pojo.vo.TagVO
+import top.inept.blog.feature.tag.model.convert.toTagVO
+import top.inept.blog.feature.tag.model.dto.CreateTagDTO
+import top.inept.blog.feature.tag.model.dto.QueryTagDTO
+import top.inept.blog.feature.tag.model.dto.UpdateTagDTO
+import top.inept.blog.feature.tag.model.vo.TagVO
 import top.inept.blog.feature.tag.service.TagService
 
 @Tag(name = "管理员标签接口")

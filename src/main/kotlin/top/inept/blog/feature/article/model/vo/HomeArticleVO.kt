@@ -2,7 +2,7 @@ package top.inept.blog.feature.article.model.vo
 
 import io.swagger.v3.oas.annotations.media.Schema
 import top.inept.blog.feature.categories.model.vo.CategoriesVO
-import top.inept.blog.feature.tag.pojo.vo.TagVO
+import top.inept.blog.feature.tag.model.vo.TagVO
 import top.inept.blog.feature.user.pojo.vo.UserPublicVO
 
 data class HomeArticleVO(

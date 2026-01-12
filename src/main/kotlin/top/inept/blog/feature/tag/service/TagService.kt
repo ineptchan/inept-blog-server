@@ -2,10 +2,10 @@ package top.inept.blog.feature.tag.service
 
 
 import org.springframework.data.domain.Page
-import top.inept.blog.feature.tag.pojo.dto.CreateTagDTO
-import top.inept.blog.feature.tag.pojo.dto.QueryTagDTO
-import top.inept.blog.feature.tag.pojo.dto.UpdateTagDTO
-import top.inept.blog.feature.tag.pojo.entity.Tag
+import top.inept.blog.feature.tag.model.dto.CreateTagDTO
+import top.inept.blog.feature.tag.model.dto.QueryTagDTO
+import top.inept.blog.feature.tag.model.dto.UpdateTagDTO
+import top.inept.blog.feature.tag.model.entity.Tag
 
 interface TagService {
     fun getTags(queryTagDTO: QueryTagDTO): Page<Tag>

@@ -1,4 +1,4 @@
-package top.inept.blog.feature.tag.pojo.vo
+package top.inept.blog.feature.tag.model.vo
 
 import io.swagger.v3.oas.annotations.media.Schema
 

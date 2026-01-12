@@ -1,4 +1,4 @@
-package top.inept.blog.feature.tag.pojo.entity
+package top.inept.blog.feature.tag.model.entity
 
 import jakarta.persistence.*
 

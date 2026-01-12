@@ -8,11 +8,11 @@ import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
-import top.inept.blog.feature.tag.pojo.convert.toTag
-import top.inept.blog.feature.tag.pojo.dto.CreateTagDTO
-import top.inept.blog.feature.tag.pojo.dto.QueryTagDTO
-import top.inept.blog.feature.tag.pojo.dto.UpdateTagDTO
-import top.inept.blog.feature.tag.pojo.entity.Tag
+import top.inept.blog.feature.tag.model.convert.toTag
+import top.inept.blog.feature.tag.model.dto.CreateTagDTO
+import top.inept.blog.feature.tag.model.dto.QueryTagDTO
+import top.inept.blog.feature.tag.model.dto.UpdateTagDTO
+import top.inept.blog.feature.tag.model.entity.Tag
 import top.inept.blog.feature.tag.repository.TagRepository
 import top.inept.blog.feature.tag.repository.TagSpecs
 import top.inept.blog.feature.tag.service.TagService

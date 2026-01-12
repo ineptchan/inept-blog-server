@@ -1,15 +1,15 @@
-package top.inept.blog.feature.tag.pojo.validated
+package top.inept.blog.feature.tag.model.validated
 
 import jakarta.validation.Constraint
 import jakarta.validation.Payload
-import jakarta.validation.constraints.Size
+import jakarta.validation.constraints.Pattern
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [])
-@Size(min = 2, max = 24, message = "valid.tag.name")
-annotation class ValidatedTagName(
+@Pattern(regexp = "^[a-z0-9]+(-[a-z0-9]+)*$", message = "valid.tag.slug")
+annotation class ValidatedTagSlug(
     val message: String = "valid.common.unknown_error",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = []

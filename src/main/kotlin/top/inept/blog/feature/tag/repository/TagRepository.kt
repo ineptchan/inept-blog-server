@@ -3,7 +3,7 @@ package top.inept.blog.feature.tag.repository
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
-import top.inept.blog.feature.tag.pojo.entity.Tag
+import top.inept.blog.feature.tag.model.entity.Tag
 
 @Repository
 interface TagRepository : JpaRepository<Tag, Long>, JpaSpecificationExecutor<Tag> {

@@ -6,8 +6,8 @@ import top.inept.blog.feature.article.model.entity.Article_
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.model.entity.Categories
 import top.inept.blog.feature.categories.model.entity.Categories_
-import top.inept.blog.feature.tag.pojo.entity.Tag
-import top.inept.blog.feature.tag.pojo.entity.Tag_
+import top.inept.blog.feature.tag.model.entity.Tag
+import top.inept.blog.feature.tag.model.entity.Tag_
 
 object ArticleSpecs {
     fun byCategoryId(category: Long?): Specification<Article>? {
