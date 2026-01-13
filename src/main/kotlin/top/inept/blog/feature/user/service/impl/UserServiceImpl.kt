@@ -82,7 +82,7 @@ class UserServiceImpl(
             username = updateUserDTO.username
             email = updateUserDTO.email
             if (updateUserDTO.password != null) password = PasswordUtil.encode(updateUserDTO.password)
-            role = updateUserDTO.role
+           // role = updateUserDTO.role
         }
 
         return userRepository.save(dbUser)
@@ -113,7 +113,7 @@ class UserServiceImpl(
             ttlHours = jwtProperties.ttlHours,
             id = dbUser.id,
             username = dbUser.username,
-            role = dbUser.role,
+      //      role = dbUser.role,
         )
 
         return LoginUserVO(

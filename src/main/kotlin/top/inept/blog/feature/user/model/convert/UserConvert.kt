@@ -23,5 +23,5 @@ fun CreateUserDTO.toUser() = User(
     username = this.username,
     password = PasswordUtil.encode(this.password),
     email = this.email,
-    role = this.role,
+   // role = this.role,
 )

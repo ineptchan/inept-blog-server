@@ -29,6 +29,6 @@ data class UpdateUserDTO(
     @field:ValidatedUserEmail
     val email: String?,
 
-    @Schema(description = "openapi.user.role")
-    val role: UserRole
+/*    @Schema(description = "openapi.user.role")
+    val role: UserRole*/
 )

@@ -33,12 +33,12 @@ class JwtUtil(private val messages: MessageSourceAccessor) {
         ttlHours: Long,
         id: Long,
         username: String,
-        role: UserRole,
+      //  role: UserRole,
     ): String {
         val payload = HashMap<String, Any>()
         payload.put(JwtClaimsConstant.ID, id)
         payload.put(JwtClaimsConstant.USERNAME, username)
-        payload.put(JwtClaimsConstant.ROLE, role.toString())
+      //  payload.put(JwtClaimsConstant.ROLE, role.toString())
 
         return createJWT(secretKey, ttlHours, payload)
     }
