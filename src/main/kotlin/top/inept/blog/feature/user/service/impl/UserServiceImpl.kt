@@ -188,9 +188,7 @@ class UserServiceImpl(
         validateUniqueUserFields(
             nickname = if (updateUserProfileDTO.nickname != user.nickname) updateUserProfileDTO.nickname else null,
         )
-
-
-
+        
         user.apply {
             nickname = updateUserProfileDTO.nickname
             updateUserProfileDTO.password?.let {
