@@ -20,7 +20,7 @@ class Role(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var id: Long? = null,
+    var id: Long = 0,
 
     @Column(name = "code", nullable = false, length = 64)
     var code: String,
