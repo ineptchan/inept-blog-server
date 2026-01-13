@@ -193,8 +193,11 @@ class UserServiceImpl(
 
         user.apply {
             nickname = updateUserProfileDTO.nickname
-            //TODO
-            // if (updateUserProfileDTO.password != null) password = PasswordUtil.encode(updateUserProfileDTO.password)
+            updateUserProfileDTO.password?.let {
+                PasswordUtil.encode(it)?.let { encodePassword ->
+                    password = encodePassword
+                }
+            }
         }
 
         return userRepository.save(user)
