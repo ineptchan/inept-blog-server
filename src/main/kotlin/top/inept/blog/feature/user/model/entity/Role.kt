@@ -8,6 +8,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.user.model.entity.constraints.RoleConstraints
 import java.time.LocalDateTime
 
+/**
+ * Role
+ *
+ * @property id
+ * @property code
+ * @property name
+ * @property description
+ * @property createdAt
+ * @property updatedAt
+ * @property userBindings
+ * @property permissionBindings
+ * @constructor Create empty Role
+ */
 @Entity
 @Table(
     name = "roles",

@@ -44,5 +44,5 @@ class UserRole(
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    var updatedAt: LocalDateTime = LocalDateTime.now(),
+    var updatedAt: LocalDateTime? = null,
 )

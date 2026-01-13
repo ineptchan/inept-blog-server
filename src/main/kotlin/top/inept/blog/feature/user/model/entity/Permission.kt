@@ -8,6 +8,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.user.model.entity.constraints.PermissionConstraints
 import java.time.LocalDateTime
 
+/**
+ * Permission
+ *
+ * @property id
+ * @property code
+ * @property name
+ * @property description
+ * @property createdAt
+ * @property updatedAt
+ * @property roleBindings
+ * @constructor Create empty Permission
+ */
 @Entity
 @Table(
     name = "permissions",
@@ -40,7 +52,7 @@ class Permission(
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @LastModifiedDate
     @Column(name = "updated_at")
-    var updatedAt: LocalDateTime = LocalDateTime.now(),
+    var updatedAt: LocalDateTime? = null,
 
     @OneToMany(mappedBy = "permission")
     var roleBindings: MutableSet<RolePermission> = mutableSetOf()
