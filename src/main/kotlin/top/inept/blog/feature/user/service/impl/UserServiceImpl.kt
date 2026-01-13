@@ -100,9 +100,11 @@ class UserServiceImpl(
             username = updateUserDTO.username
             email = updateUserDTO.email
 
-            //TODO 查看
-            //   if (updateUserDTO.password != null) password = PasswordUtil.encode(updateUserDTO.password)
-            // role = updateUserDTO.role
+            updateUserDTO.password?.let {
+                PasswordUtil.encode(it)?.let { encodePassword ->
+                    password = encodePassword
+                }
+            }
         }
 
         return userRepository.save(dbUser)
