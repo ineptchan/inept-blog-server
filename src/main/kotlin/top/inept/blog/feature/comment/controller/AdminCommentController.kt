@@ -3,12 +3,11 @@ package top.inept.blog.feature.comment.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import top.inept.blog.base.ApiResponse
 import top.inept.blog.base.BaseQueryDTO
 import top.inept.blog.base.PageResponse
-import top.inept.blog.extensions.toApiResponse
 import top.inept.blog.feature.comment.model.dto.CreateCommentDTO
 import top.inept.blog.feature.comment.model.dto.QueryCommentDTO
 import top.inept.blog.feature.comment.model.dto.UpdateCommentDTO
@@ -26,33 +25,33 @@ class AdminCommentController(
 ) {
     @Operation(summary = "获取评论列表")
     @GetMapping
-    fun getComments(@Valid queryCommentDTO: QueryCommentDTO): ApiResponse<PageResponse<CommentVO>> {
-        return commentService.getComments(queryCommentDTO).toApiResponse()
+    fun getComments(@Valid queryCommentDTO: QueryCommentDTO): ResponseEntity<PageResponse<CommentVO>> {
+        return ResponseEntity.ok(commentService.getComments(queryCommentDTO))
     }
 
     @Operation(summary = "根据id获取评论")
     @GetMapping("/{id}")
-    fun getCommentById(@PathVariable id: Long): ApiResponse<CommentVO> {
-        return ApiResponse.success(commentService.getCommentById(id))
+    fun getCommentById(@PathVariable id: Long): ResponseEntity<CommentVO> {
+        return ResponseEntity.ok(commentService.getCommentById(id))
     }
 
     @Operation(summary = "创建评论")
     @PostMapping
-    fun createComment(@Valid @RequestBody createCommentDTO: CreateCommentDTO): ApiResponse<CommentVO> {
-        return ApiResponse.success(commentService.createComment(createCommentDTO))
+    fun createComment(@Valid @RequestBody createCommentDTO: CreateCommentDTO): ResponseEntity<CommentVO> {
+        return ResponseEntity.ok(commentService.createComment(createCommentDTO))
     }
 
     @Operation(summary = "更新评论")
     @PutMapping
-    fun updateComment(@Valid @RequestBody updateCommentDTO: UpdateCommentDTO): ApiResponse<CommentSummaryVO> {
-        return ApiResponse.success(commentService.updateComment(updateCommentDTO))
+    fun updateComment(@Valid @RequestBody updateCommentDTO: UpdateCommentDTO): ResponseEntity<CommentSummaryVO> {
+        return ResponseEntity.ok(commentService.updateComment(updateCommentDTO))
     }
 
     @Operation(summary = "删除评论")
     @DeleteMapping("/{id}")
-    fun deleteComment(@PathVariable id: Long): ApiResponse<Boolean> {
+    fun deleteComment(@PathVariable id: Long): ResponseEntity<Boolean> {
         commentService.deleteComment(id)
-        return ApiResponse.success(true)
+        return ResponseEntity.ok(true)
     }
 
     @Operation(summary = "获得评论回复列表")
@@ -60,7 +59,7 @@ class AdminCommentController(
     fun getCommentReplies(
         @PathVariable commentId: Long,
         @Valid baseQueryDTO: BaseQueryDTO
-    ): ApiResponse<PageResponse<CommentReplyVO>> {
-        return commentService.getCommentReplies(commentId, baseQueryDTO).toApiResponse()
+    ): ResponseEntity<PageResponse<CommentReplyVO>> {
+        return ResponseEntity.ok(commentService.getCommentReplies(commentId, baseQueryDTO))
     }
 }

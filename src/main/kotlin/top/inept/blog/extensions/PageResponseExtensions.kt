@@ -1,15 +1,11 @@
 package top.inept.blog.extensions
 
 import org.springframework.data.domain.Page
-import top.inept.blog.base.ApiResponse
+import org.springframework.http.ResponseEntity
 import top.inept.blog.base.PageResponse
 
-fun <T> PageResponse<T>.toApiResponse(): ApiResponse<PageResponse<T>> {
-    return ApiResponse(
-        code = 0,
-        msg = "success",
-        data = this
-    )
+fun <T> PageResponse<T>.toResponseEntity(): ResponseEntity<PageResponse<T>> {
+    return ResponseEntity.ok(this)
 }
 
 fun <T : Any> Page<T>.toPageResponse(): PageResponse<T> {
