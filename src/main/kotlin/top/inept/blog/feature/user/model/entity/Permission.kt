@@ -30,7 +30,7 @@ class Permission(
     var name: String,
 
     @Column(name = "description")
-    var description: String,
+    var description: String? = null,
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
