@@ -17,11 +17,3 @@ fun User.toUserPublicVO() = UserPublicVO(
     id = this.id,
     nickname = this.nickname,
 )
-
-fun CreateUserDTO.toUser() = User(
-    nickname = this.nickname,
-    username = this.username,
-    password = PasswordUtil.encode(this.password),
-    email = this.email,
-   // role = this.role,
-)

@@ -1,2 +1,4 @@
-INSERT INTO users (created_at, email, password, role, updated_at, username)
-VALUES (now(), null, '$2a$10$BaYEDWI0QkwEsfpIGaPwgumB8SEDNAviLwvndiVgMT3sZjw705.Iy', 1, now(), 'admintest')
+insert into users(created_at, email, nickname, password, updated_at, username)
+values (now(),'admin@inept.top','inept','$2a$10$P53CwaeHtpaPxUU9fiBOPOVTHuh7e1PWJ.D3ZV9HSeGMn6ryliQai',null,'admintest')
+-- admintest admin123456
+

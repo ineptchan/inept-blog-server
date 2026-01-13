@@ -3,6 +3,7 @@ package top.inept.blog.feature.article.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.ApiResponse
@@ -26,6 +27,7 @@ import top.inept.blog.feature.article.service.ArticleService
 class AdminArticleController(
     private val articleService: ArticleService,
 ) {
+    @PreAuthorize("hasAuthority('admin:articles:read')")
     @Operation(summary = "获取文章列表")
     @GetMapping
     fun getArticles(@Valid queryArticleDTO: QueryArticleDTO): ApiResponse<PageResponse<HomeArticleVO>> {

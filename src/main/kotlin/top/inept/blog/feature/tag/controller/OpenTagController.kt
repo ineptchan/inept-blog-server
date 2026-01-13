@@ -18,7 +18,7 @@ import top.inept.blog.feature.tag.service.TagService
 
 @Tag(name = "公开标签接口")
 @RestController
-@RequestMapping("/open/tag")
+@RequestMapping("/public/tag")
 @Validated
 class OpenTagController(
     private val tagService: TagService,

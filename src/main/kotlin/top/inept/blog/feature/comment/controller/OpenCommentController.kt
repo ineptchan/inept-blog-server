@@ -18,7 +18,7 @@ import top.inept.blog.feature.comment.service.CommentService
 
 @Tag(name = "公开评论接口")
 @RestController
-@RequestMapping("/open/comment")
+@RequestMapping("/public/comment")
 @Validated
 class OpenCommentController(
     private val commentService: CommentService

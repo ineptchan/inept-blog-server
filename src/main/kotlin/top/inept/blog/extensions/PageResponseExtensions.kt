@@ -12,7 +12,7 @@ fun <T> PageResponse<T>.toApiResponse(): ApiResponse<PageResponse<T>> {
     )
 }
 
-fun <T> Page<T>.toPageResponse(): PageResponse<T> {
+fun <T : Any> Page<T>.toPageResponse(): PageResponse<T> {
     return PageResponse(
         content = this.content,
         page = this.number + 1,
@@ -22,7 +22,7 @@ fun <T> Page<T>.toPageResponse(): PageResponse<T> {
     )
 }
 
-fun <E, V> Page<E>.toPageResponse(transform: (E) -> V): PageResponse<V> {
+fun <E : Any, V> Page<E>.toPageResponse(transform: (E) -> V): PageResponse<V> {
     return PageResponse(
         content = this.content.map(transform),
         page = this.number + 1,
@@ -32,7 +32,7 @@ fun <E, V> Page<E>.toPageResponse(transform: (E) -> V): PageResponse<V> {
     )
 }
 
-fun <E, V> Page<E>.toPageResponseTransformNotNull(transform: (E) -> V?): PageResponse<V> {
+fun <E : Any, V> Page<E>.toPageResponseTransformNotNull(transform: (E) -> V?): PageResponse<V> {
     return PageResponse(
         content = this.content.mapNotNull(transform),
         page = this.number + 1,

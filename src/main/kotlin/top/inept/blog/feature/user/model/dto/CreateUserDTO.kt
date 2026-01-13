@@ -1,7 +1,6 @@
 package top.inept.blog.feature.user.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import top.inept.blog.feature.user.model.entity.enums.UserRole
 import top.inept.blog.feature.user.model.validated.ValidateUserNickname
 import top.inept.blog.feature.user.model.validated.ValidateUserUsername
 import top.inept.blog.feature.user.model.validated.ValidatedUserEmail
@@ -24,6 +23,6 @@ data class CreateUserDTO(
     @field:ValidatedUserEmail
     val email: String?,
 
-    @Schema(description = "openapi.user.role")
-    val role: UserRole
+//    @Schema(description = "openapi.user.role")
+//    val role: UserRole
 )

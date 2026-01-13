@@ -19,7 +19,7 @@ import top.inept.blog.feature.article.service.ArticleService
 
 @Tag(name = "公开文章接口")
 @RestController
-@RequestMapping("/open/articles")
+@RequestMapping("/public/articles")
 @Validated
 class OpenArticleController(
     private val articleService: ArticleService,

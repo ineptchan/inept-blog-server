@@ -2,7 +2,6 @@ package top.inept.blog.feature.user.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.PositiveOrZero
-import top.inept.blog.feature.user.model.entity.enums.UserRole
 import top.inept.blog.feature.user.model.validated.ValidateUserNickname
 import top.inept.blog.feature.user.model.validated.ValidateUserUsername
 import top.inept.blog.feature.user.model.validated.ValidatedUserEmail

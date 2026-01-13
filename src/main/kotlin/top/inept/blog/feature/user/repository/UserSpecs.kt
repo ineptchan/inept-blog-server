@@ -8,7 +8,7 @@ object UserSpecs {
     fun nicknameContains(keyword: String?): Specification<User>? {
         return keyword?.takeIf { it.isNotBlank() }?.let {
             Specification { root, _, cb ->
-                cb.like(cb.lower(root.get(User_.nickname)), "%${it.lowercase()}%")
+                cb.like(cb.lower(root.get<String>(User_.nickname)), "%${it.lowercase()}%")
             }
         }
     }

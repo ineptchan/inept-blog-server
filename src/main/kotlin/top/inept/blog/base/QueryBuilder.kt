@@ -3,7 +3,7 @@ package top.inept.blog.base
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 
-data class QueryBuilder<T>(
+data class QueryBuilder<T: Any>(
     val specs: MutableList<Specification<T>> = mutableListOf(),
     var sort: Sort = Sort.unsorted()
 ) {
@@ -29,6 +29,6 @@ data class QueryBuilder<T>(
         return this
     }
 
-    fun buildSpec(): Specification<T>? =
-        specs.reduceOrNull(Specification<T>::and)
+    fun buildSpec(): Specification<T> =
+        Specification.allOf(specs)
 }
