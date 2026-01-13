@@ -29,7 +29,7 @@ class Permission(
     @Column(name = "name", nullable = false)
     var name: String,
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     var description: String,
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
