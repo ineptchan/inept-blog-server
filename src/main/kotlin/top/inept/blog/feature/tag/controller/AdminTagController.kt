@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.PageResponse
@@ -22,6 +23,7 @@ import top.inept.blog.feature.tag.service.TagService
 class AdminTagController(
     private val tagService: TagService,
 ) {
+    @PreAuthorize("hasAuthority('admin:tag:read')")
     @Operation(summary = "获取标签列表")
     @GetMapping()
     fun getTags(@Valid queryTagDTO: QueryTagDTO): ResponseEntity<PageResponse<TagVO>> {
@@ -32,24 +34,28 @@ class AdminTagController(
         )
     }
 
+    @PreAuthorize("hasAuthority('admin:tag:read')")
     @Operation(summary = "根据id获取标签")
     @GetMapping("/{id}")
     fun getTagById(@PathVariable id: Long): ResponseEntity<TagVO> {
         return ResponseEntity.ok(tagService.getTagById(id).toTagVO())
     }
 
+    @PreAuthorize("hasAuthority('admin:tag:create')")
     @Operation(summary = "创建标签")
     @PostMapping
     fun createTag(@Valid @RequestBody createTagDTO: CreateTagDTO): ResponseEntity<TagVO> {
         return ResponseEntity.ok(tagService.createTag(createTagDTO).toTagVO())
     }
 
+    @PreAuthorize("hasAuthority('admin:tag:update')")
     @Operation(summary = "更新标签")
     @PutMapping
     fun updateTag(@Valid @RequestBody updateTagDTO: UpdateTagDTO): ResponseEntity<TagVO> {
         return ResponseEntity.ok(tagService.updateTag(updateTagDTO).toTagVO())
     }
 
+    @PreAuthorize("hasAuthority('admin:tag:delete')")
     @Operation(summary = "删除标签")
     @DeleteMapping("/{id}")
     fun deleteTag(@PathVariable id: Long): ResponseEntity<Boolean> {

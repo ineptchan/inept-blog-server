@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -20,6 +21,7 @@ import top.inept.blog.feature.comment.service.CommentService
 class UserCommentController(
     private val commentService: CommentService
 ) {
+    @PreAuthorize("hasAuthority('user:comment:create')")
     @Operation(summary = "创建评论")
     @PostMapping
     fun createComment(@Valid @RequestBody createCommentDTO: CreateCommentDTO): ResponseEntity<CommentVO> {

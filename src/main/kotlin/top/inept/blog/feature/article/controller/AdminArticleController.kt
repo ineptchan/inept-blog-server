@@ -26,7 +26,7 @@ import top.inept.blog.feature.article.service.ArticleService
 class AdminArticleController(
     private val articleService: ArticleService,
 ) {
-    @PreAuthorize("hasAuthority('admin:articles:read')")
+    @PreAuthorize("hasAuthority('admin:article:read')")
     @Operation(summary = "获取文章列表")
     @GetMapping
     fun getArticles(@Valid queryArticleDTO: QueryArticleDTO): ResponseEntity<PageResponse<HomeArticleVO>> {
@@ -34,24 +34,28 @@ class AdminArticleController(
         return ResponseEntity.ok(articlePage.toPageResponse { it.toHomeArticleVO() })
     }
 
+    @PreAuthorize("hasAuthority('admin:article:read')")
     @Operation(summary = "根据id获取文章")
     @GetMapping("/{id}")
     fun getArticleById(@PathVariable id: Long): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.getArticleById(id).toArticleVO())
     }
 
+    @PreAuthorize("hasAuthority('admin:article:create')")
     @Operation(summary = "创建文章")
     @PostMapping
     fun createArticle(@Valid @RequestBody createArticleDTO: CreateArticleDTO): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.createArticle(createArticleDTO).toArticleVO())
     }
 
+    @PreAuthorize("hasAuthority('admin:article:update')")
     @Operation(summary = "更新文章")
     @PutMapping
     fun updateArticle(@Valid @RequestBody updateArticleDTO: UpdateArticleDTO): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.updateArticle(updateArticleDTO).toArticleVO())
     }
 
+    @PreAuthorize("hasAuthority('admin:article:delete')")
     @Operation(summary = "删除文章")
     @DeleteMapping("/{id}")
     fun deleteArticle(@PathVariable id: Long): ResponseEntity<Boolean> {
@@ -59,6 +63,7 @@ class AdminArticleController(
         return ResponseEntity.ok(true)
     }
 
+    @PreAuthorize("hasAuthority('admin:article:update')")
     @Operation(summary = "批量更新文章状态")
     @PutMapping("/status")
     fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ResponseEntity<Boolean> {
