@@ -29,6 +29,6 @@ server:
 top:
   inept:
     jwt:
-      secretKey: ${top.inept.jwt.secretKey}
-      ttlHours: ${top.inept.jwt.ttlHours}
-      tokenName: ${top.inept.jwt.tokenName}
+      issuer: ${top.inept.jwt.issuer}
+      secret-key: ${top.inept.jwt.secret-key}
+      expires-minutes: ${top.inept.jwt.expires-minutes}
