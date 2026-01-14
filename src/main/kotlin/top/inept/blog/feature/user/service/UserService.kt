@@ -16,7 +16,6 @@ interface UserService {
     fun createUser(createUserDTO: CreateUserDTO): User
     fun updateUser(updateUserDTO: UpdateUserDTO): User
     fun deleteUserById(id: Long)
-    fun loginUser(userLoginDTO: LoginUserDTO): LoginUserVO
     fun updateProfile(updateUserProfileDTO: UpdateUserProfileDTO): User
     fun getProfile(): User
 }

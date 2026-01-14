@@ -2,10 +2,11 @@ package top.inept.blog.config
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret
 import com.nimbusds.jose.proc.SecurityContext
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
-import org.springframework.core.env.Profiles
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -28,58 +29,73 @@ import javax.crypto.spec.SecretKeySpec
 @EnableMethodSecurity
 class SecurityConfig() {
     @Bean
-    fun securityFilterChain(
-        http: HttpSecurity,
-        environment: Environment,
-        jwtAuthConverter: JwtAuthenticationConverter
-    ): SecurityFilterChain {
-        return http
+    @Order(1)
+    fun publicChain(http: HttpSecurity, environment: Environment): SecurityFilterChain {
+        http
+            .securityMatcher("/public/**", "/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeHttpRequests {
-                it.requestMatchers(
-                    "/public/**"
-                ).permitAll()
+            .authorizeHttpRequests { it.anyRequest().permitAll() }
 
-                //非prod配置开启openapi
-                val notProd: Boolean = environment.acceptsProfiles(Profiles.of("!prod"))
-                if (notProd) {
-                    it.requestMatchers("/swagger-ui/**").permitAll()
-                    it.requestMatchers("/v3/api-docs/**").permitAll()
-                }
+        return http.build()
+    }
 
-                it.anyRequest().authenticated()
-            }
+    @Bean
+    @Order(2)
+    fun apiChain(
+        http: HttpSecurity,
+        jwtAuthConverter: JwtAuthenticationConverter,
+        @Qualifier("accessJwtDecoder") accessJwtDecoder: JwtDecoder,
+    ): SecurityFilterChain {
+        http
+            .csrf { it.disable() }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests { it.anyRequest().authenticated() }
             .oauth2ResourceServer { oauth2 ->
                 oauth2.jwt { jwt ->
+                    jwt.decoder(accessJwtDecoder)
                     jwt.jwtAuthenticationConverter(jwtAuthConverter)
                 }
             }
-            .build()
+
+        return http.build()
     }
 
-    /** 用 HS256 对称密钥做 JwtEncoder/JwtDecoder */
-    @Bean
-    fun jwtSecret(jwtProperties: JwtProperties): SecretKey {
-        return SecretKeySpec(jwtProperties.secretKey.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
-    }
+    @Bean("accessJwtSecret")
+    fun accessJwtSecret(props: JwtProperties): SecretKey =
+        SecretKeySpec(props.accessSecretKey.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
 
-    @Bean
-    fun jwtDecoder(jwtSecret: SecretKey): JwtDecoder {
-        return NimbusJwtDecoder.withSecretKey(jwtSecret)
+    @Bean("refreshJwtSecret")
+    fun refreshJwtSecret(props: JwtProperties): SecretKey =
+        SecretKeySpec(props.refreshSecretKey.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
+
+    @Bean("accessJwtDecoder")
+    fun accessJwtDecoder(@Qualifier("accessJwtSecret") jwtSecret: SecretKey): JwtDecoder =
+        NimbusJwtDecoder.withSecretKey(jwtSecret)
             .macAlgorithm(MacAlgorithm.HS256)
             .build()
+
+    @Bean("refreshJwtDecoder")
+    fun refreshJwtDecoder(@Qualifier("refreshJwtSecret") jwtSecret: SecretKey): JwtDecoder =
+        NimbusJwtDecoder.withSecretKey(jwtSecret)
+            .macAlgorithm(MacAlgorithm.HS256)
+            .build()
+
+    @Bean("accessJwtEncoder")
+    fun accessJwtEncoder(@Qualifier("accessJwtSecret") jwtSecret: SecretKey): JwtEncoder {
+        val source = ImmutableSecret<SecurityContext>(jwtSecret.encoded)
+        return NimbusJwtEncoder(source)
     }
 
-    @Bean
-    fun jwtEncoder(jwtSecret: SecretKey): JwtEncoder {
+    @Bean("refreshJwtEncoder")
+    fun refreshJwtEncoder(@Qualifier("refreshJwtSecret") jwtSecret: SecretKey): JwtEncoder {
         val source = ImmutableSecret<SecurityContext>(jwtSecret.encoded)
         return NimbusJwtEncoder(source)
     }
 
     /**
      * 把 JWT 里自定义 claim: auth (List<String>) 映射成 GrantedAuthority
-     * 例：["ROLE_ADMIN", "user:read", "user:write"]
+     * 例：["user:read", "user:write"]
      */
     @Bean
     fun jwtAuthenticationConverter(): JwtAuthenticationConverter {

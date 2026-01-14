@@ -11,5 +11,7 @@ top:
       port: 8080
     jwt:
       issuer: boot4-rbac
-      secret-key: U7lIBboDJW24Ak1ROncsOyuVNuugnZriJWZBY9ULB//4EdZU5AeGCRlVAdXMKxinBynktrcuQgGVCM4Fm54tBg==  #openssl rand -base64 64
-      expires-minutes: 10080  #7day
+      access-secret-key: U7lIBboDJW24Ak1ROncsOyuVNuugnZriJWZBY9ULB//4EdZU5AeGCRlVAdXMKxinBynktrcuQgGVCM4Fm54tBg==     #openssl rand -base64 64
+      refresh-secret-key: mOxd0bfTmeEsf8kkmFldk/ztkys6FkKRSGF0r66n6coKPRvqm0xJ9tCOBunH0v/9GaWqop0ZIgsEMUNyIZqPTA==    #openssl rand -base64 64
+      access-expires-minutes: 15
+      refresh-expires-minutes: 10080  #7day
