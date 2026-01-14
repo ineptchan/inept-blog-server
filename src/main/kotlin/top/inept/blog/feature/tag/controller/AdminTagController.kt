@@ -41,14 +41,14 @@ class AdminTagController(
         return ResponseEntity.ok(tagService.getTagById(id).toTagVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:tag:create')")
+    @PreAuthorize("hasAuthority('admin:tag:write')")
     @Operation(summary = "创建标签")
     @PostMapping
     fun createTag(@Valid @RequestBody createTagDTO: CreateTagDTO): ResponseEntity<TagVO> {
         return ResponseEntity.ok(tagService.createTag(createTagDTO).toTagVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:tag:update')")
+    @PreAuthorize("hasAuthority('admin:tag:modify')")
     @Operation(summary = "更新标签")
     @PutMapping
     fun updateTag(@Valid @RequestBody updateTagDTO: UpdateTagDTO): ResponseEntity<TagVO> {

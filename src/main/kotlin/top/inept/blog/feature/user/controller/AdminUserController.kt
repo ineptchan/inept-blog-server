@@ -41,14 +41,14 @@ class AdminUserController(
         return ResponseEntity.ok(userService.getUserById(id).toUserVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:user:create')")
+    @PreAuthorize("hasAuthority('admin:user:write')")
     @Operation(summary = "创建用户")
     @PostMapping
     fun createUser(@Valid @RequestBody createUserDTO: CreateUserDTO): ResponseEntity<UserVO> {
         return ResponseEntity.ok(userService.createUser(createUserDTO).toUserVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:user:update')")
+    @PreAuthorize("hasAuthority('admin:user:modify')")
     @Operation(summary = "更新用户")
     @PutMapping
     fun updateUser(@Valid @RequestBody updateUserDTO: UpdateUserDTO): ResponseEntity<UserVO> {

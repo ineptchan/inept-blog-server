@@ -41,14 +41,14 @@ class AdminArticleController(
         return ResponseEntity.ok(articleService.getArticleById(id).toArticleVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:article:create')")
+    @PreAuthorize("hasAuthority('admin:article:write')")
     @Operation(summary = "创建文章")
     @PostMapping
     fun createArticle(@Valid @RequestBody createArticleDTO: CreateArticleDTO): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.createArticle(createArticleDTO).toArticleVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:article:update')")
+    @PreAuthorize("hasAuthority('admin:article:modify')")
     @Operation(summary = "更新文章")
     @PutMapping
     fun updateArticle(@Valid @RequestBody updateArticleDTO: UpdateArticleDTO): ResponseEntity<ArticleVO> {
@@ -63,7 +63,7 @@ class AdminArticleController(
         return ResponseEntity.ok(true)
     }
 
-    @PreAuthorize("hasAuthority('admin:article:update')")
+    @PreAuthorize("hasAuthority('admin:article:modify')")
     @Operation(summary = "批量更新文章状态")
     @PutMapping("/status")
     fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ResponseEntity<Boolean> {

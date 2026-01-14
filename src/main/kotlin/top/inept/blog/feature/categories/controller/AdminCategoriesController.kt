@@ -41,14 +41,14 @@ class AdminCategoriesController(
         return ResponseEntity.ok(categoriesService.getCategoriesById(id).toCategoriesVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:categories:create')")
+    @PreAuthorize("hasAuthority('admin:categories:write')")
     @Operation(summary = "创建分类")
     @PostMapping
     fun createCategory(@Valid @RequestBody createCategoriesDTO: CreateCategoriesDTO): ResponseEntity<CategoriesVO> {
         return ResponseEntity.ok(categoriesService.createCategory(createCategoriesDTO).toCategoriesVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:categories:update')")
+    @PreAuthorize("hasAuthority('admin:categories:modify')")
     @Operation(summary = "更新分类")
     @PutMapping
     fun updateCategory(@Valid @RequestBody updateCategoriesDTO: UpdateCategoriesDTO): ResponseEntity<CategoriesVO> {

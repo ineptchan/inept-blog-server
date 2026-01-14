@@ -26,7 +26,7 @@ class UserUserController(
         return ResponseEntity.ok(userService.getProfile().toUserVO())
     }
 
-    @PreAuthorize("hasAuthority('user:user:update')")
+    @PreAuthorize("hasAuthority('user:user:modify')")
     @Operation(summary = "更新用户资料")
     @PutMapping
     fun updateProfile(@Valid @RequestBody updateUserProfileDTO: UpdateUserProfileDTO): ResponseEntity<UserVO> {
