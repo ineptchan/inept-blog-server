@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.vo.AuthLoginVO
 import top.inept.blog.feature.auth.service.AuthService
+import top.inept.blog.properties.JwtProperties
 import java.time.Duration
 
 @Tag(name = "公开身份验证接口")
@@ -20,33 +23,57 @@ import java.time.Duration
 @Validated
 class AuthController(
     private val authService: AuthService,
+    private val jwtProperties: JwtProperties,
+    private val environment: Environment
 ) {
     @Operation(summary = "登录")
     @PostMapping("/login")
     fun login(@Valid @RequestBody dto: AuthLoginDTO, response: HttpServletResponse): ResponseEntity<AuthLoginVO> {
         val combo = authService.login(dto)
 
-        val refreshToken = combo.value2
+        //在prod配置模式下必须https才能用携带cookie
+        val secure = environment.acceptsProfiles(Profiles.of("prod"))
 
-        val cookie = ResponseCookie.from("X-Refresh-Token", refreshToken)
+        val cookie = ResponseCookie.from("X-Refresh-Token", combo.refreshToken)
             .httpOnly(true)
-            .secure(false)          //TODO 必须 HTTPS，本地 http 调试可先 false，上线必须 true
+            .secure(secure)
             .sameSite("Lax")
             .path("/auth/refresh")
-
-            //最好从properties算
-            .maxAge(Duration.ofDays(7))
+            .maxAge(Duration.ofMinutes(jwtProperties.refreshExpiresMinutes))
             .build()
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
 
-        return ResponseEntity.ok(combo.value1)
+        return ResponseEntity.ok(combo.dto)
     }
 
     @Operation(summary = "刷新令牌")
     @PostMapping("/refresh")
-    fun refresh(@CookieValue("X-Refresh-Token") token: String): ResponseEntity<String> {
+    fun refresh(@CookieValue("X-Refresh-Token") token: String, response: HttpServletResponse): ResponseEntity<String> {
         val accessToken = authService.refresh(token)
-        return ResponseEntity.ok(accessToken)
+
+        //在prod配置模式下必须https才能用携带cookie
+        val secure = environment.acceptsProfiles(Profiles.of("prod"))
+
+        val cookie1 = ResponseCookie.from("X-Access-Token", accessToken)
+            .httpOnly(true)
+            .secure(secure)
+            .sameSite("Lax")
+            .path("/admin")
+            .maxAge(Duration.ofMinutes(jwtProperties.accessExpiresMinutes))
+            .build()
+
+        val cookie2 = ResponseCookie.from("X-Access-Token", accessToken)
+            .httpOnly(true)
+            .secure(secure)
+            .sameSite("Lax")
+            .path("/user")
+            .maxAge(Duration.ofMinutes(jwtProperties.accessExpiresMinutes))
+            .build()
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie1.toString())
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie2.toString())
+
+        return ResponseEntity.ok("ok")
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
-import top.inept.blog.feature.auth.model.Combo
+import top.inept.blog.feature.auth.model.LoginBundle
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.entity.RefreshToken
 import top.inept.blog.feature.auth.model.vo.AuthLoginVO
@@ -40,7 +40,7 @@ class AuthServiceImpl(
      * @param dto
      * @return AuthLoginVO,refreshToken
      */
-    override fun login(dto: AuthLoginDTO): Combo<AuthLoginVO, String> {
+    override fun login(dto: AuthLoginDTO): LoginBundle {
         //根据用户名查找用户
         val dbUser = userRepository.findByUsername(dto.username)
 
@@ -76,7 +76,7 @@ class AuthServiceImpl(
             accessToken = accessToken
         )
 
-        return Combo(vo, refreshToken)
+        return LoginBundle(vo, refreshToken)
     }
 
     /**

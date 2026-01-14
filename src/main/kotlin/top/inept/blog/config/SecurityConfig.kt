@@ -2,11 +2,13 @@ package top.inept.blog.config
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret
 import com.nimbusds.jose.proc.SecurityContext
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -18,6 +20,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver
 import org.springframework.security.web.SecurityFilterChain
 import top.inept.blog.properties.JwtProperties
 import java.nio.charset.StandardCharsets
@@ -28,11 +32,23 @@ import javax.crypto.spec.SecretKeySpec
 @EnableWebSecurity
 @EnableMethodSecurity
 class SecurityConfig() {
+    //TODO csrf+httpOnly安全问题
     @Bean
     @Order(1)
     fun publicChain(http: HttpSecurity, environment: Environment): SecurityFilterChain {
+        val isDev = environment.acceptsProfiles(Profiles.of("dev"))
+
+        val matchers = buildList {
+            add("/public/**")
+            add("/auth/**")
+            if (isDev) {
+                add("/swagger-ui/**")
+                add("/v3/api-docs/**")
+            }
+        }.toTypedArray()
+
         http
-            .securityMatcher("/public/**", "/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
+            .securityMatcher(*matchers)
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { it.anyRequest().permitAll() }
@@ -52,6 +68,7 @@ class SecurityConfig() {
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { it.anyRequest().authenticated() }
             .oauth2ResourceServer { oauth2 ->
+                oauth2.bearerTokenResolver(HeaderOrCookieBearerTokenResolver("X-Access-Token"))
                 oauth2.jwt { jwt ->
                     jwt.decoder(accessJwtDecoder)
                     jwt.jwtAuthenticationConverter(jwtAuthConverter)
@@ -113,5 +130,34 @@ class SecurityConfig() {
         }
 
         return converter
+    }
+}
+
+/**
+ * Header or cookie bearer token resolver
+ *
+ * @property cookieName
+ * @constructor Create empty Header or cookie bearer token resolver
+ * @author chatgpt
+ */
+class HeaderOrCookieBearerTokenResolver(
+    private val cookieName: String = "X-Access-Token"
+) : BearerTokenResolver {
+
+    private val delegate = DefaultBearerTokenResolver()
+
+    override fun resolve(request: HttpServletRequest): String? {
+        // 1) 优先走标准 Authorization: Bearer xxx
+        val fromHeader = delegate.resolve(request)
+        if (!fromHeader.isNullOrBlank()) return fromHeader
+
+        // 2) 再从 Cookie 取
+        val raw = request.cookies
+            ?.firstOrNull { it.name == cookieName }
+            ?.value
+            ?: return null
+
+        // 兼容 cookie 里误放了 "Bearer xxx"
+        return raw.removePrefix("Bearer ").trim().ifBlank { null }
     }
 }
