@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.vo.AuthLoginVO
+import top.inept.blog.feature.auth.model.vo.RefreshVO
 import top.inept.blog.feature.auth.service.AuthService
 import top.inept.blog.properties.JwtProperties
 import java.time.Duration
@@ -49,8 +50,8 @@ class AuthController(
 
     @Operation(summary = "刷新令牌")
     @PostMapping("/refresh")
-    fun refresh(@CookieValue("X-Refresh-Token") token: String): ResponseEntity<String> {
+    fun refresh(@CookieValue("X-Refresh-Token") token: String): ResponseEntity<RefreshVO> {
         val accessToken = authService.refresh(token)
-        return ResponseEntity.ok(accessToken)
+        return ResponseEntity.ok(RefreshVO(accessToken))
     }
 }
