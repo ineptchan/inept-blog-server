@@ -49,31 +49,8 @@ class AuthController(
 
     @Operation(summary = "刷新令牌")
     @PostMapping("/refresh")
-    fun refresh(@CookieValue("X-Refresh-Token") token: String, response: HttpServletResponse): ResponseEntity<String> {
+    fun refresh(@CookieValue("X-Refresh-Token") token: String): ResponseEntity<String> {
         val accessToken = authService.refresh(token)
-
-        //在prod配置模式下必须https才能用携带cookie
-        val secure = environment.acceptsProfiles(Profiles.of("prod"))
-
-        val cookie1 = ResponseCookie.from("X-Access-Token", accessToken)
-            .httpOnly(true)
-            .secure(secure)
-            .sameSite("Lax")
-            .path("/admin")
-            .maxAge(Duration.ofMinutes(jwtProperties.accessExpiresMinutes))
-            .build()
-
-        val cookie2 = ResponseCookie.from("X-Access-Token", accessToken)
-            .httpOnly(true)
-            .secure(secure)
-            .sameSite("Lax")
-            .path("/user")
-            .maxAge(Duration.ofMinutes(jwtProperties.accessExpiresMinutes))
-            .build()
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie1.toString())
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie2.toString())
-
-        return ResponseEntity.ok("ok")
+        return ResponseEntity.ok(accessToken)
     }
 }
