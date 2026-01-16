@@ -1,11 +1,14 @@
 package top.inept.blog.feature.article.service.impl
 
+import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
+import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
@@ -14,6 +17,7 @@ import top.inept.blog.feature.article.model.dto.QueryArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.article.model.entity.constraints.ArticleConstraints
 import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.article.repository.ArticleSpecs
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
@@ -35,18 +39,13 @@ class ArticleServiceImpl(
 
     override fun getArticleById(id: Long): Article {
         //根据id查找文章
-        val articles = articleRepository.findByIdOrNull(id)
+        val dbArticles = articleRepository.findByIdOrNull(id)
+            ?: throw NotFoundException(messages["message.articles.not_found"])
 
-        //判断文章是否存在
-        if (articles == null) throw NotFoundException(messages["message.articles.articles_not_found"])
-
-        return articles
+        return dbArticles
     }
 
-    override fun createArticle(createArticleDTO: CreateArticleDTO): Article {
-        //判断文章slug是否重复
-        if (articleRepository.existsBySlug(createArticleDTO.slug)) throw Exception(messages["message.articles.duplicate_slug"])
-
+    override fun createArticle(dto: CreateArticleDTO): Article {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw Exception("message.common.missing_user_context")
@@ -55,33 +54,36 @@ class ArticleServiceImpl(
         val user = userService.getUserByUsername(username)
 
         //根据id查找分类
-        val categories = categoriesService.getCategoriesById(createArticleDTO.categoryId)
+        val categories = categoriesService.getCategoriesById(dto.categoryId)
 
         //获取标签
-        val tags = tagService.getTagsByIds(createArticleDTO.tagIds)
+        val tags = tagService.getTagsByIds(dto.tagIds)
 
-        return articleRepository.save(
-            Article(
-                title = createArticleDTO.title,
-                slug = createArticleDTO.slug,
-                content = createArticleDTO.content,
-                author = user,
-                category = categories,
-                tags = tags.toMutableSet(),
-            )
+        val dbArticle = Article(
+            title = dto.title,
+            slug = dto.slug,
+            content = dto.content,
+            author = user,
+            category = categories,
+            tags = tags.toMutableSet(),
         )
+
+        try {
+            articleRepository.saveAndFlush(dbArticle)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                ArticleConstraints.UNIQUE_SLUG -> DbDuplicateException(dbArticle.slug)
+            }
+        }
+
+        return dbArticle
     }
 
-    override fun updateArticle(updateArticleDTO: UpdateArticleDTO): Article {
+    override fun updateArticle(id: Long, dto: UpdateArticleDTO): Article {
         //根据id查找文章
-        val dbArticle = articleRepository.findByIdOrNull(updateArticleDTO.id)
-
-        //判断文章是否存在
-        if (dbArticle == null) throw NotFoundException(messages["message.articles.articles_not_found"])
-
-        //判断文章slug是否重复
-        if (updateArticleDTO.slug != dbArticle.slug && articleRepository.existsBySlug(updateArticleDTO.slug))
-            throw Exception(messages["message.articles.duplicate_slug"])
+        val dbArticle = articleRepository.findByIdOrNull(id)
+            ?: throw NotFoundException(messages["message.articles.not_found"])
 
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
@@ -90,39 +92,46 @@ class ArticleServiceImpl(
         //根据用户名获取用户
         val user = userService.getUserByUsername(username)
 
+        //TODO 复查功能？
         //判断所属用户
         if (dbArticle.author.id != user.id) throw Exception(messages["message.articles.permission_denied"])
 
-        //根据id查找分类
-        val categories = categoriesService.getCategoriesById(updateArticleDTO.categoryId)
+        dbArticle.apply {
+            dto.title?.let { title = it }
+            dto.slug?.let { slug = it }
+            dto.content?.let { content = it }
+            dto.categoryId?.let {
+                category = categoriesService.getCategoriesById(it)
+            }
+            dto.tagIds?.let {
+                this.tags = tagService.getTagsByIds(it).toMutableSet()
+            }
+            articleStatus?.let { articleStatus = it }
+        }
 
-        //获取标签
-        val tags = tagService.getTagsByIds(updateArticleDTO.tagIds)
+        try {
+            articleRepository.saveAndFlush(dbArticle)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                ArticleConstraints.UNIQUE_SLUG -> DbDuplicateException(dbArticle.slug)
+            }
+        }
 
-        return articleRepository.save(
-            Article(
-                id = updateArticleDTO.id,
-                title = updateArticleDTO.title,
-                slug = updateArticleDTO.slug,
-                content = updateArticleDTO.content,
-                author = user,
-                category = categories,
-                tags = tags.toMutableSet(),
-            )
-        )
+        return dbArticle
     }
 
     override fun deleteArticle(id: Long) {
         //根据id判断文章是否存在
-        existsArticleById(id)
+        if (!existsArticleById(id)) throw Exception(messages["message.articles.not_found"])
 
         //删除文章
         articleRepository.deleteById(id)
     }
 
-    override fun updateArticleStatus(updateArticleStatusDTO: UpdateArticleStatusDTO) {
+    override fun updateArticleStatus(dto: UpdateArticleStatusDTO) {
         //批量更新文章状态
-        articleRepository.updateStatusByIds(updateArticleStatusDTO.articleStatus, updateArticleStatusDTO.articleIds)
+        articleRepository.updateStatusByIds(dto.articleStatus, dto.articleIds)
     }
 
     override fun getArticleTitleById(articleIds: List<Long>): List<ArticleTitleDTO> {
@@ -134,28 +143,28 @@ class ArticleServiceImpl(
         val articleTitleDTO = articleRepository.findTitleByIdOrNull(articleId)
 
         //未找到文章
-        if (articleTitleDTO == null) throw NotFoundException(messages["message.articles.articles_not_found"])
+        if (articleTitleDTO == null) throw NotFoundException(messages["message.articles.not_found"])
 
         return articleTitleDTO
     }
 
     override fun existsArticleById(id: Long): Boolean {
-        if (!articleRepository.existsById(id)) throw NotFoundException(messages["message.articles.articles_not_found"])
+        if (!articleRepository.existsById(id)) throw NotFoundException(messages["message.articles.not_found"])
         return true
     }
 
-    override fun getHomeArticles(queryArticleDTO: QueryArticleDTO): Page<Article> {
-        val pageRequest = queryArticleDTO.toPageRequest()
+    override fun getHomeArticles(dto: QueryArticleDTO): Page<Article> {
+        val pageRequest = dto.toPageRequest()
 
         val specs = QueryBuilder<Article>()
-            .and(ArticleSpecs.byCategoryId(queryArticleDTO.category))
-            .and(ArticleSpecs.byTagIds(queryArticleDTO.tagIds))
+            .and(ArticleSpecs.byCategoryId(dto.category))
+            .and(ArticleSpecs.byTagIds(dto.tagIds))
             .or(
-                ArticleSpecs.titleContains(queryArticleDTO.keyword),
-                ArticleSpecs.contentContains(queryArticleDTO.keyword),
-                ArticleSpecs.slugContains(queryArticleDTO.keyword),
+                ArticleSpecs.titleContains(dto.keyword),
+                ArticleSpecs.contentContains(dto.keyword),
+                ArticleSpecs.slugContains(dto.keyword),
             )
-            .and(ArticleSpecs.byArticleStatus(queryArticleDTO.articleStatus))
+            .and(ArticleSpecs.byArticleStatus(dto.articleStatus))
             .buildSpec()
 
         return articleRepository.findAll(specs, pageRequest)

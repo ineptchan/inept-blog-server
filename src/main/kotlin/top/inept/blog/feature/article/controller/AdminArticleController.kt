@@ -50,9 +50,12 @@ class AdminArticleController(
 
     @PreAuthorize("hasAuthority('admin:article:modify')")
     @Operation(summary = "更新文章")
-    @PutMapping
-    fun updateArticle(@Valid @RequestBody updateArticleDTO: UpdateArticleDTO): ResponseEntity<ArticleVO> {
-        return ResponseEntity.ok(articleService.updateArticle(updateArticleDTO).toArticleVO())
+    @PutMapping("/{id}")
+    fun updateArticle(
+        @Valid @RequestBody updateArticleDTO: UpdateArticleDTO,
+        @PathVariable id: Long
+    ): ResponseEntity<ArticleVO> {
+        return ResponseEntity.ok(articleService.updateArticle(id, updateArticleDTO).toArticleVO())
     }
 
     @PreAuthorize("hasAuthority('admin:article:delete')")

@@ -8,29 +8,25 @@ import top.inept.blog.feature.article.model.validated.ValidatedArticleSlug
 import top.inept.blog.feature.article.model.validated.ValidatedArticleTitle
 
 data class UpdateArticleDTO(
-    @Schema(description = "openapi.article.id")
-    @field:PositiveOrZero(message = "valid.common.id")
-    val id: Long,
-
     @Schema(description = "openapi.article.title")
     @field:ValidatedArticleTitle
-    val title: String,
+    val title: String?,
 
     @Schema(description = "openapi.article.slug")
     @field:ValidatedArticleSlug
-    val slug: String,
+    val slug: String?,
 
     @Schema(description = "openapi.article.content")
     @field:ValidatedArticleContent
-    val content: String,
+    val content: String?,
 
     @Schema(description = "openapi.article.category")
     @field:PositiveOrZero(message = "valid.article.category_cannot_be_empty")
-    val categoryId: Long,
+    val categoryId: Long?,
 
     @Schema(description = "openapi.article.tags")
-    val tagIds: List<Long>,
+    val tagIds: List<Long>?,
 
     @Schema(description = "openapi.article.article_status")
-    val articleStatus: ArticleStatus,
+    val articleStatus: ArticleStatus?,
 )

@@ -5,6 +5,7 @@ import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import top.inept.blog.feature.article.model.entity.constraints.ArticleConstraints
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.model.entity.Categories
 import top.inept.blog.feature.tag.model.entity.Tag
@@ -12,7 +13,12 @@ import top.inept.blog.feature.user.model.entity.User
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "articles")
+@Table(
+    name = "articles",
+    uniqueConstraints = [
+        UniqueConstraint(name = ArticleConstraints.UNIQUE_SLUG, columnNames = ["slug"])
+    ]
+)
 @EntityListeners(value = [AuditingEntityListener::class])
 class Article(
     @Id
@@ -22,7 +28,7 @@ class Article(
     @Column(nullable = false)
     var title: String,
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "slug", nullable = false)
     var slug: String,
 
     //@Basic(fetch = FetchType.LAZY)
