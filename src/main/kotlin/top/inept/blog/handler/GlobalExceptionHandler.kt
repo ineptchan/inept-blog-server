@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import top.inept.blog.base.ValidationError
+import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.log
 

@@ -7,7 +7,7 @@ import top.inept.blog.feature.user.model.validated.ValidatedUserPassword
 data class UpdateUserProfileDTO(
     @Schema(description = "openapi.user.nickname")
     @field:ValidateUserNickname
-    val nickname: String,
+    val nickname: String?,
 
     @Schema(description = "openapi.user.password")
     @field:ValidatedUserPassword

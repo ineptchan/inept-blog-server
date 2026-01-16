@@ -50,9 +50,9 @@ class AdminUserController(
 
     @PreAuthorize("hasAuthority('admin:user:modify')")
     @Operation(summary = "更新用户")
-    @PutMapping
-    fun updateUser(@Valid @RequestBody updateUserDTO: UpdateUserDTO): ResponseEntity<UserVO> {
-        return ResponseEntity.ok(userService.updateUser(updateUserDTO).toUserVO())
+    @PutMapping("/{id}")
+    fun updateUser(@Valid @RequestBody updateUserDTO: UpdateUserDTO, @PathVariable id: Long): ResponseEntity<UserVO> {
+        return ResponseEntity.ok(userService.updateUser(id, updateUserDTO).toUserVO())
     }
 
     @PreAuthorize("hasAuthority('admin:user:delete')")
