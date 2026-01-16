@@ -1,10 +1,13 @@
 package top.inept.blog.feature.categories.service.impl
 
+import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
+import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
@@ -13,6 +16,7 @@ import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
 import top.inept.blog.feature.categories.model.dto.QueryCategoriesDTO
 import top.inept.blog.feature.categories.model.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.model.entity.Categories
+import top.inept.blog.feature.categories.model.entity.CategoriesConstraints
 import top.inept.blog.feature.categories.repository.CategoriesRepository
 import top.inept.blog.feature.categories.repository.CategoriesSpecs
 import top.inept.blog.feature.categories.service.CategoriesService
@@ -22,13 +26,13 @@ class CategoriesServiceImpl(
     private val categoriesRepository: CategoriesRepository,
     private val messages: MessageSourceAccessor,
 ) : CategoriesService {
-    override fun getCategories(queryCategoriesDTO: QueryCategoriesDTO): Page<Categories> {
-        val pageRequest = queryCategoriesDTO.toPageRequest()
+    override fun getCategories(dto: QueryCategoriesDTO): Page<Categories> {
+        val pageRequest = dto.toPageRequest()
 
         val specs = QueryBuilder<Categories>()
             .or(
-                CategoriesSpecs.nameContains(queryCategoriesDTO.keyword),
-                CategoriesSpecs.slugContains(queryCategoriesDTO.keyword),
+                CategoriesSpecs.nameContains(dto.keyword),
+                CategoriesSpecs.slugContains(dto.keyword),
             )
             .buildSpec()
 
@@ -38,45 +42,48 @@ class CategoriesServiceImpl(
     override fun getCategoriesById(id: Long): Categories {
         //根据id查找分类
         val categories = categoriesRepository.findByIdOrNull(id)
-
-        //判断分类是否存在
-        if (categories == null) throw NotFoundException(messages["message.categories.categories_not_found"])
+            ?: throw NotFoundException(messages["message.categories.categories_not_found"])
 
         return categories
     }
 
-    override fun createCategory(createCategoriesDTO: CreateCategoriesDTO): Categories {
-        //初次判断分类名称与分类slug是否重复
-        if (categoriesRepository.existsByNameOrSlug(createCategoriesDTO.name, createCategoriesDTO.slug)) {
-            //判断分类名称是否重复
-            if (categoriesRepository.existsByName(createCategoriesDTO.name)) throw Exception(messages["message.categories.duplicate_name"])
+    override fun createCategory(dto: CreateCategoriesDTO): Categories {
+        val dbCategories = dto.toCategories()
 
-            //判断分类slug是否重复
-            if (categoriesRepository.existsBySlug(createCategoriesDTO.slug)) throw Exception(messages["message.categories.duplicate_slug"])
+        try {
+            categoriesRepository.saveAndFlush(dbCategories)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                CategoriesConstraints.UNIQUE_NAME -> DbDuplicateException(dbCategories.name)
+                CategoriesConstraints.UNIQUE_SLUG -> DbDuplicateException(dbCategories.slug)
+            }
         }
 
-        return categoriesRepository.save(createCategoriesDTO.toCategories())
+        return dbCategories
     }
 
-    override fun updateCategory(updateCategoriesDTO: UpdateCategoriesDTO): Categories {
+    override fun updateCategory(id: Long, dto: UpdateCategoriesDTO): Categories {
         //根据id查找分类
-        val dbCategories = categoriesRepository.findByIdOrNull(updateCategoriesDTO.id)
+        val dbCategories = categoriesRepository.findByIdOrNull(id)
+            ?: throw NotFoundException(messages["message.categories.categories_not_found"])
 
-        //判断分类是否存在
-        if (dbCategories == null) throw NotFoundException(messages["message.categories.categories_not_found"])
-
-        //初次判断分类名称与分类Slug是否重复
-        if (categoriesRepository.existsByNameOrSlug(updateCategoriesDTO.name, updateCategoriesDTO.slug)) {
-            //判断分类名称是否重复
-            if (updateCategoriesDTO.name != dbCategories.name && categoriesRepository.existsByName(updateCategoriesDTO.name))
-                throw Exception(messages["message.categories.duplicate_name"])
-
-            //判断分类slug是否重复
-            if (updateCategoriesDTO.slug != dbCategories.slug && categoriesRepository.existsBySlug(updateCategoriesDTO.slug))
-                throw Exception(messages["message.categories.duplicate_slug"])
+        dbCategories.apply {
+            dto.name?.let { name = it }
+            dto.slug?.let { slug = it }
         }
 
-        return categoriesRepository.save(updateCategoriesDTO.toCategories())
+        try {
+            categoriesRepository.saveAndFlush(dbCategories)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                CategoriesConstraints.UNIQUE_NAME -> DbDuplicateException(dbCategories.name)
+                CategoriesConstraints.UNIQUE_SLUG -> DbDuplicateException(dbCategories.slug)
+            }
+        }
+
+        return dbCategories
     }
 
     override fun deleteCategory(id: Long) {

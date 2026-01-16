@@ -50,9 +50,12 @@ class AdminCategoriesController(
 
     @PreAuthorize("hasAuthority('admin:categories:modify')")
     @Operation(summary = "更新分类")
-    @PutMapping
-    fun updateCategory(@Valid @RequestBody updateCategoriesDTO: UpdateCategoriesDTO): ResponseEntity<CategoriesVO> {
-        return ResponseEntity.ok(categoriesService.updateCategory(updateCategoriesDTO).toCategoriesVO())
+    @PutMapping("/{id}")
+    fun updateCategory(
+        @Valid @RequestBody updateCategoriesDTO: UpdateCategoriesDTO,
+        @PathVariable id: Long
+    ): ResponseEntity<CategoriesVO> {
+        return ResponseEntity.ok(categoriesService.updateCategory(id, updateCategoriesDTO).toCategoriesVO())
     }
 
     @PreAuthorize("hasAuthority('admin:categories:delete')")
