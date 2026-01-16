@@ -72,7 +72,7 @@ class CommentServiceImpl(
 
     override fun getCommentById(id: Long): CommentVO {
         //根据id查找评论
-        val comment = commentRepository.findByIdOrNull(id)
+        val comment = commentRepository.findCommentsById(id)
             ?: throw NotFoundException(messages["message.comment.comment_not_found"])
 
         //获得文章标题
@@ -91,7 +91,7 @@ class CommentServiceImpl(
 
         //判断有没有父级评论
         val parentComment = dto.parentCommentId?.let {
-            commentRepository.findByIdOrNull(it)
+            commentRepository.findCommentsById(it)
                 ?: throw NotFoundException(messages["message.comment.parent_comment_not_found"])
         }
 
@@ -118,7 +118,7 @@ class CommentServiceImpl(
 
     override fun updateComment(id: Long, dto: UpdateCommentDTO): CommentSummaryVO {
         //根据id查找评论
-        val dbComment = commentRepository.findByIdOrNull(id)
+        val dbComment = commentRepository.findCommentsById(id)
             ?: throw NotFoundException(messages["message.comment.comment_not_found"])
 
         dbComment.apply {
@@ -140,7 +140,7 @@ class CommentServiceImpl(
 
     override fun getCommentReplies(commentId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<CommentReplyVO> {
         //根据id查找评论
-        val comment = commentRepository.findByIdOrNull(commentId)
+        val comment = commentRepository.findCommentsById(commentId)
             ?: throw NotFoundException(messages["message.comment.comment_not_found"])
 
         val pageRequest = baseQueryDTO.toPageRequest()

@@ -16,5 +16,5 @@ interface CommentRepository : JpaRepository<Comment, Long>, JpaSpecificationExec
     fun countByParentCommentId(@Param("parentId") parentId: Long): Long
 
     @EntityGraph(attributePaths = ["user"])
-    fun findByIdOrNull(id: Long): Comment?
+    fun findCommentsById(id: Long): Comment?
 }
