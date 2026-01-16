@@ -47,9 +47,12 @@ class AdminCommentController(
 
     @PreAuthorize("hasAuthority('admin:comment:modify')")
     @Operation(summary = "更新评论")
-    @PutMapping
-    fun updateComment(@Valid @RequestBody updateCommentDTO: UpdateCommentDTO): ResponseEntity<CommentSummaryVO> {
-        return ResponseEntity.ok(commentService.updateComment(updateCommentDTO))
+    @PutMapping("/{id}")
+    fun updateComment(
+        @Valid @RequestBody updateCommentDTO: UpdateCommentDTO,
+        @PathVariable id: Long
+    ): ResponseEntity<CommentSummaryVO> {
+        return ResponseEntity.ok(commentService.updateComment(id, updateCommentDTO))
     }
 
     @PreAuthorize("hasAuthority('admin:comment:delete')")

@@ -12,12 +12,12 @@ import top.inept.blog.feature.comment.model.vo.CommentVO
 import top.inept.blog.feature.comment.model.vo.TopCommentVO
 
 interface CommentService {
-    fun getComments(queryCommentDTO: QueryCommentDTO): PageResponse<CommentVO>
+    fun getComments(dto: QueryCommentDTO): PageResponse<CommentVO>
     fun getCommentById(id: Long): CommentVO
-    fun createComment(createCommentDTO: CreateCommentDTO): CommentVO
-    fun updateComment(updateCommentDTO: UpdateCommentDTO): CommentSummaryVO
+    fun createComment(dto: CreateCommentDTO): CommentVO
+    fun updateComment(id: Long, dto: UpdateCommentDTO): CommentSummaryVO
     fun deleteComment(id: Long)
     fun getCommentReplies(commentId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<CommentReplyVO>
     fun getTopComments(articleId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<TopCommentVO>
-    fun createAnonymousComment(createAnonymousCommentDTO: CreateAnonymousCommentDTO): CommentVO
+    fun createAnonymousComment(dto: CreateAnonymousCommentDTO): CommentVO
 }

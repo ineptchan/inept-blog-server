@@ -2,7 +2,6 @@ package top.inept.blog.feature.comment.service.impl
 
 import jakarta.persistence.EntityManager
 import org.springframework.context.support.MessageSourceAccessor
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import top.inept.blog.base.BaseQueryDTO
@@ -43,11 +42,11 @@ class CommentServiceImpl(
     private val entityManager: EntityManager,
     private val messages: MessageSourceAccessor,
 ) : CommentService {
-    override fun getComments(queryCommentDTO: QueryCommentDTO): PageResponse<CommentVO> {
-        val pageRequest = queryCommentDTO.toPageRequest()
+    override fun getComments(dto: QueryCommentDTO): PageResponse<CommentVO> {
+        val pageRequest = dto.toPageRequest()
 
         val specs = QueryBuilder<Comment>()
-            .and(CommentSpecs.contentContains(queryCommentDTO.keyword))
+            .and(CommentSpecs.contentContains(dto.keyword))
             .buildSpec()
 
         //获取全部评论
@@ -74,9 +73,7 @@ class CommentServiceImpl(
     override fun getCommentById(id: Long): CommentVO {
         //根据id查找评论
         val comment = commentRepository.findByIdOrNull(id)
-
-        //判断评论是否存在
-        if (comment == null) throw NotFoundException(messages["message.comment.comment_not_found"])
+            ?: throw NotFoundException(messages["message.comment.comment_not_found"])
 
         //获得文章标题
         val articleTitle = articleService.getArticleTitleById(comment.article.id)
@@ -84,7 +81,7 @@ class CommentServiceImpl(
         return comment.toCommentVO(articleTitle.toArticleTitleVO())
     }
 
-    override fun createComment(createCommentDTO: CreateCommentDTO): CommentVO {
+    override fun createComment(dto: CreateCommentDTO): CommentVO {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw Exception("message.common.missing_user_context")
@@ -93,14 +90,14 @@ class CommentServiceImpl(
         val user = userService.getUserByUsername(username)
 
         //判断有没有父级评论
-        val parentComment = createCommentDTO.parentCommentId?.let {
+        val parentComment = dto.parentCommentId?.let {
             commentRepository.findByIdOrNull(it)
                 ?: throw NotFoundException(messages["message.comment.parent_comment_not_found"])
         }
 
         //获得文章id按父级评论或者DTO的文章id
         val articleId = parentComment?.article?.id
-            ?: createCommentDTO.articleId
+            ?: dto.articleId
             ?: throw Exception(messages["message.comment.article_id_required"])
 
         //获取文章标题
@@ -110,7 +107,7 @@ class CommentServiceImpl(
         val article = entityManager.getReference(Article::class.java, articleTitle.id)
 
         val comment = Comment(
-            content = createCommentDTO.content,
+            content = dto.content,
             article = article,
             user = user,
             parentComment = parentComment
@@ -119,18 +116,18 @@ class CommentServiceImpl(
         return commentRepository.save(comment).toCommentVO(articleTitle.toArticleTitleVO())
     }
 
-    override fun updateComment(updateCommentDTO: UpdateCommentDTO): CommentSummaryVO {
+    override fun updateComment(id: Long, dto: UpdateCommentDTO): CommentSummaryVO {
         //根据id查找评论
-        val dbComment = commentRepository.findByIdOrNull(updateCommentDTO.id)
-
-        //判断评论是否存在
-        if (dbComment == null) throw NotFoundException(messages["message.comment.comment_not_found"])
+        val dbComment = commentRepository.findByIdOrNull(id)
+            ?: throw NotFoundException(messages["message.comment.comment_not_found"])
 
         dbComment.apply {
-            this.content = updateCommentDTO.content
+            dto.content?.let { content = it }
         }
 
-        return commentRepository.save(dbComment).toCommentSummaryVO()
+        commentRepository.saveAndFlush(dbComment)
+
+        return dbComment.toCommentSummaryVO()
     }
 
     override fun deleteComment(id: Long) {
@@ -144,9 +141,7 @@ class CommentServiceImpl(
     override fun getCommentReplies(commentId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<CommentReplyVO> {
         //根据id查找评论
         val comment = commentRepository.findByIdOrNull(commentId)
-
-        //判断评论是否存在
-        if (comment == null) throw NotFoundException(messages["message.comment.comment_not_found"])
+            ?: throw NotFoundException(messages["message.comment.comment_not_found"])
 
         val pageRequest = baseQueryDTO.toPageRequest()
 
@@ -177,7 +172,7 @@ class CommentServiceImpl(
         }
     }
 
-    override fun createAnonymousComment(createAnonymousCommentDTO: CreateAnonymousCommentDTO): CommentVO {
+    override fun createAnonymousComment(dto: CreateAnonymousCommentDTO): CommentVO {
         TODO("Not yet implemented")
     }
 }
