@@ -1,4 +1,4 @@
-package top.inept.blog.feature.categories.model.entity
+package top.inept.blog.feature.categories.model.entity.constraints
 
 object CategoriesConstraints {
     const val UNIQUE_NAME = "uk_categories_name"

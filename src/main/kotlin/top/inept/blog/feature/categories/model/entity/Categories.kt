@@ -1,6 +1,7 @@
 package top.inept.blog.feature.categories.model.entity
 
 import jakarta.persistence.*
+import top.inept.blog.feature.categories.model.entity.constraints.CategoriesConstraints
 
 @Entity
 @Table(
@@ -15,9 +16,9 @@ class Categories(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     var name: String,
 
-    @Column(name = "slug", nullable = false, unique = true)
+    @Column(name = "slug", nullable = false)
     var slug: String,
 )

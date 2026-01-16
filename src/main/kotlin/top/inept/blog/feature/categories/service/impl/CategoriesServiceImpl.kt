@@ -16,7 +16,7 @@ import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
 import top.inept.blog.feature.categories.model.dto.QueryCategoriesDTO
 import top.inept.blog.feature.categories.model.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.model.entity.Categories
-import top.inept.blog.feature.categories.model.entity.CategoriesConstraints
+import top.inept.blog.feature.categories.model.entity.constraints.CategoriesConstraints
 import top.inept.blog.feature.categories.repository.CategoriesRepository
 import top.inept.blog.feature.categories.repository.CategoriesSpecs
 import top.inept.blog.feature.categories.service.CategoriesService
