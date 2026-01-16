@@ -16,9 +16,9 @@ class Tag(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     var name: String,
 
-    @Column(name = "slug", nullable = false, unique = true)
+    @Column(name = "slug", nullable = false)
     var slug: String,
 )
