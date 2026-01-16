@@ -1,10 +1,13 @@
 package top.inept.blog.feature.tag.service.impl
 
+import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.support.MessageSourceAccessor
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.base.QueryBuilder
+import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.toPageRequest
@@ -13,6 +16,7 @@ import top.inept.blog.feature.tag.model.dto.CreateTagDTO
 import top.inept.blog.feature.tag.model.dto.QueryTagDTO
 import top.inept.blog.feature.tag.model.dto.UpdateTagDTO
 import top.inept.blog.feature.tag.model.entity.Tag
+import top.inept.blog.feature.tag.model.entity.constraints.TagConstraints
 import top.inept.blog.feature.tag.repository.TagRepository
 import top.inept.blog.feature.tag.repository.TagSpecs
 import top.inept.blog.feature.tag.service.TagService
@@ -22,13 +26,13 @@ class TagServiceImpl(
     private val tagRepository: TagRepository,
     private val messages: MessageSourceAccessor,
 ) : TagService {
-    override fun getTags(queryTagDTO: QueryTagDTO): Page<Tag> {
-        val pageRequest = queryTagDTO.toPageRequest()
+    override fun getTags(dto: QueryTagDTO): Page<Tag> {
+        val pageRequest = dto.toPageRequest()
 
         val specs = QueryBuilder<Tag>()
             .or(
-                TagSpecs.nameContains(queryTagDTO.keyword),
-                TagSpecs.slugContains(queryTagDTO.keyword)
+                TagSpecs.nameContains(dto.keyword),
+                TagSpecs.slugContains(dto.keyword)
             )
             .buildSpec()
 
@@ -37,48 +41,48 @@ class TagServiceImpl(
 
     override fun getTagById(id: Long): Tag {
         //根据id查找标签
-        val tag = tagRepository.findByIdOrNull(id)
-
-        //判断标签是否存在
-        if (tag == null) throw NotFoundException(messages["message.tag.tag_not_found"])
+        val tag = tagRepository.findByIdOrNull(id) ?: throw NotFoundException(messages["message.tag.tag_not_found"])
 
         return tag
     }
 
-    override fun createTag(createTagDTO: CreateTagDTO): Tag {
-        //初次判断标签名称与标签slug是否重复
-        if (tagRepository.existsByNameOrSlug(createTagDTO.name, createTagDTO.slug)) {
-            //判断标签名称是否重复
-            if (tagRepository.existsByName(createTagDTO.name)) throw Exception(messages["message.tag.duplicate_name"])
+    override fun createTag(dto: CreateTagDTO): Tag {
+        val dbTag = dto.toTag()
 
-            //判断标签slug是否重复
-            if (tagRepository.existsBySlug(createTagDTO.slug)) throw Exception(messages["message.tag.duplicate_slug"])
+        try {
+            tagRepository.saveAndFlush(dbTag)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                TagConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbTag.name)
+                TagConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbTag.slug)
+            }
         }
 
-        return tagRepository.save(createTagDTO.toTag())
+        return dbTag
     }
 
-    override fun updateTag(updateTagDTO: UpdateTagDTO): Tag {
+    override fun updateTag(id: Long, dto: UpdateTagDTO): Tag {
         //根据id查找标签
-        val dbTag = tagRepository.findByIdOrNull(updateTagDTO.id)
+        val dbTag =
+            tagRepository.findByIdOrNull(id) ?: throw NotFoundException(messages["message.tag.tag_not_found"])
 
-        //判断标签是否存在
-        if (dbTag == null) throw NotFoundException(messages["message.tag.tag_not_found"])
-
-        //初次判断标签名称与标签slug是否重复
-        if (tagRepository.existsByNameOrSlug(updateTagDTO.name, updateTagDTO.slug)) {
-            //判断标签名称是否重复
-            if (updateTagDTO.name != dbTag.name && tagRepository.existsByName(updateTagDTO.name)) throw Exception(
-                messages["message.tag.duplicate_name"]
-            )
-
-            //判断标签slug是否重复
-            if (updateTagDTO.slug != dbTag.slug && tagRepository.existsBySlug(updateTagDTO.slug)) throw Exception(
-                messages["message.tag.duplicate_slug"]
-            )
+        dbTag.apply {
+            dto.name?.let { name = it }
+            dto.slug?.let { slug = it }
         }
 
-        return tagRepository.save(updateTagDTO.toTag())
+        try {
+            tagRepository.saveAndFlush(dbTag)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                TagConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbTag.name)
+                TagConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbTag.slug)
+            }
+        }
+
+        return dbTag
     }
 
     override fun deleteTag(id: Long) {

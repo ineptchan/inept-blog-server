@@ -50,9 +50,9 @@ class AdminTagController(
 
     @PreAuthorize("hasAuthority('admin:tag:modify')")
     @Operation(summary = "更新标签")
-    @PutMapping
-    fun updateTag(@Valid @RequestBody updateTagDTO: UpdateTagDTO): ResponseEntity<TagVO> {
-        return ResponseEntity.ok(tagService.updateTag(updateTagDTO).toTagVO())
+    @PutMapping("/{id}")
+    fun updateTag(@Valid @RequestBody updateTagDTO: UpdateTagDTO, @PathVariable id: Long): ResponseEntity<TagVO> {
+        return ResponseEntity.ok(tagService.updateTag(id,updateTagDTO).toTagVO())
     }
 
     @PreAuthorize("hasAuthority('admin:tag:delete')")

@@ -8,10 +8,10 @@ import top.inept.blog.feature.tag.model.dto.UpdateTagDTO
 import top.inept.blog.feature.tag.model.entity.Tag
 
 interface TagService {
-    fun getTags(queryTagDTO: QueryTagDTO): Page<Tag>
+    fun getTags(dto: QueryTagDTO): Page<Tag>
     fun getTagById(id: Long): Tag
-    fun createTag(createTagDTO: CreateTagDTO): Tag
-    fun updateTag(updateTagDTO: UpdateTagDTO): Tag
+    fun createTag(dto: CreateTagDTO): Tag
+    fun updateTag(id: Long, dto: UpdateTagDTO): Tag
     fun deleteTag(id: Long)
     fun getTagsByIds(ids: List<Long>): List<Tag>
 }
