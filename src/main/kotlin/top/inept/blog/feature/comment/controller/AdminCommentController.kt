@@ -47,7 +47,7 @@ class AdminCommentController(
 
     @PreAuthorize("hasAuthority('admin:comment:modify')")
     @Operation(summary = "更新评论")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun updateComment(
         @Valid @RequestBody updateCommentDTO: UpdateCommentDTO,
         @PathVariable id: Long

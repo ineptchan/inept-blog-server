@@ -50,7 +50,7 @@ class AdminArticleController(
 
     @PreAuthorize("hasAuthority('admin:article:modify')")
     @Operation(summary = "更新文章")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun updateArticle(
         @Valid @RequestBody updateArticleDTO: UpdateArticleDTO,
         @PathVariable id: Long

@@ -50,7 +50,7 @@ class AdminCategoriesController(
 
     @PreAuthorize("hasAuthority('admin:categories:modify')")
     @Operation(summary = "更新分类")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun updateCategory(
         @Valid @RequestBody updateCategoriesDTO: UpdateCategoriesDTO,
         @PathVariable id: Long
