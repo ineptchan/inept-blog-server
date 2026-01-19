@@ -106,7 +106,7 @@ class ArticleServiceImpl(
             dto.tagIds?.let {
                 this.tags = tagService.getTagsByIds(it).toMutableSet()
             }
-            articleStatus?.let { articleStatus = it }
+            dto.articleStatus?.let { articleStatus = it }
         }
 
         try {

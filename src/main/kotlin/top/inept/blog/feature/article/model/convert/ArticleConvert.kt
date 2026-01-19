@@ -49,4 +49,5 @@ fun Article.toHomeArticleVO() = HomeArticleVO(
     author = this.author.toUserPublicVO(),
     category = this.category.toCategoriesVO(),
     tags = this.tags.map { it.toTagVO() },
+    articleStatus = this.articleStatus
 )
