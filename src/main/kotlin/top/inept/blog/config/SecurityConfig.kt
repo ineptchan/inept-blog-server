@@ -20,6 +20,9 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import top.inept.blog.properties.JwtProperties
 import java.nio.charset.StandardCharsets
 import javax.crypto.SecretKey
@@ -29,7 +32,23 @@ import javax.crypto.spec.SecretKeySpec
 @EnableWebSecurity
 @EnableMethodSecurity
 class SecurityConfig() {
-    //TODO csrf+httpOnly安全问题
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val config = CorsConfiguration().apply {
+            allowedOriginPatterns = listOf(
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+            )
+            allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            allowedHeaders = listOf("*")
+            allowCredentials = true
+        }
+
+        return UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", config)
+        }
+    }
+
     @Bean
     @Order(1)
     fun publicChain(http: HttpSecurity, environment: Environment): SecurityFilterChain {
@@ -46,6 +65,7 @@ class SecurityConfig() {
 
         http
             .securityMatcher(*matchers)
+            .cors { }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { it.anyRequest().permitAll() }
@@ -61,6 +81,7 @@ class SecurityConfig() {
         @Qualifier("accessJwtDecoder") accessJwtDecoder: JwtDecoder,
     ): SecurityFilterChain {
         http
+            .cors { }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { it.anyRequest().authenticated() }
