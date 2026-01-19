@@ -15,7 +15,7 @@ import jakarta.persistence.UniqueConstraint
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.user.model.entity.User
-import top.inept.blog.feature.user.model.entity.constraints.RefreshTokenConstraints
+import top.inept.blog.feature.auth.model.entity.constraints.RefreshTokenConstraints
 import java.time.Instant
 import java.time.LocalDateTime
 
