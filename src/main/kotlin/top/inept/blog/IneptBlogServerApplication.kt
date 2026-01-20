@@ -1,14 +1,13 @@
 package top.inept.blog
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import top.inept.blog.properties.JwtProperties
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableConfigurationProperties(JwtProperties::class)
+@ConfigurationPropertiesScan
 class IneptBlogServerApplication
 
 fun main(args: Array<String>) {

@@ -26,7 +26,11 @@ values ('admin:article:read', now(), '管理员读取文章'),
        ('admin:user:delete', now(), '管理员删除用户'),
 
        ('user:user:read', now(), '用户读取用户'),
-       ('user:user:modify', now(), '用户更新用户');
+       ('user:user:modify', now(), '用户更新用户'),
+
+       ('admin:file:read', now(), '管理员读取文件'),
+       ('admin:file:write', now(), '管理员写入文件'),
+       ('admin:file:delete', now(), '管理员删除文件');
 
 --- 创建角色
 insert into roles(code, created_at, description, name)
@@ -60,5 +64,13 @@ select now(), r.id, u.id
 from roles r
          cross join users u
 where r.code = 'admin'
+  and u.username = 'admintest'
+on conflict (role_id,user_id) do nothing;
+
+insert into users_roles(created_at, role_id, user_id)
+select now(), r.id, u.id
+from roles r
+         cross join users u
+where r.code = 'user'
   and u.username = 'admintest'
 on conflict (role_id,user_id) do nothing;

@@ -3,32 +3,21 @@ spring:
     name: inept-blog-server
   profiles:
     active: dev
-  datasource:
-    url: jdbc:postgresql://${top.inept.datasource.host}:${top.inept.datasource.port}/${top.inept.datasource.database}
-    username: ${top.inept.datasource.username}
-    password: ${top.inept.datasource.password}
-
   jpa:
-    hibernate:
-      ddl-auto: ${top.inept.datasource.ddl-auto}
     show-sql: true
     properties:
       hibernate:
         format_sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
-
   messages:
     basename: i18n/messages,i18n/validation,i18n/openapi
     encoding: UTF-8
     fallback-to-system-locale: false
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
 
 server:
-  port: ${top.inept.server.port}
-
-top:
-  inept:
-    jwt:
-      issuer: ${top.inept.jwt.issuer}
-      secret-key: ${top.inept.jwt.secret-key}
-      expires-minutes: ${top.inept.jwt.expires-minutes}
+  port: 8080

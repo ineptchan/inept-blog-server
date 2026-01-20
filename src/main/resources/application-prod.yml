@@ -1,17 +1,26 @@
 top:
   inept:
-    datasource:
-      ddl-auto: validate
-      host: 127.0.0.1
-      port: 5432
-      database: inept_blog
-      username: user
-      password: 123456
-    server:
-      port: 8080
     jwt:
       issuer: boot4-rbac
       access-secret-key: U7lIBboDJW24Ak1ROncsOyuVNuugnZriJWZBY9ULB//4EdZU5AeGCRlVAdXMKxinBynktrcuQgGVCM4Fm54tBg==     #openssl rand -base64 64
       refresh-secret-key: mOxd0bfTmeEsf8kkmFldk/ztkys6FkKRSGF0r66n6coKPRvqm0xJ9tCOBunH0v/9GaWqop0ZIgsEMUNyIZqPTA==    #openssl rand -base64 64
       access-expires-minutes: 15
       refresh-expires-minutes: 10080  #7day
+    minio:
+      endpoint: http://127.0.0.1:9000
+      access-key: you_minio_username
+      secret-key: you_minio_password
+      bucket: inept-blog
+      region:
+
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/inept_blog
+    username: you_postgresql_username
+    password: you_postgresql_password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port: 8080
