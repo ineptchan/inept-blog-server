@@ -55,8 +55,8 @@ class CategoriesServiceImpl(
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
             when (violation?.constraintName) {
-                CategoriesConstraints.UNIQUE_NAME -> DbDuplicateException(dbCategories.name)
-                CategoriesConstraints.UNIQUE_SLUG -> DbDuplicateException(dbCategories.slug)
+                CategoriesConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbCategories.name)
+                CategoriesConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbCategories.slug)
             }
         }
 
@@ -78,8 +78,8 @@ class CategoriesServiceImpl(
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
             when (violation?.constraintName) {
-                CategoriesConstraints.UNIQUE_NAME -> DbDuplicateException(dbCategories.name)
-                CategoriesConstraints.UNIQUE_SLUG -> DbDuplicateException(dbCategories.slug)
+                CategoriesConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbCategories.name)
+                CategoriesConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbCategories.slug)
             }
         }
 
