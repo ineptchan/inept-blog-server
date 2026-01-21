@@ -15,9 +15,6 @@ data class TopCommentVO(
     @Schema(description = "openapi.comment.user")
     val user: UserPublicVO,
 
-    @Schema(description = "openapi.comment.reply_total")
-    val replyTotal: Long,
-
     @Schema(description = "openapi.comment.createdAt")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     val createdAt: LocalDateTime,

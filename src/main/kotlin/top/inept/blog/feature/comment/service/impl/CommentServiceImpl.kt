@@ -166,10 +166,7 @@ class CommentServiceImpl(
 
         val comments = commentRepository.findAll(specs, pageRequest)
 
-        return comments.toPageResponse {
-            //获得子评论数
-            it.toTopCommentVO(commentRepository.countByParentCommentId(it.id))
-        }
+        return comments.toPageResponse { it.toTopCommentVO() }
     }
 
     override fun createAnonymousComment(dto: CreateAnonymousCommentDTO): CommentVO {

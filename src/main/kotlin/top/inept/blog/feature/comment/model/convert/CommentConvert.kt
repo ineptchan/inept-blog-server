@@ -30,10 +30,9 @@ fun Comment.toCommentReplyVO() = CommentReplyVO(
     createdAt = this.createdAt,
 )
 
-fun Comment.toTopCommentVO(replyTotal: Long) = TopCommentVO(
+fun Comment.toTopCommentVO() = TopCommentVO(
     id = this.id,
     content = this.content,
     user = this.user.toUserPublicVO(),
-    replyTotal = replyTotal,
     createdAt = this.createdAt,
 )
