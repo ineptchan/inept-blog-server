@@ -73,7 +73,7 @@ class ArticleServiceImpl(
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
             when (violation?.constraintName) {
-                ArticleConstraints.UNIQUE_SLUG -> DbDuplicateException(dbArticle.slug)
+                ArticleConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbArticle.slug)
             }
         }
 
@@ -114,7 +114,7 @@ class ArticleServiceImpl(
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
             when (violation?.constraintName) {
-                ArticleConstraints.UNIQUE_SLUG -> DbDuplicateException(dbArticle.slug)
+                ArticleConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbArticle.slug)
             }
         }
 
