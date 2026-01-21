@@ -60,7 +60,7 @@ class AuthServiceImpl(
         val dbRefreshToken = RefreshToken(
             user = dbUser,
             tokenHash = ShaUtil.sha256Hex(refreshToken),
-            expiresAt = jwt.expiresAt!!,   //TODO有点危险
+            expiresAt = jwt.expiresAt!!,
             createdAt = jwt.issuedAt!!,
         )
         refreshTokenRepository.save(dbRefreshToken)
@@ -135,6 +135,32 @@ class AuthServiceImpl(
         refreshTokenRepository.saveAndFlush(dbRefreshToken)
 
         return token
+    }
+
+    override fun logout(token: String) {
+        //根据sha256去数据库查找refreshToken
+        val refreshTokenSha256 = ShaUtil.sha256Hex(token)
+        val dbRefreshToken = refreshTokenRepository.findByTokenHash(refreshTokenSha256) ?: throw NotFoundException(
+            messages["message.auth.refresh_token_not_found"]
+        )
+
+        //校验refreshToken是否合法
+        val jwt =
+            try {
+                refreshDecoder.decode(token)
+            } catch (e: JwtException) {
+                throw Exception(messages["message.auth.unknown_token_content_error"])
+            }
+
+        //校验token的使用类型
+        val tokenUse = jwt.claims["token_use"] as? String
+        if (tokenUse != "refresh") {
+            throw Exception(messages["message.auth.unknown_token_content_error"])
+        }
+
+        //撤销写入数据库
+        dbRefreshToken.revokedAt = Instant.now()
+        refreshTokenRepository.saveAndFlush(dbRefreshToken)
     }
 
     private fun createRefreshToken(username: String): Jwt {

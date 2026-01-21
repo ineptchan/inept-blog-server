@@ -18,7 +18,7 @@ import top.inept.blog.feature.auth.service.AuthService
 import top.inept.blog.properties.JwtProperties
 import java.time.Duration
 
-@Tag(name = "公开身份验证接口")
+@Tag(name = "身份接口")
 @RestController
 @RequestMapping("/auth")
 @Validated
@@ -39,7 +39,7 @@ class AuthController(
             .httpOnly(true)
             .secure(secure)
             .sameSite("Lax")
-            .path("/auth/refresh")
+            .path("/auth")
             .maxAge(Duration.ofMinutes(jwtProperties.refreshExpiresMinutes))
             .build()
 
@@ -55,5 +55,24 @@ class AuthController(
         return ResponseEntity.ok(RefreshVO(accessToken))
     }
 
-    //TODO 退出登录
+    @Operation(summary = "退出登录")
+    @PostMapping("/logout")
+    fun logout(@CookieValue("X-Refresh-Token") token: String, response: HttpServletResponse): ResponseEntity<String> {
+        authService.logout(token)
+
+        //在prod配置模式下必须https才能用携带cookie
+        val secure = environment.acceptsProfiles(Profiles.of("prod"))
+
+        val deleteCookie = ResponseCookie.from("X-Refresh-Token", "")
+            .httpOnly(true)
+            .secure(secure)
+            .sameSite("Lax")
+            .path("/auth")
+            .maxAge(Duration.ZERO)
+            .build()
+
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+
+        return ResponseEntity.ok("ok")
+    }
 }
