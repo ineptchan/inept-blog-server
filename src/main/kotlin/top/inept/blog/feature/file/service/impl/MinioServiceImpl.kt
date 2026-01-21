@@ -108,17 +108,19 @@ class MinioServiceImpl(
 
     override fun presignedGetUrl(
         objectName: String,
-        duration: Long,
+        duration: Long?,
         unit: TimeUnit
     ): String {
-        return minioClient.getPresignedObjectUrl(
-            GetPresignedObjectUrlArgs.builder()
-                .method(Method.GET)
-                .bucket(minioProperties.bucket)
-                .`object`(objectName)
-                .expiry(duration.toInt(), unit)
-                .build()
-        )
+        val builder = GetPresignedObjectUrlArgs.builder()
+            .method(Method.GET)
+            .bucket(minioProperties.bucket)
+            .`object`(objectName)
+
+        duration?.let {
+            builder.expiry(it.toInt(), unit)
+        }
+
+        return minioClient.getPresignedObjectUrl(builder.build())
     }
 
     override fun presignedPutUrl(

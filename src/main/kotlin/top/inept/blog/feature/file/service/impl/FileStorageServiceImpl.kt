@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile
 import top.inept.blog.feature.file.model.entity.FileStorage
 import top.inept.blog.feature.file.model.entity.constraints.FileStorageConstraints
 import top.inept.blog.feature.file.model.entity.enums.FileStorageStatus
+import top.inept.blog.feature.file.model.vo.FileStorageVO
 import top.inept.blog.feature.file.repository.FileStorageRepository
 import top.inept.blog.feature.file.service.FileStorageService
 import top.inept.blog.feature.file.service.MinioService
@@ -21,7 +22,7 @@ class FileStorageServiceImpl(
 ) : FileStorageService {
     //TODO 异常修复
 
-    override fun upload(file: MultipartFile): String {
+    override fun upload(file: MultipartFile): FileStorageVO {
         val dto = minioService.upload(file)
 
         //确认有没有上传成功
@@ -49,29 +50,47 @@ class FileStorageServiceImpl(
             }
         }
 
-        return minioService.presignedGetUrl(dto.objectName, 10, TimeUnit.MINUTES)
+        val url = minioService.presignedGetUrl(dto.objectName, null, TimeUnit.MINUTES)
+
+        return FileStorageVO(
+            id = dbFileStorage.id,
+            url = url,
+            objectName = dto.objectName,
+        )
     }
 
-    override fun presignedGetUrl(id: Long): String {
-        val fileStorage = (fileStorageRepository.findByIdOrNull(id)
+    override fun presignedGetUrl(id: Long): FileStorageVO {
+        val dbFileStorage = (fileStorageRepository.findByIdOrNull(id)
             ?: throw Exception("未找到"))
 
-        if (fileStorage.status == FileStorageStatus.DELETED || fileStorage.deletedAt != null) {
+        if (dbFileStorage.status == FileStorageStatus.DELETED || dbFileStorage.deletedAt != null) {
             throw Exception("已经删除")
         }
 
-        return minioService.presignedGetUrl(fileStorage.objectName, 10, TimeUnit.MINUTES)
+        val url = minioService.presignedGetUrl(dbFileStorage.objectName, 10, TimeUnit.MINUTES)
+
+        return FileStorageVO(
+            id = dbFileStorage.id,
+            url = url,
+            objectName = dbFileStorage.objectName,
+        )
     }
 
-    override fun presignedGetUrl(objectName: String): String {
-        val fileStorage = (fileStorageRepository.findFileStorageByOriginalFileName(objectName)
+    override fun presignedGetUrl(objectName: String): FileStorageVO {
+        val dbFileStorage = (fileStorageRepository.findFileStorageByOriginalFileName(objectName)
             ?: throw Exception("未找到"))
 
-        if (fileStorage.status == FileStorageStatus.DELETED || fileStorage.deletedAt != null) {
+        if (dbFileStorage.status == FileStorageStatus.DELETED || dbFileStorage.deletedAt != null) {
             throw Exception("已经删除")
         }
 
-        return minioService.presignedGetUrl(fileStorage.objectName, 10, TimeUnit.MINUTES)
+        val url = minioService.presignedGetUrl(dbFileStorage.objectName, 10, TimeUnit.MINUTES)
+
+        return FileStorageVO(
+            id = dbFileStorage.id,
+            url = url,
+            objectName = dbFileStorage.objectName,
+        )
     }
 
     override fun delete(id: Long) {
@@ -83,6 +102,4 @@ class FileStorageServiceImpl(
 
         fileStorageRepository.saveAndFlush(fileStorage)
     }
-
-
 }

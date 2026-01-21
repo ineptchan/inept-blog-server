@@ -11,6 +11,6 @@ interface MinioService {
     fun upload(file: MultipartFile): MinioUploadDTO
     fun download(objectName: String): InputStream
     fun delete(objectName: String)
-    fun presignedGetUrl(objectName: String, duration: Long, unit: TimeUnit): String
+    fun presignedGetUrl(objectName: String, duration: Long?, unit: TimeUnit): String
     fun presignedPutUrl(objectName: String, duration: Long, unit: TimeUnit): String
 }
