@@ -96,9 +96,6 @@ class UserServiceImpl(
                 PasswordUtil.encode(it)?.let { encodePassword ->
                     password = encodePassword
                 }
-
-                //如果改密码撤销刷新token
-                refreshRepository.revokeActiveTokenByUserId(id, Instant.now())
             }
         }
 
@@ -112,6 +109,9 @@ class UserServiceImpl(
                 UserConstraints.UNIQUE_EMAIL -> throw DbDuplicateException(dbUser.email)
             }
         }
+
+        //撤销refreshToken
+        refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
 
         return dbUser
     }
@@ -133,6 +133,7 @@ class UserServiceImpl(
         return getUserByUsername(contextUsername)
     }
 
+    @Transactional
     override fun updateProfile(dto: UpdateUserProfileDTO): User {
         //从上下文获取用户名
         val contextUsername = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
@@ -160,6 +161,9 @@ class UserServiceImpl(
                 UserConstraints.UNIQUE_EMAIL -> throw DbDuplicateException(dbUser.email)
             }
         }
+
+        //撤销refreshToken
+        refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
 
         return dbUser
     }
