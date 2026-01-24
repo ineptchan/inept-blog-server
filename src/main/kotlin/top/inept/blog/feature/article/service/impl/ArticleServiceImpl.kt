@@ -69,14 +69,7 @@ class ArticleServiceImpl(
             tags = tags.toMutableSet(),
         )
 
-        try {
-            articleRepository.saveAndFlush(dbArticle)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                ArticleConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbArticle.slug)
-            }
-        }
+        saveAndFlushArticleOrThrow(dbArticle)
 
         return dbArticle
     }
@@ -110,14 +103,7 @@ class ArticleServiceImpl(
             dto.articleStatus?.let { articleStatus = it }
         }
 
-        try {
-            articleRepository.saveAndFlush(dbArticle)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                ArticleConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbArticle.slug)
-            }
-        }
+        saveAndFlushArticleOrThrow(dbArticle)
 
         return dbArticle
     }
@@ -152,7 +138,7 @@ class ArticleServiceImpl(
     override fun existsArticleById(id: Long): Boolean {
         return articleRepository.existsById(id)
     }
-    
+
     override fun getHomeArticles(dto: QueryArticleDTO): Page<Article> {
         val pageRequest = dto.toPageRequest()
         val a = QArticle.article
@@ -171,5 +157,17 @@ class ArticleServiceImpl(
         }
 
         return articleRepository.findAll(predicate, pageRequest)
+    }
+
+    private fun saveAndFlushArticleOrThrow(dbArticle: Article): Article {
+        return try {
+            articleRepository.saveAndFlush(dbArticle)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                ArticleConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbArticle.slug)
+                else -> throw Exception(messages["message.common.unknown_error"])
+            }
+        }
     }
 }
