@@ -48,7 +48,7 @@ class CommentServiceImpl(
 
         val builder = BooleanBuilder()
             .and(dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
-                c.content.likeIgnoreCase("%$kw%")
+                c.content.containsIgnoreCase(kw)
             })
 
         //获取全部评论
