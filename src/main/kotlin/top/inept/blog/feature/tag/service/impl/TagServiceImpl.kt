@@ -1,12 +1,12 @@
 package top.inept.blog.feature.tag.service.impl
 
+import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
@@ -15,10 +15,10 @@ import top.inept.blog.feature.tag.model.convert.toTag
 import top.inept.blog.feature.tag.model.dto.CreateTagDTO
 import top.inept.blog.feature.tag.model.dto.QueryTagDTO
 import top.inept.blog.feature.tag.model.dto.UpdateTagDTO
+import top.inept.blog.feature.tag.model.entity.QTag
 import top.inept.blog.feature.tag.model.entity.Tag
 import top.inept.blog.feature.tag.model.entity.constraints.TagConstraints
 import top.inept.blog.feature.tag.repository.TagRepository
-import top.inept.blog.feature.tag.repository.TagSpecs
 import top.inept.blog.feature.tag.service.TagService
 
 @Service
@@ -28,15 +28,16 @@ class TagServiceImpl(
 ) : TagService {
     override fun getTags(dto: QueryTagDTO): Page<Tag> {
         val pageRequest = dto.toPageRequest()
+        val t = QTag.tag
 
-        val specs = QueryBuilder<Tag>()
-            .or(
-                TagSpecs.nameContains(dto.keyword),
-                TagSpecs.slugContains(dto.keyword)
+        val builder = BooleanBuilder()
+            .and(
+                dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                    t.name.contains(kw).or(t.slug.containsIgnoreCase(kw))
+                }
             )
-            .buildSpec()
 
-        return tagRepository.findAll(specs, pageRequest)
+        return tagRepository.findAll(builder, pageRequest)
     }
 
     override fun getTagById(id: Long): Tag {
