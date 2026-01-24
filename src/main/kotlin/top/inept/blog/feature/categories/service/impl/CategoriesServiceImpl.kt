@@ -50,15 +50,7 @@ class CategoriesServiceImpl(
     override fun createCategory(dto: CreateCategoriesDTO): Categories {
         val dbCategories = dto.toCategories()
 
-        try {
-            categoriesRepository.saveAndFlush(dbCategories)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                CategoriesConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbCategories.name)
-                CategoriesConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbCategories.slug)
-            }
-        }
+        saveAndFlushCategoryOrThrow(dbCategories)
 
         return dbCategories
     }
@@ -73,15 +65,7 @@ class CategoriesServiceImpl(
             dto.slug?.let { slug = it }
         }
 
-        try {
-            categoriesRepository.saveAndFlush(dbCategories)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                CategoriesConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbCategories.name)
-                CategoriesConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbCategories.slug)
-            }
-        }
+        saveAndFlushCategoryOrThrow(dbCategories)
 
         return dbCategories
     }
@@ -92,5 +76,18 @@ class CategoriesServiceImpl(
 
         //删除分类
         categoriesRepository.deleteById(id)
+    }
+
+    private fun saveAndFlushCategoryOrThrow(dbCategories: Categories): Categories {
+        return try {
+            categoriesRepository.saveAndFlush(dbCategories)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                CategoriesConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbCategories.name)
+                CategoriesConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbCategories.slug)
+                else -> throw Exception(messages["message.common.unknown_error"])
+            }
+        }
     }
 }
