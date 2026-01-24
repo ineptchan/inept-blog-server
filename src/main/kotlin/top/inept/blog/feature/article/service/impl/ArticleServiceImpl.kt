@@ -150,8 +150,7 @@ class ArticleServiceImpl(
     }
 
     override fun existsArticleById(id: Long): Boolean {
-        if (!articleRepository.existsById(id)) throw NotFoundException(messages["message.articles.not_found"])
-        return true
+        return articleRepository.existsById(id)
     }
 
     override fun getHomeArticles(dto: QueryArticleDTO): Page<Article> {
