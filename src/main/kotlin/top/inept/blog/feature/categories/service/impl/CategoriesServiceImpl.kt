@@ -30,12 +30,13 @@ class CategoriesServiceImpl(
         val pageRequest = dto.toPageRequest()
         val c = QCategories.categories
 
-        val predicate = BooleanBuilder()
-            .and(dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
-                c.slug.contains(kw).or(c.name.contains(kw))
-            })
+        val builder = BooleanBuilder().apply {
+            dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                and(c.slug.contains(kw).or(c.name.contains(kw)))
+            }
+        }
 
-        return categoriesRepository.findAll(predicate, pageRequest)
+        return categoriesRepository.findAll(builder, pageRequest)
     }
 
     override fun getCategoriesById(id: Long): Categories {
