@@ -1,12 +1,12 @@
 package top.inept.blog.feature.categories.service.impl
 
+import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
@@ -16,9 +16,9 @@ import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
 import top.inept.blog.feature.categories.model.dto.QueryCategoriesDTO
 import top.inept.blog.feature.categories.model.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.model.entity.Categories
+import top.inept.blog.feature.categories.model.entity.QCategories
 import top.inept.blog.feature.categories.model.entity.constraints.CategoriesConstraints
 import top.inept.blog.feature.categories.repository.CategoriesRepository
-import top.inept.blog.feature.categories.repository.CategoriesSpecs
 import top.inept.blog.feature.categories.service.CategoriesService
 
 @Service
@@ -28,15 +28,14 @@ class CategoriesServiceImpl(
 ) : CategoriesService {
     override fun getCategories(dto: QueryCategoriesDTO): Page<Categories> {
         val pageRequest = dto.toPageRequest()
+        val c = QCategories.categories
 
-        val specs = QueryBuilder<Categories>()
-            .or(
-                CategoriesSpecs.nameContains(dto.keyword),
-                CategoriesSpecs.slugContains(dto.keyword),
-            )
-            .buildSpec()
+        val predicate = BooleanBuilder()
+            .and(dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                c.slug.contains(kw).or(c.name.contains(kw))
+            })
 
-        return categoriesRepository.findAll(specs, pageRequest)
+        return categoriesRepository.findAll(predicate, pageRequest)
     }
 
     override fun getCategoriesById(id: Long): Categories {
