@@ -1,5 +1,6 @@
 package top.inept.blog.feature.user.service.impl
 
+import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.dao.DataIntegrityViolationException
@@ -8,7 +9,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
@@ -18,10 +18,10 @@ import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.QueryUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
+import top.inept.blog.feature.user.model.entity.QUser
 import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.model.entity.constraints.UserConstraints
 import top.inept.blog.feature.user.repository.UserRepository
-import top.inept.blog.feature.user.repository.UserSpecs
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.PasswordUtil
 import top.inept.blog.utils.SecurityUtil
@@ -35,16 +35,21 @@ class UserServiceImpl(
 ) : UserService {
     override fun getUsers(queryUserDTO: QueryUserDTO): Page<User> {
         val pageRequest = queryUserDTO.toPageRequest()
+        val u = QUser.user
 
-        val specs = QueryBuilder<User>()
-            .or(
-                UserSpecs.nicknameContains(queryUserDTO.keyword),
-                UserSpecs.usernameContains(queryUserDTO.keyword),
-                UserSpecs.emailContains(queryUserDTO.keyword)
-            ).buildSpec()
+        val builder = BooleanBuilder().apply {
+            queryUserDTO.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                and(
+                    u.nickname.contains(kw)
+                        .or(u.password.contains(kw))
+                        .or(u.email.contains(kw))
+                )
+            }
+        }
 
-        return userRepository.findAll(specs, pageRequest)
+        return userRepository.findAll(builder, pageRequest)
     }
+
 
     override fun getUserById(id: Long): User {
         //根据id查找用户
