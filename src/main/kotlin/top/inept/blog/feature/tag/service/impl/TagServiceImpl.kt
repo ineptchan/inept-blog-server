@@ -49,15 +49,7 @@ class TagServiceImpl(
     override fun createTag(dto: CreateTagDTO): Tag {
         val dbTag = dto.toTag()
 
-        try {
-            tagRepository.saveAndFlush(dbTag)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                TagConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbTag.name)
-                TagConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbTag.slug)
-            }
-        }
+        saveAndFlushTagOrThrow(dbTag)
 
         return dbTag
     }
@@ -72,15 +64,7 @@ class TagServiceImpl(
             dto.slug?.let { slug = it }
         }
 
-        try {
-            tagRepository.saveAndFlush(dbTag)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                TagConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbTag.name)
-                TagConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbTag.slug)
-            }
-        }
+        saveAndFlushTagOrThrow(dbTag)
 
         return dbTag
     }
@@ -105,5 +89,19 @@ class TagServiceImpl(
         }
 
         return tags
+    }
+
+    private fun saveAndFlushTagOrThrow(dbTag: Tag): Tag {
+        return try {
+            tagRepository.saveAndFlush(dbTag)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                TagConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbTag.name)
+                TagConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbTag.slug)
+                else -> throw Exception(messages["message.common.unknown_error"])
+            }
+        }
+
     }
 }
