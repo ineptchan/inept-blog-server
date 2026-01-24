@@ -152,20 +152,23 @@ class ArticleServiceImpl(
     override fun existsArticleById(id: Long): Boolean {
         return articleRepository.existsById(id)
     }
-
+    
     override fun getHomeArticles(dto: QueryArticleDTO): Page<Article> {
         val pageRequest = dto.toPageRequest()
         val a = QArticle.article
 
-        val predicate = BooleanBuilder()
-            .and(dto.category?.let { a.category.id.eq(it) })
-            .and(dto.articleStatus?.let { a.articleStatus.eq(it) })
-            .and(dto.tagIds?.takeIf { it.isNotEmpty() }?.let { a.tags.any().id.`in`(it) })
-            .and(dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
-                a.title.containsIgnoreCase(kw)
-                    .or(a.content.containsIgnoreCase(kw))
-                    .or(a.slug.containsIgnoreCase(kw))
-            })
+        val predicate = BooleanBuilder().apply {
+            dto.category?.let { and(a.category.id.eq(it)) }
+            dto.articleStatus?.let { and(a.articleStatus.eq(it)) }
+            dto.tagIds?.takeIf { it.isNotEmpty() }?.let { and(a.tags.any().id.`in`(it)) }
+            dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                and(
+                    a.title.containsIgnoreCase(kw)
+                        .or(a.content.containsIgnoreCase(kw))
+                        .or(a.slug.containsIgnoreCase(kw))
+                )
+            }
+        }
 
         return articleRepository.findAll(predicate, pageRequest)
     }
