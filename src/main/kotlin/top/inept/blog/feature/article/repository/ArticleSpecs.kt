@@ -22,8 +22,8 @@ object ArticleSpecs {
         return tags.takeIf { it != null && it.isNotEmpty() }?.let {
             Specification { root, query, cb ->
                 query?.distinct(true)
-                val tagsJoin = root.join<Article, Tag>("${Article_.tags}")
-                tagsJoin.get<Long>(Tag_.id).`in`(it)
+                val tagsJoin = root.join(Article_.tags)
+                tagsJoin.get(Tag_.id).`in`(it)
             }
         }
     }
