@@ -46,10 +46,11 @@ class CommentServiceImpl(
         val pageRequest = dto.toPageRequest()
         val c = QComment.comment
 
-        val builder = BooleanBuilder()
-            .and(dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
-                c.content.containsIgnoreCase(kw)
-            })
+        val builder = BooleanBuilder().apply {
+            dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                and(c.content.containsIgnoreCase(kw))
+            }
+        }
 
         //获取全部评论
         val comments = commentRepository.findAll(builder, pageRequest)
