@@ -1,5 +1,7 @@
 package top.inept.blog.feature.article.service.impl
 
+//import top.inept.blog.feature.article.repository.ArticleSpecs
+import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.dao.DataIntegrityViolationException
@@ -7,7 +9,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import top.inept.blog.base.QueryBuilder
 import top.inept.blog.exception.DbDuplicateException
 import top.inept.blog.exception.NotFoundException
 import top.inept.blog.extensions.get
@@ -17,9 +18,9 @@ import top.inept.blog.feature.article.model.dto.QueryArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.article.model.entity.QArticle
 import top.inept.blog.feature.article.model.entity.constraints.ArticleConstraints
 import top.inept.blog.feature.article.repository.ArticleRepository
-import top.inept.blog.feature.article.repository.ArticleSpecs
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.categories.service.CategoriesService
@@ -155,18 +156,18 @@ class ArticleServiceImpl(
 
     override fun getHomeArticles(dto: QueryArticleDTO): Page<Article> {
         val pageRequest = dto.toPageRequest()
+        val a = QArticle.article
 
-        val specs = QueryBuilder<Article>()
-            .and(ArticleSpecs.byCategoryId(dto.category))
-            .and(ArticleSpecs.byTagIds(dto.tagIds))
-            .or(
-                ArticleSpecs.titleContains(dto.keyword),
-                ArticleSpecs.contentContains(dto.keyword),
-                ArticleSpecs.slugContains(dto.keyword),
-            )
-            .and(ArticleSpecs.byArticleStatus(dto.articleStatus))
-            .buildSpec()
+        val predicate = BooleanBuilder()
+            .and(dto.category?.let { a.category.id.eq(it) })
+            .and(dto.articleStatus?.let { a.articleStatus.eq(it) })
+            .and(dto.tagIds?.takeIf { it.isNotEmpty() }?.let { a.tags.any().id.`in`(it) })
+            .and(dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                a.title.containsIgnoreCase(kw)
+                    .or(a.content.containsIgnoreCase(kw))
+                    .or(a.slug.containsIgnoreCase(kw))
+            })
 
-        return articleRepository.findAll(specs, pageRequest)
+        return articleRepository.findAll(predicate, pageRequest)
     }
 }
