@@ -30,12 +30,11 @@ class TagServiceImpl(
         val pageRequest = dto.toPageRequest()
         val t = QTag.tag
 
-        val builder = BooleanBuilder()
-            .and(
-                dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
-                    t.name.contains(kw).or(t.slug.containsIgnoreCase(kw))
-                }
-            )
+        val builder = BooleanBuilder().apply {
+            dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+                and(t.name.contains(kw).or(t.slug.containsIgnoreCase(kw)))
+            }
+        }
 
         return tagRepository.findAll(builder, pageRequest)
     }
