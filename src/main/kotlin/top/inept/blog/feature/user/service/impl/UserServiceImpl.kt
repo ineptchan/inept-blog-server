@@ -72,18 +72,9 @@ class UserServiceImpl(
             password = encodePassword
         )
 
-        //推荐不要传入密码，系统随机生成发邮件通知
+        //TODO 推荐不要传入密码，系统随机生成发邮件通知
 
-        try {
-            userRepository.saveAndFlush(dbUser)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                UserConstraints.UNIQUE_USERNAME -> throw DbDuplicateException(dbUser.username)
-                UserConstraints.UNIQUE_NICKNAME -> throw DbDuplicateException(dbUser.nickname)
-                UserConstraints.UNIQUE_EMAIL -> throw DbDuplicateException(dbUser.email)
-            }
-        }
+        saveAndFlushUserOrThrow(dbUser)
 
         return dbUser
     }
@@ -104,16 +95,7 @@ class UserServiceImpl(
             }
         }
 
-        try {
-            userRepository.saveAndFlush(dbUser)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                UserConstraints.UNIQUE_USERNAME -> throw DbDuplicateException(dbUser.username)
-                UserConstraints.UNIQUE_NICKNAME -> throw DbDuplicateException(dbUser.nickname)
-                UserConstraints.UNIQUE_EMAIL -> throw DbDuplicateException(dbUser.email)
-            }
-        }
+        saveAndFlushUserOrThrow(dbUser)
 
         //撤销refreshToken
         refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
@@ -156,7 +138,16 @@ class UserServiceImpl(
             }
         }
 
-        try {
+        saveAndFlushUserOrThrow(dbUser)
+
+        //撤销refreshToken
+        refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
+
+        return dbUser
+    }
+
+    private fun saveAndFlushUserOrThrow(dbUser: User): User {
+        return try {
             userRepository.saveAndFlush(dbUser)
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
@@ -164,12 +155,8 @@ class UserServiceImpl(
                 UserConstraints.UNIQUE_USERNAME -> throw DbDuplicateException(dbUser.username)
                 UserConstraints.UNIQUE_NICKNAME -> throw DbDuplicateException(dbUser.nickname)
                 UserConstraints.UNIQUE_EMAIL -> throw DbDuplicateException(dbUser.email)
+                else -> throw Exception(messages["message.common.unknown_error"])
             }
         }
-
-        //撤销refreshToken
-        refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
-
-        return dbUser
     }
 }
