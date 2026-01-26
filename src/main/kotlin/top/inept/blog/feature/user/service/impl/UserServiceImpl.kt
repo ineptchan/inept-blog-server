@@ -2,16 +2,15 @@ package top.inept.blog.feature.user.service.impl
 
 import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
-import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import top.inept.blog.exception.DbDuplicateException
-import top.inept.blog.exception.NotFoundException
-import top.inept.blog.extensions.get
+import top.inept.blog.exception.BusinessException
+import top.inept.blog.exception.error.CommonErrorCode
+import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.auth.repository.RefreshTokenRepository
 import top.inept.blog.feature.user.model.dto.CreateUserDTO
@@ -30,7 +29,6 @@ import java.time.Instant
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val messages: MessageSourceAccessor,
     private val refreshRepository: RefreshTokenRepository
 ) : UserService {
     override fun getUsers(queryUserDTO: QueryUserDTO): Page<User> {
@@ -53,17 +51,19 @@ class UserServiceImpl(
 
     override fun getUserById(id: Long): User {
         //根据id查找用户
-        return userRepository.findByIdOrNull(id) ?: throw NotFoundException("message.user.user_not_found")
+        return userRepository.findByIdOrNull(id)
+            ?: throw BusinessException(UserErrorCode.ID_NOT_FOUND, id)
     }
 
     override fun getUserByUsername(username: String): User {
         //根据username查找用户
-        return userRepository.findByUsername(username) ?: throw NotFoundException("message.user.user_not_found")
+        return userRepository.findByUsername(username)
+            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
     }
 
     override fun createUser(createUserDTO: CreateUserDTO): User {
-        val encodePassword =
-            PasswordUtil.encode(createUserDTO.password) ?: throw Exception(messages["message.common.unknown_error"])
+        val encodePassword = PasswordUtil.encode(createUserDTO.password)
+            ?: throw BusinessException(CommonErrorCode.UNKNOWN)
 
         val dbUser = User(
             username = createUserDTO.username,
@@ -82,7 +82,7 @@ class UserServiceImpl(
     @Transactional
     override fun updateUser(id: Long, dto: UpdateUserDTO): User {
         //根据id查找用户
-        val dbUser = userRepository.findByIdOrNull(id) ?: throw Exception(messages["message.user.user_not_found"])
+        val dbUser = getUserById(id)
 
         dbUser.apply {
             dto.nickname?.let { nickname = it }
@@ -105,7 +105,7 @@ class UserServiceImpl(
 
     override fun deleteUserById(id: Long) {
         //根据id判断用户是否存在
-        if (!userRepository.existsById(id)) throw NotFoundException(messages["message.user.user_not_found"])
+        if (!userRepository.existsById(id)) throw BusinessException(UserErrorCode.ID_NOT_FOUND, id)
 
         //删除用户
         userRepository.deleteById(id)
@@ -114,7 +114,7 @@ class UserServiceImpl(
     override fun getProfile(): User {
         //从上下文获取用户名
         val contextUsername = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw Exception("message.common.missing_user_context")
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
 
         //根据用户名获取用户
         return getUserByUsername(contextUsername)
@@ -124,7 +124,7 @@ class UserServiceImpl(
     override fun updateProfile(dto: UpdateUserProfileDTO): User {
         //从上下文获取用户名
         val contextUsername = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw Exception("message.common.missing_user_context")
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
 
         //根据用户名获取用户
         val dbUser = getUserByUsername(contextUsername)
@@ -152,10 +152,13 @@ class UserServiceImpl(
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
             when (violation?.constraintName) {
-                UserConstraints.UNIQUE_USERNAME -> throw DbDuplicateException(dbUser.username)
-                UserConstraints.UNIQUE_NICKNAME -> throw DbDuplicateException(dbUser.nickname)
-                UserConstraints.UNIQUE_EMAIL -> throw DbDuplicateException(dbUser.email)
-                else -> throw Exception(messages["message.common.unknown_error"])
+                UserConstraints.UNIQUE_USERNAME ->
+                    throw BusinessException(UserErrorCode.USERNAME_DB_DUPLICATE, dbUser.username)
+
+                UserConstraints.UNIQUE_EMAIL ->
+                    throw BusinessException(UserErrorCode.EMAIL_DB_DUPLICATE, dbUser.email ?: "null")
+
+                else -> throw BusinessException(CommonErrorCode.UNKNOWN)
             }
         }
     }
