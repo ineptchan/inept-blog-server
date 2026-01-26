@@ -152,6 +152,10 @@ class AuthServiceImpl(
                 throw Exception(messages["message.auth.unknown_token_content_error"])
             }
 
+        //是否已经撤销
+        if (dbRefreshToken.revokedAt != null)
+            throw Exception(messages["message.auth.token_has_been_revoked"])
+
         //校验token的使用类型
         val tokenUse = jwt.claims["token_use"] as? String
         if (tokenUse != "refresh") {
