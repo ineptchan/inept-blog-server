@@ -51,8 +51,7 @@ class Article(
     )
     var tags: MutableSet<Tag> = mutableSetOf(),
 
-    //TODO EnumType.STRING
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var articleStatus: ArticleStatus = ArticleStatus.Draft,
 

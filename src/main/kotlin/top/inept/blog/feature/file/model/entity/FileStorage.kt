@@ -35,7 +35,7 @@ class FileStorage(
     @Column(name = "sha_256", nullable = false)
     var sha256: String,
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     var status: FileStorageStatus = FileStorageStatus.PENDING,
 
