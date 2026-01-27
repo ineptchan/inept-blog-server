@@ -1,25 +1,25 @@
 package top.inept.blog.handler
 
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.context.support.MessageSourceAccessor
-import org.springframework.http.HttpStatus
-import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.authorization.AuthorizationDeniedException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.extensions.get
-import top.inept.blog.extensions.log
+
 
 @RestControllerAdvice
 class GlobalExceptionHandler(
     private val messages: MessageSourceAccessor,
     private val messageSource: MessageSource
-) {
+) : ResponseEntityExceptionHandler() {
     @ExceptionHandler(BusinessException::class)
     fun handleBusinessException(e: BusinessException): ProblemDetail {
         val locale = LocaleContextHolder.getLocale()
@@ -53,54 +53,77 @@ class GlobalExceptionHandler(
         return problemDetail
     }
 
-    @ExceptionHandler
-    fun exceptionHandler(ex: HttpMessageNotReadableException): ResponseEntity<String> {
-        log.error(ex.message, ex)
-
-        val cause = ex.mostSpecificCause
-        val message = when (cause) {
-//            is MissingKotlinParameterException -> {
-//                // 拿到缺失的那个参数名
-//                val paramName = cause.parameter.name ?: "UNKNOWN"
-//                messages["message.common.missing_json_field", arrayOf(paramName)]
-//            }
-
-            is MismatchedInputException -> {
-                // 类型不匹配，比如 String 传到 Int
-                val path = cause.path.joinToString(".") { it.fieldName ?: "?" }
-                messages["message.common.mismatched_json_field_type", arrayOf(path)]
-            }
-
-            else -> messages["message.common.unknown_error"]
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message)
-    }
-
     /**
      * 没有权限的验证错误
      */
     @ExceptionHandler
-    fun exceptionHandler(ex: AuthorizationDeniedException): ResponseEntity<Any> {
+    fun exceptionHandler(e: AuthorizationDeniedException): ResponseEntity<Any> {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null)
     }
 
-    /*    */
     /**
-     * Validated的验证错误
-     *//*
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun exceptionHandler(ex: MethodArgumentNotValidException): ResponseEntity<List<ValidationError>> {
-        val errors = ex.bindingResult.fieldErrors.map { fe ->
-            ValidationError(
-                field = fe.field,
-                message = messages[fe.defaultMessage ?: "message.common.illegal_parameters"],
-            )
+     * Validation 校验异常
+     *
+     */
+    @Override
+    override fun handleMethodArgumentNotValid(
+        ex: MethodArgumentNotValidException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any>? {
+        val errors = ex.bindingResult.fieldErrors.associate { fieldError ->
+            fieldError.field to messages[fieldError.defaultMessage ?: "message.common.unknown_error"]
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(errors)
-    }*/
+        return createValidationResponse(
+            status = HttpStatus.BAD_REQUEST,
+            detailKey = "message.common.parameter_validation",
+            errors = errors,
+            headers = HttpHeaders(),
+            request = request
+        )
+    }
 
+    /**
+     * 请求体不可读 (JSON 格式错误)
+     */
+    @Override
+    override fun handleHttpMessageNotReadable(
+        ex: HttpMessageNotReadableException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any>? {
+        val problemDetail = ProblemDetail.forStatusAndDetail(
+            status,
+            messages["message.common.request_body_missing"]
+        ).apply {
+            title = messages["message.common.bad_request_title"]
+            setProperty("error", messages["message.common.json_format_error"])
+        }
 
+        return createResponseEntity(problemDetail, headers, status, request)
+    }
+
+    /**
+     * 统一构建包含 errors 字段的 Validation 响应
+     */
+    private fun createValidationResponse(
+        status: HttpStatusCode,
+        detailKey: String,
+        errors: Map<String, String>,
+        headers: HttpHeaders,
+        request: WebRequest
+    ): ResponseEntity<Any>? {
+        val problemDetail = ProblemDetail.forStatusAndDetail(
+            status,
+            messages[detailKey],
+        ).apply {
+            title = messages["message.common.validation_failed_title"]
+            setProperty("errors", errors)
+        }
+
+        return createResponseEntity(problemDetail, headers, status, request)
+    }
 }
