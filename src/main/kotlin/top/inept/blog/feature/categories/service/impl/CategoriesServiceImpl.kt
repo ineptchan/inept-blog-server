@@ -2,14 +2,13 @@ package top.inept.blog.feature.categories.service.impl
 
 import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
-import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import top.inept.blog.exception.DbDuplicateException
-import top.inept.blog.exception.NotFoundException
-import top.inept.blog.extensions.get
+import top.inept.blog.exception.BusinessException
+import top.inept.blog.exception.error.CategoriesErrorCode
+import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.categories.model.convert.toCategories
 import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
@@ -24,7 +23,6 @@ import top.inept.blog.feature.categories.service.CategoriesService
 @Service
 class CategoriesServiceImpl(
     private val categoriesRepository: CategoriesRepository,
-    private val messages: MessageSourceAccessor,
 ) : CategoriesService {
     override fun getCategories(dto: QueryCategoriesDTO): Page<Categories> {
         val pageRequest = dto.toPageRequest()
@@ -41,10 +39,8 @@ class CategoriesServiceImpl(
 
     override fun getCategoriesById(id: Long): Categories {
         //根据id查找分类
-        val categories = categoriesRepository.findByIdOrNull(id)
-            ?: throw NotFoundException(messages["message.categories.categories_not_found"])
-
-        return categories
+        return categoriesRepository.findByIdOrNull(id)
+            ?: throw BusinessException(CategoriesErrorCode.ID_NOT_FOUND, id)
     }
 
     override fun createCategory(dto: CreateCategoriesDTO): Categories {
@@ -57,8 +53,7 @@ class CategoriesServiceImpl(
 
     override fun updateCategory(id: Long, dto: UpdateCategoriesDTO): Categories {
         //根据id查找分类
-        val dbCategories = categoriesRepository.findByIdOrNull(id)
-            ?: throw NotFoundException(messages["message.categories.categories_not_found"])
+        val dbCategories = getCategoriesById(id)
 
         dbCategories.apply {
             dto.name?.let { name = it }
@@ -72,7 +67,7 @@ class CategoriesServiceImpl(
 
     override fun deleteCategory(id: Long) {
         //根据id判断分类是否存在
-        if (!categoriesRepository.existsById(id)) throw NotFoundException(messages["message.categories.categories_not_found"])
+        if (!categoriesRepository.existsById(id)) throw BusinessException(CategoriesErrorCode.ID_NOT_FOUND, id)
 
         //删除分类
         categoriesRepository.deleteById(id)
@@ -84,9 +79,13 @@ class CategoriesServiceImpl(
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
             when (violation?.constraintName) {
-                CategoriesConstraints.UNIQUE_NAME -> throw DbDuplicateException(dbCategories.name)
-                CategoriesConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbCategories.slug)
-                else -> throw Exception(messages["message.common.unknown_error"])
+                CategoriesConstraints.UNIQUE_NAME ->
+                    throw BusinessException(CategoriesErrorCode.NAME_DB_DUPLICATE, dbCategories.name)
+
+                CategoriesConstraints.UNIQUE_SLUG ->
+                    throw BusinessException(CategoriesErrorCode.SLUG_DB_DUPLICATE, dbCategories.slug)
+
+                else -> throw BusinessException(CommonErrorCode.UNKNOWN)
             }
         }
     }
