@@ -1,36 +1,56 @@
 package top.inept.blog.handler
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.authorization.AuthorizationDeniedException
-import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import top.inept.blog.base.ValidationError
-import top.inept.blog.exception.DbDuplicateException
+import top.inept.blog.exception.BusinessException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.log
 
 @RestControllerAdvice
 class GlobalExceptionHandler(
-    private val messages: MessageSourceAccessor
+    private val messages: MessageSourceAccessor,
+    private val messageSource: MessageSource
 ) {
+    @ExceptionHandler(BusinessException::class)
+    fun handleBusinessException(e: BusinessException): ProblemDetail {
+        val locale = LocaleContextHolder.getLocale()
 
-    @ExceptionHandler
-    fun exceptionHandler(ex: Exception): ResponseEntity<String> {
-        val status = ex::class.annotations
-            .filterIsInstance<ResponseStatus>()
-            .firstOrNull()
-            ?.value
-            ?: HttpStatus.INTERNAL_SERVER_ERROR
+        val title = try {
+            messageSource.getMessage(e.errorCode.messageKey, null, locale)
+        } catch (_: Exception) {
+            e.errorCode.messageKey
+        }
 
-        log.error(ex.message, ex)
+        val detail = try {
+            messageSource.getMessage("${e.errorCode.messageKey}.detail", e.args, locale)
+        } catch (_: Exception) {
+            // 用 title 兜底
+            "$title: ${e.args.joinToString()}"
+        }
 
-        return ResponseEntity.status(status).body(ex.message ?: messages["message.common.unknown_error"])
+
+        val problemDetail = ProblemDetail.forStatusAndDetail(
+            e.errorCode.httpStatus,
+            detail,
+        ).apply {
+            this.title = title
+        }
+
+        // 放入业务数据 (balance, accounts 等)
+        e.extensions.forEach { (key, value) ->
+            problemDetail.setProperty(key, value)
+        }
+
+        return problemDetail
     }
 
     @ExceptionHandler
@@ -65,9 +85,10 @@ class GlobalExceptionHandler(
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null)
     }
 
+    /*    */
     /**
      * Validated的验证错误
-     */
+     *//*
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun exceptionHandler(ex: MethodArgumentNotValidException): ResponseEntity<List<ValidationError>> {
         val errors = ex.bindingResult.fieldErrors.map { fe ->
@@ -79,5 +100,7 @@ class GlobalExceptionHandler(
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(errors)
-    }
+    }*/
+
+
 }
