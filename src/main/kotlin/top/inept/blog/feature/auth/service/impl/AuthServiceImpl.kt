@@ -1,15 +1,15 @@
 package top.inept.blog.feature.auth.service.impl
 
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
-import top.inept.blog.exception.NotFoundException
-import top.inept.blog.extensions.get
+import top.inept.blog.exception.BusinessException
+import top.inept.blog.exception.error.AuthErrorCode
+import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.feature.auth.model.LoginBundle
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.entity.RefreshToken
@@ -28,7 +28,6 @@ class AuthServiceImpl(
     private val userRepository: UserRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtProperties: JwtProperties,
-    private val messages: MessageSourceAccessor,
     @Qualifier("accessJwtEncoder") private val accessEncoder: JwtEncoder,
     @Qualifier("refreshJwtEncoder") private val refreshEncoder: JwtEncoder,
     @Qualifier("accessJwtDecoder") private val accessDecoder: JwtDecoder,
@@ -43,13 +42,11 @@ class AuthServiceImpl(
     override fun login(dto: AuthLoginDTO): LoginBundle {
         //根据用户名查找用户
         val dbUser = userRepository.findByUsername(dto.username)
-
-        //没有用户
-        if (dbUser == null) throw NotFoundException(messages["message.user.user_not_found"])
+            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, dto.username)
 
         //校验密码
         if (!PasswordUtil.matches(dto.password, dbUser.password))
-            throw Exception(messages["message.user.username_or_password_error"])
+            throw BusinessException(AuthErrorCode.USERNAME_OR_PASSWORD)
 
         //生成refreshToken
         val jwt = createRefreshToken(dbUser.username)
@@ -82,43 +79,45 @@ class AuthServiceImpl(
     /**
      * Refresh
      *
-     * @param refreshTokenString
+     * @param refreshToken
      * @return accessToken
      */
-    override fun refresh(refreshTokenString: String): String {
+    override fun refresh(refreshToken: String): String {
+        if (refreshToken.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
+
         val now = Instant.now()
 
         //根据sha256去数据库查找refreshToken
-        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshTokenString)
-        val dbRefreshToken = refreshTokenRepository.findByTokenHash(refreshTokenSha256) ?: throw NotFoundException(
-            messages["message.auth.refresh_token_not_found"]
-        )
+        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshToken)
+        val dbRefreshToken = refreshTokenRepository.findByTokenHash(refreshTokenSha256)
+            ?: throw BusinessException(AuthErrorCode.REFRESH_TOKEN_DB_NOT_FOUND)
 
         //是否被撤销
-        if (dbRefreshToken.revokedAt != null) {
-            throw Exception(messages["message.auth.token_has_been_revoked"])
-        }
+        if (dbRefreshToken.revokedAt != null) throw BusinessException(AuthErrorCode.TOKEN_HAS_BEEN_REVOKED)
+
+
         //是否过期
         if (dbRefreshToken.expiresAt.isBefore(now)) {
-            throw Exception(messages["message.auth.token_expired"])
+            throw BusinessException(AuthErrorCode.TOKEN_EXPIRED)
         }
 
         //校验refreshToken是否合法
         val jwt =
             try {
-                refreshDecoder.decode(refreshTokenString)
-            } catch (e: JwtException) {
-                throw Exception(messages["message.auth.unknown_token_content_error"])
+                refreshDecoder.decode(refreshToken)
+            } catch (_: JwtException) {
+                throw BusinessException(AuthErrorCode.TOKEN_VERIFICATION)
             }
 
         //校验jwt的subject内容
         if (jwt.subject != dbRefreshToken.user.username)
-            throw Exception(messages["message.auth.unknown_token_content_error"])
+            throw BusinessException(AuthErrorCode.TOKEN_SUBJECT_VERIFICATION)
 
+        //TODO  字符串改为常量
         //校验token的使用类型
         val tokenUse = jwt.claims["token_use"] as? String
         if (tokenUse != "refresh") {
-            throw Exception(messages["message.auth.unknown_token_content_error"])
+            throw BusinessException(AuthErrorCode.TOKEN_USE_TYPE_VERIFICATION, "refresh", tokenUse ?: "null")
         }
 
         //构建用户拥有的权限
@@ -137,29 +136,30 @@ class AuthServiceImpl(
         return token
     }
 
-    override fun logout(token: String) {
+    override fun logout(refreshToken: String) {
+        if (refreshToken.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
+
         //根据sha256去数据库查找refreshToken
-        val refreshTokenSha256 = ShaUtil.sha256Hex(token)
-        val dbRefreshToken = refreshTokenRepository.findByTokenHash(refreshTokenSha256) ?: throw NotFoundException(
-            messages["message.auth.refresh_token_not_found"]
-        )
+        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshToken)
+        val dbRefreshToken = refreshTokenRepository.findByTokenHash(refreshTokenSha256)
+            ?: throw BusinessException(AuthErrorCode.REFRESH_TOKEN_DB_NOT_FOUND)
 
         //校验refreshToken是否合法
         val jwt =
             try {
-                refreshDecoder.decode(token)
-            } catch (e: JwtException) {
-                throw Exception(messages["message.auth.unknown_token_content_error"])
+                refreshDecoder.decode(refreshToken)
+            } catch (_: JwtException) {
+                throw BusinessException(AuthErrorCode.TOKEN_VERIFICATION)
             }
 
         //是否已经撤销
-        if (dbRefreshToken.revokedAt != null)
-            throw Exception(messages["message.auth.token_has_been_revoked"])
+        if (dbRefreshToken.revokedAt != null) throw BusinessException(AuthErrorCode.TOKEN_HAS_BEEN_REVOKED)
 
+        //TODO  字符串改为常量
         //校验token的使用类型
         val tokenUse = jwt.claims["token_use"] as? String
         if (tokenUse != "refresh") {
-            throw Exception(messages["message.auth.unknown_token_content_error"])
+            throw BusinessException(AuthErrorCode.TOKEN_USE_TYPE_VERIFICATION, "refresh", tokenUse ?: "null")
         }
 
         //撤销写入数据库
@@ -173,6 +173,7 @@ class AuthServiceImpl(
         //过期时间
         val exp = now.plus(Duration.ofMinutes(jwtProperties.refreshExpiresMinutes))
 
+        //TODO  字符串改为常量
         val claims = JwtClaimsSet.builder().apply {
             issuer(jwtProperties.issuer)
             issuedAt(now)
