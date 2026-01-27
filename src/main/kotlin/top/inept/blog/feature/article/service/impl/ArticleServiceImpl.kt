@@ -1,17 +1,16 @@
 package top.inept.blog.feature.article.service.impl
 
-//import top.inept.blog.feature.article.repository.ArticleSpecs
 import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
-import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import top.inept.blog.exception.DbDuplicateException
-import top.inept.blog.exception.NotFoundException
-import top.inept.blog.extensions.get
+import top.inept.blog.exception.BusinessException
+import top.inept.blog.exception.error.ArticleErrorCode
+import top.inept.blog.exception.error.CommonErrorCode
+import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.article.model.dto.CreateArticleDTO
 import top.inept.blog.feature.article.model.dto.QueryArticleDTO
@@ -34,22 +33,19 @@ class ArticleServiceImpl(
     private val userService: UserService,
     private val categoriesService: CategoriesService,
     private val tagService: TagService,
-    private val messages: MessageSourceAccessor,
 ) : ArticleService {
     override fun getArticles(): List<Article> = articleRepository.findAll()
 
     override fun getArticleById(id: Long): Article {
         //根据id查找文章
-        val dbArticles = articleRepository.findByIdOrNull(id)
-            ?: throw NotFoundException(messages["message.articles.not_found"])
-
-        return dbArticles
+        return articleRepository.findByIdOrNull(id)
+            ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, id)
     }
 
     override fun createArticle(dto: CreateArticleDTO): Article {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw Exception("message.common.missing_user_context")
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
 
         //根据用户名获取用户
         val user = userService.getUserByUsername(username)
@@ -76,19 +72,18 @@ class ArticleServiceImpl(
 
     override fun updateArticle(id: Long, dto: UpdateArticleDTO): Article {
         //根据id查找文章
-        val dbArticle = articleRepository.findByIdOrNull(id)
-            ?: throw NotFoundException(messages["message.articles.not_found"])
+        val dbArticle = getArticleById(id)
 
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw Exception("message.common.missing_user_context")
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
 
         //根据用户名获取用户
         val user = userService.getUserByUsername(username)
 
         //TODO 复查功能？
         //判断所属用户
-        if (dbArticle.author.id != user.id) throw Exception(messages["message.articles.permission_denied"])
+        // if (dbArticle.author.id != user.id) throw Exception(messages["message.articles.permission_denied"])
 
         dbArticle.apply {
             dto.title?.let { title = it }
@@ -110,7 +105,7 @@ class ArticleServiceImpl(
 
     override fun deleteArticle(id: Long) {
         //根据id判断文章是否存在
-        if (!existsArticleById(id)) throw Exception(messages["message.articles.not_found"])
+        if (!existsArticleById(id)) throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, id)
 
         //删除文章
         articleRepository.deleteById(id)
@@ -121,18 +116,14 @@ class ArticleServiceImpl(
         articleRepository.updateStatusByIds(dto.articleStatus, dto.articleIds)
     }
 
-    override fun getArticleTitleById(articleIds: List<Long>): List<ArticleTitleDTO> {
-        return articleRepository.findTitleAllById(articleIds)
+    override fun getArticleTitleById(id: List<Long>): List<ArticleTitleDTO> {
+        return articleRepository.findTitleAllById(id)
     }
 
-    override fun getArticleTitleById(articleId: Long): ArticleTitleDTO {
+    override fun getArticleTitleById(id: Long): ArticleTitleDTO {
         //按id查找文章
-        val articleTitleDTO = articleRepository.findTitleByIdOrNull(articleId)
-
-        //未找到文章
-        if (articleTitleDTO == null) throw NotFoundException(messages["message.articles.not_found"])
-
-        return articleTitleDTO
+        return articleRepository.findTitleByIdOrNull(id)
+            ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, id)
     }
 
     override fun existsArticleById(id: Long): Boolean {
@@ -165,8 +156,10 @@ class ArticleServiceImpl(
         } catch (e: DataIntegrityViolationException) {
             val violation = e.cause as? ConstraintViolationException
             when (violation?.constraintName) {
-                ArticleConstraints.UNIQUE_SLUG -> throw DbDuplicateException(dbArticle.slug)
-                else -> throw Exception(messages["message.common.unknown_error"])
+                ArticleConstraints.UNIQUE_SLUG ->
+                    throw BusinessException(ArticleErrorCode.SLUG_DB_DUPLICATE, dbArticle.slug)
+
+                else -> throw BusinessException(CommonErrorCode.UNKNOWN)
             }
         }
     }
