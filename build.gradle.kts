@@ -20,7 +20,7 @@ repositories {
     mavenCentral()
 }
 
-val querydslVersion = "5.1.0"
+val querydslVersion = "7.1"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -37,11 +37,13 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation("commons-io:commons-io:2.16.1")
+    //openapi
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
-    kapt("org.hibernate.orm:hibernate-jpamodelgen:6.4.4.Final")
-    implementation("com.querydsl:querydsl-jpa:$querydslVersion:jakarta")
-    kapt("com.querydsl:querydsl-apt:$querydslVersion:jakarta")
+    implementation("commons-io:commons-io:2.16.1")
+
+    //querydsl
+    implementation("io.github.openfeign.querydsl:querydsl-jpa-spring:$querydslVersion")
+    kapt("io.github.openfeign.querydsl:querydsl-apt:$querydslVersion:jakarta")
 
     //minio
     implementation("io.minio:minio:8.6.0")
