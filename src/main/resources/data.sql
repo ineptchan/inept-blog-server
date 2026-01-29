@@ -39,19 +39,29 @@ values ('admin', now(), '管理员', '管理员'),
 
 --- 绑定权限到admin角色
 insert into roles_permissions(created_at, updated_at, permission_id, role_id)
-select now(), null, p.id, r.id
+select current_timestamp, null, p.id, r.id
 from permissions p
          join roles r on r.code = 'admin'
 where p.code like 'admin:%'
-on conflict (permission_id, role_id) do nothing;
+  and not exists (
+    select 1
+    from roles_permissions rp
+    where rp.permission_id = p.id
+      and rp.role_id = r.id
+);
 
 --- 绑定权限到user角色
 insert into roles_permissions(created_at, updated_at, permission_id, role_id)
-select now(), null, p.id, r.id
+select current_timestamp, null, p.id, r.id
 from permissions p
          join roles r on r.code = 'user'
 where p.code like 'user:%'
-on conflict (permission_id, role_id) do nothing;
+  and not exists (
+    select 1
+    from roles_permissions rp
+    where rp.permission_id = p.id
+      and rp.role_id = r.id
+);
 
 --- 创建管理用户 admintest admin123456
 insert into users(created_at, email, nickname, password, updated_at, username)
@@ -60,17 +70,25 @@ values (now(), 'admin@inept.top', 'inept', '$2a$10$P53CwaeHtpaPxUU9fiBOPOVTHuh7e
 
 --分配角色给admintest
 insert into users_roles(created_at, role_id, user_id)
-select now(), r.id, u.id
+select current_timestamp, r.id, u.id
 from roles r
-         cross join users u
+         join users u on u.username = 'admintest'
 where r.code = 'admin'
-  and u.username = 'admintest'
-on conflict (role_id,user_id) do nothing;
+  and not exists (
+    select 1
+    from users_roles ur
+    where ur.role_id = r.id
+      and ur.user_id = u.id
+);
 
 insert into users_roles(created_at, role_id, user_id)
-select now(), r.id, u.id
+select current_timestamp, r.id, u.id
 from roles r
-         cross join users u
+         join users u on u.username = 'admintest'
 where r.code = 'user'
-  and u.username = 'admintest'
-on conflict (role_id,user_id) do nothing;
+  and not exists (
+    select 1
+    from users_roles ur
+    where ur.role_id = r.id
+      and ur.user_id = u.id
+);
