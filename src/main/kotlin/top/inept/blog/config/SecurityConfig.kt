@@ -60,6 +60,7 @@ class SecurityConfig() {
             if (isDev) {
                 add("/swagger-ui/**")
                 add("/v3/api-docs/**")
+                add("/v3/api-docs.yaml")
             }
         }.toTypedArray()
 
