@@ -1,7 +1,5 @@
 package top.inept.blog.handler
 
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.http.*
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -18,31 +16,14 @@ import top.inept.blog.extensions.get
 @RestControllerAdvice
 class GlobalExceptionHandler(
     private val messages: MessageSourceAccessor,
-    private val messageSource: MessageSource
 ) : ResponseEntityExceptionHandler() {
     @ExceptionHandler(BusinessException::class)
     fun handleBusinessException(e: BusinessException): ProblemDetail {
-        val locale = LocaleContextHolder.getLocale()
-
-        val title = try {
-            messageSource.getMessage(e.errorCode.messageKey, null, locale)
-        } catch (_: Exception) {
-            e.errorCode.messageKey
-        }
-
-        val detail = try {
-            messageSource.getMessage("${e.errorCode.messageKey}.detail", e.args, locale)
-        } catch (_: Exception) {
-            // 用 title 兜底
-            "$title: ${e.args.joinToString()}"
-        }
-
-
         val problemDetail = ProblemDetail.forStatusAndDetail(
             e.errorCode.httpStatus,
-            detail,
+            messages["${e.errorCode.messageKey}.detail"],
         ).apply {
-            this.title = title
+            this.title = messages[e.errorCode.messageKey]
         }
 
         // 放入业务数据 (balance, accounts 等)
@@ -57,8 +38,15 @@ class GlobalExceptionHandler(
      * 没有权限的验证错误
      */
     @ExceptionHandler
-    fun exceptionHandler(e: AuthorizationDeniedException): ResponseEntity<Any> {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null)
+    fun exceptionHandler(e: AuthorizationDeniedException): ProblemDetail {
+        val problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.FORBIDDEN,
+            messages["message.common.authorization_denied.detail"]
+        ).apply {
+            title = messages["message.common.authorization_denied"]
+        }
+
+        return problemDetail
     }
 
     /**
