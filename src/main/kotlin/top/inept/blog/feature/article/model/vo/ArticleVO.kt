@@ -7,27 +7,27 @@ import top.inept.blog.feature.tag.model.vo.TagVO
 import top.inept.blog.feature.user.model.vo.UserPublicVO
 
 data class ArticleVO(
-    @Schema(description = "openapi.article.id")
+    @field:Schema(description = "openapi.article.id")
     val id: Long,
 
-    @Schema(description = "openapi.article.title")
+    @field:Schema(description = "openapi.article.title")
     val title: String,
 
-    @Schema(description = "openapi.article.slug")
+    @field:Schema(description = "openapi.article.slug")
     val slug: String,
 
-    @Schema(description = "openapi.article.content")
+    @field:Schema(description = "openapi.article.content")
     val content: String,
 
-    @Schema(description = "openapi.article.author")
+    @field:Schema(description = "openapi.article.author")
     val author: UserPublicVO,
 
-    @Schema(description = "openapi.article.category")
+    @field:Schema(description = "openapi.article.category")
     val category: CategoriesVO,
 
-    @Schema(description = "openapi.article.tags")
+    @field:Schema(description = "openapi.article.tags")
     val tags: List<TagVO>,
 
-    @Schema(description = "openapi.article.article_status")
+    @field:Schema(description = "openapi.article.article_status")
     val articleStatus: ArticleStatus,
 )

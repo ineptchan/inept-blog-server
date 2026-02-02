@@ -6,16 +6,16 @@ import top.inept.blog.feature.user.model.vo.UserPublicVO
 import java.time.LocalDateTime
 
 data class CommentReplyVO(
-    @Schema(description = "openapi.comment.id")
+    @field:Schema(description = "openapi.comment.id")
     val id: Long,
 
-    @Schema(description = "openapi.comment.content")
+    @field:Schema(description = "openapi.comment.content")
     val content: String,
 
-    @Schema(description = "openapi.comment.user")
+    @field:Schema(description = "openapi.comment.user")
     val user: UserPublicVO,
 
-    @Schema(description = "openapi.comment.createdAt")
+    @field:Schema(description = "openapi.comment.createdAt")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     val createdAt: LocalDateTime,
 )

@@ -3,12 +3,12 @@ package top.inept.blog.feature.tag.model.vo
 import io.swagger.v3.oas.annotations.media.Schema
 
 data class TagVO(
-    @Schema(description = "openapi.tag.id")
+    @field:Schema(description = "openapi.tag.id")
     val id: Long,
 
-    @Schema(description = "openapi.tag.name")
+    @field:Schema(description = "openapi.tag.name")
     val name: String,
 
-    @Schema(description = "openapi.tag.slug")
+    @field:Schema(description = "openapi.tag.slug")
     val slug: String
 )
