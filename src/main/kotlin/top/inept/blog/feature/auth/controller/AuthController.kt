@@ -48,6 +48,7 @@ class AuthController(
         return ResponseEntity.ok(combo.dto)
     }
 
+    //TODO 建议返回权限标识符
     @Operation(summary = "刷新令牌")
     @PostMapping("/refresh")
     fun refresh(@CookieValue("X-Refresh-Token") token: String): ResponseEntity<RefreshVO> {

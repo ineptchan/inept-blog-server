@@ -20,6 +20,7 @@ import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
 import top.inept.blog.feature.user.model.entity.QUser
 import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.model.entity.constraints.UserConstraints
+import top.inept.blog.feature.user.repository.RoleRepository
 import top.inept.blog.feature.user.repository.UserRepository
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.PasswordUtil
@@ -29,7 +30,8 @@ import java.time.Instant
 @Service
 class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val refreshRepository: RefreshTokenRepository
+    private val refreshRepository: RefreshTokenRepository,
+    private val roleRepository: RoleRepository,
 ) : UserService {
     override fun getUsers(queryUserDTO: QueryUserDTO): Page<User> {
         val pageRequest = queryUserDTO.toPageRequest()
@@ -61,19 +63,40 @@ class UserServiceImpl(
             ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
     }
 
-    override fun createUser(createUserDTO: CreateUserDTO): User {
-        val encodePassword = PasswordUtil.encode(createUserDTO.password)
+    @Transactional
+    override fun createUser(dto: CreateUserDTO): User {
+        val encodePassword = PasswordUtil.encode(dto.password)
             ?: throw BusinessException(CommonErrorCode.UNKNOWN)
 
         val dbUser = User(
-            username = createUserDTO.username,
-            nickname = createUserDTO.nickname,
-            email = createUserDTO.email,
+            username = dto.username,
+            nickname = dto.nickname,
+            email = dto.email,
             password = encodePassword
         )
 
+        dto.role?.let { roles ->
+            if (roles.isNotEmpty()) {
+                val dbRoles = roleRepository.findAllById(dto.role)
+
+                //判断是否都可用
+                if (dto.role.size != dbRoles.size) {
+                    //role转成long
+                    val ids = dbRoles.map { it.id }
+                    val notFind = dto.role
+                        .filter { it !in ids }
+                        .joinToString(prefix = "(", postfix = ")")
+
+                    throw BusinessException(UserErrorCode.ROLE_NOT_FOUND, notFind)
+                }
+
+                dbUser.bindRoles(dbRoles)
+            }
+        }
+
         //TODO 推荐不要传入密码，系统随机生成发邮件通知
 
+        //保存用户
         saveAndFlushUserOrThrow(dbUser)
 
         return dbUser
@@ -92,6 +115,26 @@ class UserServiceImpl(
                 PasswordUtil.encode(it)?.let { encodePassword ->
                     password = encodePassword
                 }
+            }
+        }
+
+        //角色相关
+        dto.role?.let { roles ->
+            if (roles.isNotEmpty()) {
+                val dbRoles = roleRepository.findAllById(roles)
+
+                //判断是否都可用
+                if (dto.role.size != dbRoles.size) {
+                    //role转成long
+                    val ids = dbRoles.map { it.id }
+                    val notFind = dto.role
+                        .filter { it !in ids }
+                        .joinToString(prefix = "(", postfix = ")")
+
+                    throw BusinessException(UserErrorCode.ROLE_NOT_FOUND, notFind)
+                }
+
+                dbUser.updateRoles(dbRoles)
             }
         }
 

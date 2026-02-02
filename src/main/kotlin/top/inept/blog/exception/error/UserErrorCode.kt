@@ -14,4 +14,5 @@ enum class UserErrorCode(
     USERNAME_MISSING_CONTEXT("USER_004", "message.user.username_missing_context", HttpStatus.INTERNAL_SERVER_ERROR),
     USERNAME_DB_DUPLICATE("USER_005", "message.user.username_db_duplicate", HttpStatus.CONFLICT),
     EMAIL_DB_DUPLICATE("USER_006", "message.user.email_db_duplicate", HttpStatus.CONFLICT),
+    ROLE_NOT_FOUND("USER_007", "message.user.role_not_found", HttpStatus.NOT_FOUND),
 }

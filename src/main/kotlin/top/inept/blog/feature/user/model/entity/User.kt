@@ -60,4 +60,30 @@ class User(
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var roleBindings: MutableSet<UserRole> = mutableSetOf()
-)
+) {
+    fun bindRoles(roles: Collection<Role>) {
+        //获取已经绑定的角色
+        val existingRoleIds = this.roleBindings.map { it.role.id }.toSet()
+
+        val newBindings = roles
+            .filter { it.id !in existingRoleIds }
+            .map { role ->
+                UserRole(
+                    id = UserRoleId(this.id, role.id),
+                    user = this,
+                    role = role
+                )
+            }
+        this.roleBindings.addAll(newBindings)
+    }
+
+    fun updateRoles(newRoles: Collection<Role>) {
+        val newRoleIds = newRoles.map { it.id }.toSet()
+
+        //移除不在新列表中的
+        roleBindings.removeIf { it.role.id !in newRoleIds }
+
+        //添加原本不存在的
+        bindRoles(newRoles)
+    }
+}
