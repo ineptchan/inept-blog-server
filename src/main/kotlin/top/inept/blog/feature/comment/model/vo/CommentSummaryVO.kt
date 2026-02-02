@@ -1,7 +1,7 @@
 package top.inept.blog.feature.comment.model.vo
 
 import io.swagger.v3.oas.annotations.media.Schema
-import top.inept.blog.feature.user.model.vo.UserPublicVO
+import top.inept.blog.feature.user.model.vo.UserLiteVO
 
 data class CommentSummaryVO(
     @field:Schema(description = "openapi.comment.id")
@@ -11,5 +11,5 @@ data class CommentSummaryVO(
     val content: String,
 
     @field:Schema(description = "openapi.comment.user")
-    val user: UserPublicVO,
+    val user: UserLiteVO,
 )
