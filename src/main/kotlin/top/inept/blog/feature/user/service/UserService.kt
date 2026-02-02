@@ -6,6 +6,7 @@ import top.inept.blog.feature.user.model.dto.QueryUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
 import top.inept.blog.feature.user.model.entity.User
+import top.inept.blog.feature.user.model.vo.UserInfoVO
 
 interface UserService {
     fun getUsers(queryUserDTO: QueryUserDTO): Page<User>
@@ -15,5 +16,5 @@ interface UserService {
     fun updateUser(id: Long, dto: UpdateUserDTO): User
     fun deleteUserById(id: Long)
     fun updateProfile(dto: UpdateUserProfileDTO): User
-    fun getProfile(): User
+    fun getProfile(): UserInfoVO
 }

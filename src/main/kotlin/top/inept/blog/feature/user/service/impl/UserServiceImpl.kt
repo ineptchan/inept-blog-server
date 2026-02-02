@@ -13,6 +13,7 @@ import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.auth.repository.RefreshTokenRepository
+import top.inept.blog.feature.user.model.convert.toUserInfoVO
 import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.QueryUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserDTO
@@ -20,6 +21,7 @@ import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
 import top.inept.blog.feature.user.model.entity.QUser
 import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.model.entity.constraints.UserConstraints
+import top.inept.blog.feature.user.model.vo.UserInfoVO
 import top.inept.blog.feature.user.repository.RoleRepository
 import top.inept.blog.feature.user.repository.UserRepository
 import top.inept.blog.feature.user.service.UserService
@@ -154,13 +156,17 @@ class UserServiceImpl(
         userRepository.deleteById(id)
     }
 
-    override fun getProfile(): User {
+    override fun getProfile(): UserInfoVO {
         //从上下文获取用户名
         val contextUsername = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
 
         //根据用户名获取用户
-        return getUserByUsername(contextUsername)
+        val dbUser = getUserByUsername(contextUsername)
+
+        val permissionCodes = userRepository.findPermissionCodes(dbUser.id)
+
+        return dbUser.toUserInfoVO(permissionCodes)
     }
 
     @Transactional

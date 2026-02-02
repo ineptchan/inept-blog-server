@@ -1,10 +1,9 @@
 package top.inept.blog.feature.user.model.convert
 
-import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.entity.User
-import top.inept.blog.feature.user.model.vo.UserPublicVO
+import top.inept.blog.feature.user.model.vo.UserInfoVO
+import top.inept.blog.feature.user.model.vo.UserLiteVO
 import top.inept.blog.feature.user.model.vo.UserVO
-import top.inept.blog.utils.PasswordUtil
 
 fun User.toUserVO() = UserVO(
     id = this.id,
@@ -13,7 +12,15 @@ fun User.toUserVO() = UserVO(
     email = this.email,
 )
 
-fun User.toUserPublicVO() = UserPublicVO(
+fun User.toUserPublicVO() = UserLiteVO(
     id = this.id,
     nickname = this.nickname,
+)
+
+fun User.toUserInfoVO(permissionCodes: List<String>) = UserInfoVO(
+    id = this.id,
+    nickname = this.nickname,
+    username = this.username,
+    email = this.email,
+    permissionCodes = permissionCodes
 )
