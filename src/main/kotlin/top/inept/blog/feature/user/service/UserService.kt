@@ -11,6 +11,7 @@ import top.inept.blog.feature.user.model.vo.UserInfoVO
 interface UserService {
     fun getUsers(queryUserDTO: QueryUserDTO): Page<User>
     fun getUserById(id: Long): User
+    fun getUserInfoById(id: Long): UserInfoVO
     fun getUserByUsername(username: String): User
     fun createUser(createUserDTO: CreateUserDTO): User
     fun updateUser(id: Long, dto: UpdateUserDTO): User

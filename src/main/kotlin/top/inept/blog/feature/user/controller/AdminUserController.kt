@@ -13,6 +13,7 @@ import top.inept.blog.feature.user.model.convert.toUserVO
 import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.QueryUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserDTO
+import top.inept.blog.feature.user.model.vo.UserInfoVO
 import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.feature.user.service.UserService
 
@@ -37,8 +38,8 @@ class AdminUserController(
     @PreAuthorize("hasAuthority('admin:user:read')")
     @Operation(summary = "根据id获取用户")
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: Long): ResponseEntity<UserVO> {
-        return ResponseEntity.ok(userService.getUserById(id).toUserVO())
+    fun getUserById(@PathVariable id: Long): ResponseEntity<UserInfoVO> {
+        return ResponseEntity.ok(userService.getUserInfoById(id))
     }
 
     @PreAuthorize("hasAuthority('admin:user:write')")

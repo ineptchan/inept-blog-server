@@ -52,11 +52,19 @@ class UserServiceImpl(
         return userRepository.findAll(builder, pageRequest)
     }
 
-
     override fun getUserById(id: Long): User {
-        //根据id查找用户
         return userRepository.findByIdOrNull(id)
             ?: throw BusinessException(UserErrorCode.ID_NOT_FOUND, id)
+    }
+
+    override fun getUserInfoById(id: Long): UserInfoVO {
+        //根据id查找用户
+        val dbUser = userRepository.findByIdOrNull(id)
+            ?: throw BusinessException(UserErrorCode.ID_NOT_FOUND, id)
+
+        val permissionCodes = userRepository.findPermissionCodes(dbUser.id)
+
+        return dbUser.toUserInfoVO(permissionCodes)
     }
 
     override fun getUserByUsername(username: String): User {
