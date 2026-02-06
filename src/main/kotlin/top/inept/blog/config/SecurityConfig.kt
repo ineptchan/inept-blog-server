@@ -58,9 +58,10 @@ class SecurityConfig() {
             add("/public/**")
             add("/auth/**")
             if (isDev) {
-                add("/swagger-ui/**")
-                add("/v3/api-docs/**")
-                add("/v3/api-docs.yaml")
+//                add("/swagger-ui/**")
+//                add("/v3/api-docs/**")
+//                add("/v3/api-docs.yaml")
+                add("/openapi/**")
             }
         }.toTypedArray()
 
