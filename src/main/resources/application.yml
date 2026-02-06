@@ -27,3 +27,9 @@ spring:
 #      mode: always
 server:
   port: 8080
+
+springdoc:
+  api-docs:
+    path: /openapi/api-docs
+  swagger-ui:
+    path: /openapi/swagger-ui

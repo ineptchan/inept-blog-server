@@ -67,6 +67,6 @@ tasks.withType<Test> {
 }
 
 openApi {
-    apiDocsUrl = "http://localhost:8080/v3/api-docs.yaml"
+    apiDocsUrl = "http://localhost:8080/openapi/api-docs.yaml"
     outputFileName = "openapi.yaml"
 }
