@@ -52,15 +52,12 @@ class SecurityConfig() {
     @Bean
     @Order(1)
     fun publicChain(http: HttpSecurity, environment: Environment): SecurityFilterChain {
-        val isDev = environment.acceptsProfiles(Profiles.of("dev"))
+        val isProd = environment.acceptsProfiles(Profiles.of("prod"))
 
         val matchers = buildList {
             add("/public/**")
             add("/auth/**")
-            if (isDev) {
-//                add("/swagger-ui/**")
-//                add("/v3/api-docs/**")
-//                add("/v3/api-docs.yaml")
+            if (!isProd) {
                 add("/openapi/**")
             }
         }.toTypedArray()
