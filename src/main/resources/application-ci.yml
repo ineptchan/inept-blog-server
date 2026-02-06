@@ -21,3 +21,9 @@ top:
       secret-key: test
       bucket: test-bucket
       region: ""
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
