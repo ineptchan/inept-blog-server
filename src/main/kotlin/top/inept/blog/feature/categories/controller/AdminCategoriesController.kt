@@ -1,6 +1,7 @@
 package top.inept.blog.feature.categories.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -16,7 +17,8 @@ import top.inept.blog.feature.categories.model.dto.UpdateCategoriesDTO
 import top.inept.blog.feature.categories.model.vo.CategoriesVO
 import top.inept.blog.feature.categories.service.CategoriesService
 
-@Tag(name = "管理员分类接口")
+@Tag(name = "分类接口")
+@SecurityRequirement(name = "accessToken")
 @RestController
 @RequestMapping("/admin/categories")
 @Validated

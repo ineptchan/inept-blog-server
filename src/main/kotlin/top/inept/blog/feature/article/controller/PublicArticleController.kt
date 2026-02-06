@@ -16,11 +16,11 @@ import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
 
-@Tag(name = "公开文章接口")
+@Tag(name = "文章接口")
 @RestController
 @RequestMapping("/public/articles")
 @Validated
-class OpenArticleController(
+class PublicArticleController(
     private val articleService: ArticleService,
 ) {
     @Operation(summary = "获取主页文章列表")

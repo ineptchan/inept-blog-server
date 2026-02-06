@@ -1,6 +1,7 @@
 package top.inept.blog.feature.tag.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -16,7 +17,8 @@ import top.inept.blog.feature.tag.model.dto.UpdateTagDTO
 import top.inept.blog.feature.tag.model.vo.TagVO
 import top.inept.blog.feature.tag.service.TagService
 
-@Tag(name = "管理员标签接口")
+@Tag(name = "标签接口")
+@SecurityRequirement(name = "accessToken")
 @RestController
 @RequestMapping("/admin/tag")
 @Validated

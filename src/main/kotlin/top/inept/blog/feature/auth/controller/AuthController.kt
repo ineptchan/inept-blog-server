@@ -1,6 +1,7 @@
 package top.inept.blog.feature.auth.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
@@ -48,8 +49,8 @@ class AuthController(
         return ResponseEntity.ok(combo.dto)
     }
 
-    //TODO 建议返回权限标识符
     @Operation(summary = "刷新令牌")
+    @SecurityRequirement(name = "refreshToken")
     @PostMapping("/refresh")
     fun refresh(@CookieValue("X-Refresh-Token") token: String): ResponseEntity<RefreshVO> {
         val accessToken = authService.refresh(token)
@@ -57,6 +58,7 @@ class AuthController(
     }
 
     @Operation(summary = "退出登录")
+    @SecurityRequirement(name = "refreshToken")
     @PostMapping("/logout")
     fun logout(@CookieValue("X-Refresh-Token") token: String, response: HttpServletResponse): ResponseEntity<String> {
         authService.logout(token)

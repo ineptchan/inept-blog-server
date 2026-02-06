@@ -1,6 +1,7 @@
 package top.inept.blog.feature.file.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -12,10 +13,11 @@ import top.inept.blog.feature.file.model.vo.FileStorageVO
 import top.inept.blog.feature.file.service.FileStorageService
 
 @Tag(name = "文件接口")
+@SecurityRequirement(name = "accessToken")
 @RestController
 @RequestMapping("/file")
 @Validated
-class FileStorageController(
+class AdminFileStorageController(
     private val fileStorageService: FileStorageService
 ) {
     @PreAuthorize("hasAuthority('admin:file:write')")

@@ -15,11 +15,11 @@ import top.inept.blog.feature.tag.model.dto.QueryTagDTO
 import top.inept.blog.feature.tag.model.vo.TagVO
 import top.inept.blog.feature.tag.service.TagService
 
-@Tag(name = "公开标签接口")
+@Tag(name = "标签接口")
 @RestController
 @RequestMapping("/public/tag")
 @Validated
-class OpenTagController(
+class PublicTagController(
     private val tagService: TagService,
 ) {
     @Operation(summary = "获取标签列表")

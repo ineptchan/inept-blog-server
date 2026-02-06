@@ -1,6 +1,7 @@
 package top.inept.blog.feature.article.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -19,7 +20,8 @@ import top.inept.blog.feature.article.model.vo.ArticleVO
 import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
 
-@Tag(name = "管理员文章接口")
+@Tag(name = "文章接口")
+@SecurityRequirement(name = "accessToken")
 @RestController
 @RequestMapping("/admin/articles")
 @Validated

@@ -15,11 +15,11 @@ import top.inept.blog.feature.comment.model.vo.CommentReplyVO
 import top.inept.blog.feature.comment.model.vo.TopCommentVO
 import top.inept.blog.feature.comment.service.CommentService
 
-@Tag(name = "公开评论接口")
+@Tag(name = "评论接口")
 @RestController
 @RequestMapping("/public/comment")
 @Validated
-class OpenCommentController(
+class PublicCommentController(
     private val commentService: CommentService
 ) {
     @Operation(summary = "获取顶级评论列表")

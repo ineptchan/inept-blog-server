@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import top.inept.blog.feature.user.service.UserService
 
-@Tag(name = "公开用户接口")
+@Tag(name = "用户接口")
 @RestController
 @RequestMapping("/public/user")
 @Validated
-class OpenUserController(
+class PublicUserController(
     private val userService: UserService,
 ) {
     //TODO 考虑删除

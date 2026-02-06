@@ -15,11 +15,11 @@ import top.inept.blog.feature.categories.model.dto.QueryCategoriesDTO
 import top.inept.blog.feature.categories.model.vo.CategoriesVO
 import top.inept.blog.feature.categories.service.CategoriesService
 
-@Tag(name = "公开分类接口")
+@Tag(name = "分类接口")
 @RestController
 @RequestMapping("/public/categories")
 @Validated
-class OpenCategoriesController(
+class PublicCategoriesController(
     val categoriesService: CategoriesService
 ) {
     @Operation(summary = "获取分类列表")
