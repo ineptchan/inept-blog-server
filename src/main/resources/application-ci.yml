@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/inept_blog
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+top:
+  inept:
+    jwt:
+      issuer: test-issuer
+      access-secret-key: test-access-secret-key-that-is-long-enough-1234567890
+      refresh-secret-key: test-refresh-secret-key-that-is-long-enough-1234567890
+      access-expires-minutes: 15
+      refresh-expires-minutes: 60
+    minio:
+      endpoint: http://localhost:9000
+      access-key: test
+      secret-key: test
+      bucket: test-bucket
+      region: ""
