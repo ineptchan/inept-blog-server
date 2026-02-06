@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: inept_blog
+        ports:
+          - 5432:5432
+
+    env:
+      SPRING_PROFILES_ACTIVE: ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x gradlew
+
+      - name: Build and test
+        run: ./gradlew build --no-daemon
+
+      - name: Start app (background)
+        run: |
+          ./gradlew bootRun -Dserver.port=8080 > app.log 2>&1 &
+          echo $! > app.pid
+
+      - name: Wait until OpenAPI is reachable
+        run: |
+          set -e
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8080/openapi/api-docs.yaml >/dev/null; then
+              echo "OpenAPI ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Timed out waiting for OpenAPI"
+          echo "=== last 200 lines of app.log ==="
+          tail -n 200 app.log
+          echo "=== curl debug ==="
+          curl -i http://127.0.0.1:8080/openapi/api-docs.yaml || true
+          exit 1
+
+      - name: Debug other candidates (optional)
+        if: failure()
+        run: |
+          curl -i http://127.0.0.1:8080/v3/api-docs.yaml || true
+          curl -i http://127.0.0.1:8080/v3/api-docs || true
+          curl -i http://127.0.0.1:8080/openapi/api-docs || true
+
+      - name: Generate OpenAPI docs (your task)
+        run: ./gradlew generateOpenApiDocs
+
+      - name: Stop app
+        if: always()
+        run: |
+          kill $(cat app.pid) || true
+          tail -n 200 app.log || true
