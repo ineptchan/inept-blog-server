@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.2.21"
     id("org.jetbrains.kotlin.kapt") version "2.2.21"
+    id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
 }
 
 group = "top.inept"
@@ -63,4 +64,9 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+openApi {
+    apiDocsUrl = "http://localhost:8080/v3/api-docs.yaml"
+    outputFileName = "openapi.yaml"
 }

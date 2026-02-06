@@ -35,3 +35,13 @@ jobs:
           name: inept-blog-server-jars
           path: build/libs/*.jar
           if-no-files-found: error
+
+      - name: Generate openApi docs
+        run: ./gradlew generateOpenApiDocs
+
+      - name: Upload openapi docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi
+          path: build/openapi.yaml
+          if-no-files-found: warn
