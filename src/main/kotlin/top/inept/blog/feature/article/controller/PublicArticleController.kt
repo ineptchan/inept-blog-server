@@ -26,7 +26,7 @@ class PublicArticleController(
     @Operation(summary = "获取主页文章列表")
     @GetMapping
     fun getHomeArticles(@Valid queryArticleDTO: QueryArticleDTO): ResponseEntity<PageResponse<HomeArticleVO>> {
-        val articlePage = articleService.getHomeArticles(queryArticleDTO.copy(articleStatus = ArticleStatus.Published))
+        val articlePage = articleService.getHomeArticles(queryArticleDTO.copy(articleStatus = ArticleStatus.PUBLISHED))
         return ResponseEntity.ok(articlePage.toPageResponse { it.toHomeArticleVO() })
     }
 }

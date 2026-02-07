@@ -52,7 +52,7 @@ class Article(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var articleStatus: ArticleStatus = ArticleStatus.Draft,
+    var articleStatus: ArticleStatus = ArticleStatus.DRAFT,
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
