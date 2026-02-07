@@ -3,9 +3,16 @@ spring:
     url: jdbc:postgresql://localhost:5432/inept_blog
     username: postgres
     password: postgres
+
   jpa:
     hibernate:
       ddl-auto: update
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 top:
   inept:
@@ -21,9 +28,3 @@ top:
       secret-key: test
       bucket: test-bucket
       region: ""
-
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
