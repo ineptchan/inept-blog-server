@@ -18,7 +18,9 @@ fun Article.toArticleVO() = ArticleVO(
     author = this.author.toUserPublicVO(),
     category = this.category.toCategoriesVO(),
     tags = this.tags.map { it.toTagVO() },
-    articleStatus = this.articleStatus
+    articleStatus = this.articleStatus,
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt,
 )
 
 fun Article.toArticleSummaryVO() = ArticleSummaryVO(

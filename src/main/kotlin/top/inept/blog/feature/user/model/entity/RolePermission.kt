@@ -3,7 +3,7 @@ package top.inept.blog.feature.user.model.entity
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Embeddable
 data class RolePermissionId(
@@ -31,10 +31,9 @@ class RolePermission(
     var permission: Permission,
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false, nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(updatable = false, nullable = false)
+    var createdAt: Instant = Instant.now(),
 
     @LastModifiedDate
-    @Column(name = "updated_at")
-    var updatedAt: LocalDateTime? = null,
+    var updatedAt: Instant? = null,
 )

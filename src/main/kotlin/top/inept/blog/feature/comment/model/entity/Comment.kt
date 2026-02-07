@@ -1,12 +1,11 @@
 package top.inept.blog.feature.comment.model.entity
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.user.model.entity.User
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "comments")
@@ -38,8 +37,7 @@ class Comment(
     )
     var replies: MutableList<Comment> = mutableListOf(),
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    var createdAt: Instant = Instant.now(),
 )

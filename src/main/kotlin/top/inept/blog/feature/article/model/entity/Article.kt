@@ -1,6 +1,5 @@
 package top.inept.blog.feature.article.model.entity
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -10,7 +9,7 @@ import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.model.entity.Categories
 import top.inept.blog.feature.tag.model.entity.Tag
 import top.inept.blog.feature.user.model.entity.User
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(
@@ -55,12 +54,10 @@ class Article(
     @Column(nullable = false)
     var articleStatus: ArticleStatus = ArticleStatus.Draft,
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    var createdAt: Instant = Instant.now(),
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @LastModifiedDate
-    var updatedAt: LocalDateTime? = null,
+    var updatedAt: Instant? = null,
 )

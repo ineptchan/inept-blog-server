@@ -1,10 +1,9 @@
 package top.inept.blog.feature.comment.model.vo
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.media.Schema
 import top.inept.blog.feature.article.model.vo.ArticleTitleVO
 import top.inept.blog.feature.user.model.vo.UserLiteVO
-import java.time.LocalDateTime
+import java.time.Instant
 
 data class CommentVO(
     @field:Schema(description = "openapi.comment.id")
@@ -23,6 +22,5 @@ data class CommentVO(
     val parentComment: CommentSummaryVO? = null,
 
     @field:Schema(description = "openapi.comment.createdAt")
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    val createdAt: LocalDateTime,
+    val createdAt: Instant,
 )

@@ -5,6 +5,7 @@ import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.model.vo.CategoriesVO
 import top.inept.blog.feature.tag.model.vo.TagVO
 import top.inept.blog.feature.user.model.vo.UserLiteVO
+import java.time.Instant
 
 data class ArticleVO(
     @field:Schema(description = "openapi.article.id")
@@ -30,4 +31,10 @@ data class ArticleVO(
 
     @field:Schema(description = "openapi.article.article_status")
     val articleStatus: ArticleStatus,
+
+    @field:Schema(description = "openapi.common.created_at")
+    var createdAt: Instant,
+
+    @field:Schema(description = "openapi.common.updated_at")
+    var updatedAt: Instant?,
 )

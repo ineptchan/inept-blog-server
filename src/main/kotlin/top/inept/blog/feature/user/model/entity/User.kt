@@ -1,12 +1,11 @@
 package top.inept.blog.feature.user.model.entity
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.user.model.entity.constraints.UserConstraints
-import java.time.LocalDateTime
+import java.time.Instant
 
 /**
  * 用户表
@@ -48,15 +47,12 @@ class User(
     @Column(name = "password", nullable = false)
     var password: String,
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
-    @Column(name = "created_at", updatable = false, nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(updatable = false, nullable = false)
+    var createdAt: Instant = Instant.now(),
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @LastModifiedDate
-    @Column(name = "updated_at")
-    var updatedAt: LocalDateTime? = null,
+    var updatedAt: Instant? = null,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var roleBindings: MutableSet<UserRole> = mutableSetOf()
