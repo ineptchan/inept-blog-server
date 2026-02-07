@@ -5,5 +5,5 @@
 5. [ ] 添加rbac接口
 6. [ ] 改进permissions，添加permissionType，常见：MENU/REST/OTHER
 7. [ ] 处理管理混乱的application
-8. [ ] 审计Validated验证
+8. [X] 审计Validated验证
 9. [x] 处理项目中的时间管理混乱的问题
