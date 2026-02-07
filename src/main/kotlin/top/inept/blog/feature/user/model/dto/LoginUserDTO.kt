@@ -5,11 +5,11 @@ import top.inept.blog.feature.user.model.validated.ValidateUserUsername
 import top.inept.blog.feature.user.model.validated.ValidatedUserPassword
 
 data class LoginUserDTO(
-    @Schema(description = "openapi.user.username")
+    @field:Schema(description = "openapi.user.username")
     @field:ValidateUserUsername
     val username: String,
 
-    @Schema(description = "openapi.user.password")
+    @field:Schema(description = "openapi.user.password")
     @field:ValidatedUserPassword
     val password: String,
 )

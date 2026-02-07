@@ -5,11 +5,11 @@ import top.inept.blog.feature.tag.model.validated.ValidatedTagName
 import top.inept.blog.feature.tag.model.validated.ValidatedTagSlug
 
 data class CreateTagDTO(
-    @Schema(description = "openapi.tag.name")
+    @field:Schema(description = "openapi.tag.name")
     @field:ValidatedTagName
     val name: String,
 
-    @Schema(description = "openapi.tag.slug")
+    @field:Schema(description = "openapi.tag.slug")
     @field:ValidatedTagSlug
     val slug: String,
 )

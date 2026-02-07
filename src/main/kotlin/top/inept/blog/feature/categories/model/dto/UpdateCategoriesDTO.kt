@@ -5,11 +5,11 @@ import top.inept.blog.feature.categories.model.validated.ValidatedCategoriesName
 import top.inept.blog.feature.categories.model.validated.ValidatedCategoriesSlug
 
 data class UpdateCategoriesDTO(
-    @Schema(description = "openapi.categories.name")
+    @field:Schema(description = "openapi.categories.name")
     @field:ValidatedCategoriesName
     val name: String?,
 
-    @Schema(description = "openapi.categories.slug")
+    @field:Schema(description = "openapi.categories.slug")
     @field:ValidatedCategoriesSlug
     val slug: String?,
 )

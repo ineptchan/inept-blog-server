@@ -5,11 +5,11 @@ import jakarta.validation.constraints.PositiveOrZero
 import org.hibernate.validator.constraints.Range
 
 open class BaseQueryDTO(
-    @Schema(description = "openapi.query.page")
+    @field:Schema(description = "openapi.query.page")
     @field:PositiveOrZero(message = "valid.common.query.page")
     open var page: Int = 0,
 
-    @Schema(description = "openapi.query.size")
+    @field:Schema(description = "openapi.query.size")
     @field:Range(min = 1, max = 200, message = "valid.common.query.size")
     open var size: Int = 30
 )

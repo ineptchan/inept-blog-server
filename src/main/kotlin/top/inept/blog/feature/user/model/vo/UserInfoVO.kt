@@ -6,7 +6,7 @@ data class UserInfoVO(
     @field:Schema(description = "openapi.user.id")
     val id: Long,
 
-    @Schema(description = "openapi.user.nickname")
+    @field:Schema(description = "openapi.user.nickname")
     val nickname: String,
 
     @field:Schema(description = "openapi.user.username")
