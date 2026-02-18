@@ -9,16 +9,6 @@ import java.time.Instant
 
 /**
  * 用户表
- *
- * @property id
- * @property nickname   昵称
- * @property username   用户名
- * @property email      邮箱
- * @property password   密码 BCrypt
- * @property role       角色
- * @property createdAt  创建时间
- * @property updatedAt  更新时间
- * @constructor Create empty User
  */
 @Entity
 @Table(
@@ -35,25 +25,52 @@ class User(
     @Column(name = "id", nullable = false)
     var id: Long = 0,
 
+    /**
+     * 昵称
+     */
     @Column(name = "nickname", length = 16, nullable = false)
     var nickname: String,
 
+    /**
+     * 头像
+     */
+    @Column(name = "avatar")
+    var avatar: String? = null,
+
+    /**
+     * 用户名
+     */
     @Column(name = "username", length = 16, nullable = false)
     var username: String,
 
+    /**
+     * 邮箱
+     */
     @Column(name = "email", nullable = true)
     var email: String? = null,
 
+    /**
+     * 密码   BCrypt
+     */
     @Column(name = "password", nullable = false)
     var password: String,
 
+    /**
+     * 创建时间
+     */
     @CreatedDate
     @Column(updatable = false, nullable = false)
     var createdAt: Instant = Instant.now(),
 
+    /**
+     * 更新时间
+     */
     @LastModifiedDate
     var updatedAt: Instant? = null,
 
+    /**
+     * 角色绑定
+     */
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     var roleBindings: MutableSet<UserRole> = mutableSetOf()
 ) {
