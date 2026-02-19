@@ -9,7 +9,7 @@
 9. [ ] 添加rbac接口
 10. [ ] 改进permissions，添加permissionType，常见：MENU/REST/OTHER
 11. [ ] 考虑去除错误的code使用msgkey
-12. [ ] 完全重构file模块为objectstorage
+12. [X] 完全重构file模块为objectstorage
 13. [X] 处理管理混乱的application
 14. [X] 审计Validated验证
 15. [x] 处理项目中的时间管理混乱的问题
