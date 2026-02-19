@@ -22,5 +22,6 @@ fun User.toUserInfoVO(permissionCodes: List<String>) = UserInfoVO(
     nickname = this.nickname,
     username = this.username,
     email = this.email,
+    avatar = this.avatar ?: "",
     permissionCodes = permissionCodes
 )

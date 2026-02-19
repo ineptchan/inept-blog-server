@@ -25,3 +25,27 @@
 ### 2.idea的配置
 
 ![img.png](img/img.png)
+
+### 3.minio设置
+
+#### 安装[minio client](https://github.com/minio/mc)
+
+https://github.com/minio/mc
+
+#### 配置minio端点别名
+
+```shell
+mc alias set myminio http://127.0.0.1:9000 ACCESSKEY SECRETKEY
+```
+
+#### 创建桶
+
+```shell
+mc mb myminio/inept-blog
+```
+
+#### 配置桶
+
+```shell
+mc anonymous set download myminio/inept-blog/public
+```

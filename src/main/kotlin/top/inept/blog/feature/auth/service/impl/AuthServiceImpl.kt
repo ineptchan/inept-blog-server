@@ -95,7 +95,6 @@ class AuthServiceImpl(
         //是否被撤销
         if (dbRefreshToken.revokedAt != null) throw BusinessException(AuthErrorCode.TOKEN_HAS_BEEN_REVOKED)
 
-
         //是否过期
         if (dbRefreshToken.expiresAt.isBefore(now)) {
             throw BusinessException(AuthErrorCode.TOKEN_EXPIRED)

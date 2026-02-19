@@ -52,3 +52,8 @@ top:
       secret-key: ${MINIO_SECRET_KEY}
       bucket: ${MINIO_BUCKET:inept-blog}
       region: ${MINIO_REGION:}
+
+    image:
+      avatar:
+        quality: 100
+        method: 6

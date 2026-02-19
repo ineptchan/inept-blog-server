@@ -48,6 +48,15 @@ dependencies {
 
     //minio
     implementation("io.minio:minio:8.6.0")
+
+    //tika
+    implementation(platform("org.apache.tika:tika-bom:3.2.3"))
+    implementation("org.apache.tika:tika-core")
+    implementation("org.apache.tika:tika-parser-image-module")
+
+    //scrimage
+    implementation("com.sksamuel.scrimage:scrimage-core:4.3.6")
+    implementation("com.sksamuel.scrimage:scrimage-webp:4.3.6")
 }
 
 kotlin {

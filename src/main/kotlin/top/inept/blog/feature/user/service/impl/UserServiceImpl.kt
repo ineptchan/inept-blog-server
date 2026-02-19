@@ -13,6 +13,7 @@ import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.auth.repository.RefreshTokenRepository
+import top.inept.blog.feature.objectstorage.service.ObjectStorageService
 import top.inept.blog.feature.user.model.convert.toUserInfoVO
 import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.QueryUserDTO
@@ -34,6 +35,7 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val refreshRepository: RefreshTokenRepository,
     private val roleRepository: RoleRepository,
+    private val objectStorageService: ObjectStorageService
 ) : UserService {
     override fun getUsers(queryUserDTO: QueryUserDTO): Page<User> {
         val pageRequest = queryUserDTO.toPageRequest()
@@ -193,12 +195,19 @@ class UserServiceImpl(
                     password = encodePassword
                 }
             }
+            //上传头像到s3中
+            dto.avatar?.let { file ->
+                //TODO 最好是异步上传
+                avatar = objectStorageService.saveAvatar(file, dbUser.id)
+            }
         }
 
         saveAndFlushUserOrThrow(dbUser)
 
         //撤销refreshToken
-        refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
+        if (dto.password != null) {
+            refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
+        }
 
         return dbUser
     }

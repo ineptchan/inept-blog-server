@@ -17,18 +17,18 @@ import java.util.concurrent.TimeUnit
 @Service
 class MinioServiceImpl(
     val minioClient: MinioClient,
-    val minioProperties: MinioProperties
+    val minioProps: MinioProperties
 ) : MinioService {
     override fun ensureBucket() {
         val exists = minioClient.bucketExists(
             BucketExistsArgs.builder()
-                .bucket(minioProperties.bucket)
+                .bucket(minioProps.bucket)
                 .build()
         )
         if (!exists) {
             minioClient.makeBucket(
                 MakeBucketArgs.builder()
-                    .bucket(minioProperties.bucket)
+                    .bucket(minioProps.bucket)
                     .build()
             )
         }
@@ -38,7 +38,7 @@ class MinioServiceImpl(
         try {
             minioClient.statObject(
                 StatObjectArgs.builder()
-                    .bucket(minioProperties.bucket)
+                    .bucket(minioProps.bucket)
                     .`object`(objectName)
                     .build()
             )
@@ -50,14 +50,14 @@ class MinioServiceImpl(
                 return false
             }
 
-            throw e;
+            throw e
         }
     }
 
 
     override fun upload(file: MultipartFile): MinioUploadDTO {
         val objectName = UUID.randomUUID().toString().replace("-", "")
-        val bucket = minioProperties.bucket
+        val bucket = minioProps.bucket
         ensureBucket()
 
         val md = MessageDigest.getInstance("SHA-256")
@@ -91,7 +91,7 @@ class MinioServiceImpl(
     override fun download(objectName: String): InputStream {
         return minioClient.getObject(
             GetObjectArgs.builder()
-                .bucket(minioProperties.bucket)
+                .bucket(minioProps.bucket)
                 .`object`(objectName)
                 .build()
         )
@@ -100,7 +100,7 @@ class MinioServiceImpl(
     override fun delete(objectName: String) {
         minioClient.removeObject(
             RemoveObjectArgs.builder()
-                .bucket(minioProperties.bucket)
+                .bucket(minioProps.bucket)
                 .`object`(objectName)
                 .build()
         )
@@ -113,7 +113,7 @@ class MinioServiceImpl(
     ): String {
         val builder = GetPresignedObjectUrlArgs.builder()
             .method(Method.GET)
-            .bucket(minioProperties.bucket)
+            .bucket(minioProps.bucket)
             .`object`(objectName)
 
         duration?.let {
@@ -131,7 +131,7 @@ class MinioServiceImpl(
         return minioClient.getPresignedObjectUrl(
             GetPresignedObjectUrlArgs.builder()
                 .method(Method.PUT)
-                .bucket(minioProperties.bucket)
+                .bucket(minioProps.bucket)
                 .`object`(objectName)
                 .expiry(duration.toInt(), unit)
                 .build()

@@ -28,10 +28,11 @@ import java.nio.charset.StandardCharsets
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
+//TODO分离jwt相关代码
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-class SecurityConfig() {
+class SecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config = CorsConfiguration().apply {
