@@ -26,23 +26,21 @@ jobs:
           --health-retries 20
 
       minio:
-        image: minio/minio:latest
+        image: bitnami/minio:latest
         env:
           MINIO_ROOT_USER: minio
           MINIO_ROOT_PASSWORD: minio123456
+          # 自动创建 bucket（逗号分隔多个）
+          MINIO_DEFAULT_BUCKETS: inept-blog
         ports:
-          - 9000:9000   # S3 API
-          - 9001:9001   # Console
-        options: >-
-          --name minio
-        command: server /data --console-address ":9001"
+          - 9000:9000
+          - 9001:9001
 
     env:
       SPRING_PROFILES_ACTIVE: ci
-      MINIO_ENDPOINT: http://localhost:9000
+      MINIO_ENDPOINT: http://localhost:9000/
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio123456
-      MINIO_BUCKET: inept-blog
 
     steps:
       - name: Checkout repository
