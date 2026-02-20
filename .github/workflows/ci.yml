@@ -25,17 +25,6 @@ jobs:
           --health-timeout 5s
           --health-retries 20
 
-      minio:
-        image: bitnami/minio:latest
-        env:
-          MINIO_ROOT_USER: minio
-          MINIO_ROOT_PASSWORD: minio123456
-          # 自动创建 bucket（逗号分隔多个）
-          MINIO_DEFAULT_BUCKETS: inept-blog
-        ports:
-          - 9000:9000
-          - 9001:9001
-
     env:
       SPRING_PROFILES_ACTIVE: ci
       MINIO_ENDPOINT: http://localhost:9000/
@@ -55,6 +44,14 @@ jobs:
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x gradlew
+
+      - name: Start MinIO
+        run: |
+          docker run -d --name minio \
+            -p 9000:9000 -p 9001:9001 \
+            -e MINIO_ROOT_USER="${MINIO_ACCESS_KEY}" \
+            -e MINIO_ROOT_PASSWORD="${MINIO_SECRET_KEY}" \
+            quay.io/minio/minio server /data --console-address ":9001"
 
       - name: Wait for MinIO
         run: |
