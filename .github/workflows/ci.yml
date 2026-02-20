@@ -2,9 +2,7 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ main, master ]
   pull_request:
   workflow_dispatch:
 
@@ -21,9 +19,30 @@ jobs:
           POSTGRES_DB: inept_blog
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: minio
+          MINIO_ROOT_PASSWORD: minio123456
+        ports:
+          - 9000:9000   # S3 API
+          - 9001:9001   # Console
+        options: >-
+          --name minio
+        command: server /data --console-address ":9001"
 
     env:
       SPRING_PROFILES_ACTIVE: ci
+      MINIO_ENDPOINT: http://localhost:9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123456
+      MINIO_BUCKET: inept-blog
 
     steps:
       - name: Checkout repository
@@ -39,8 +58,31 @@ jobs:
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x gradlew
 
+      - name: Wait for MinIO
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:9000/minio/health/ready >/dev/null; then
+              echo "MinIO is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MinIO not ready in time"
+          exit 1
+
+      - name: Create MinIO bucket (optional)
+        run: |
+          curl -sSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
+          chmod +x mc
+          sudo mv mc /usr/local/bin/mc
+
+          mc alias set local http://localhost:9000 "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
+          mc mb -p "local/$MINIO_BUCKET" || true
+          mc mb myminio/inept-blog
+          mc anonymous set download myminio/inept-blog/public
+
       - name: Build and test
-        run: ./gradlew build --no-daemon -x test
+        run: ./gradlew build --no-daemon
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
