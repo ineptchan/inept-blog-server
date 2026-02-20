@@ -73,8 +73,7 @@ jobs:
 
           mc alias set local http://localhost:9000 "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
           mc mb -p "local/$MINIO_BUCKET" || true
-          mc mb myminio/inept-blog
-          mc anonymous set download myminio/inept-blog/public
+          mc anonymous set download local/$MINIO_BUCKET/public
 
       - name: Build and test
         run: ./gradlew build --no-daemon
