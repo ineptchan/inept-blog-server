@@ -10,7 +10,19 @@ import org.springframework.validation.annotation.Validated
 @Validated
 data class ImageProperties(
     @field:Valid
-    val avatar: Avatar
+    val avatar: Avatar,
+    @field:Valid
+    val articleImage: ArticleImage,
+)
+
+data class ArticleImage(
+    @field:Max(100)
+    @field:Min(0)
+    val quality: Int,
+
+    @field:Max(6)
+    @field:Min(0)
+    val method: Int,
 )
 
 data class Avatar(

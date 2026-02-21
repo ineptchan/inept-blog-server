@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.article.model.entity.constraints.ArticleConstraints
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.categories.model.entity.Categories
+import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
 import top.inept.blog.feature.tag.model.entity.Tag
 import top.inept.blog.feature.user.model.entity.User
 import java.time.Instant
@@ -60,4 +61,7 @@ class Article(
 
     @LastModifiedDate
     var updatedAt: Instant? = null,
+
+    @OneToMany(mappedBy = "ownerArticle", orphanRemoval = true)
+    var objectStorages: MutableSet<ObjectStorage> = mutableSetOf(),
 )

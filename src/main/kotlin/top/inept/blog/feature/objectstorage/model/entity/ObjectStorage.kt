@@ -3,6 +3,7 @@ package top.inept.blog.feature.objectstorage.model.entity
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
+import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.objectstorage.model.entity.constraints.ObjectStorageConstraints
 import top.inept.blog.feature.objectstorage.model.entity.enums.ObjectStorageStatus
 import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
@@ -28,6 +29,13 @@ class ObjectStorage(
      */
     @Column(name = "owner_user_id", nullable = false)
     var ownerUserId: Long,
+
+    /**
+     * 归属文章
+     */
+    @ManyToOne
+    @JoinColumn(name = "owner_article_id")
+    var ownerArticle: Article? = null,
 
     /**
      * 使用目的

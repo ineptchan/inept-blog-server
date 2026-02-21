@@ -57,3 +57,6 @@ top:
       avatar:
         quality: 100
         method: 6
+      article-image:
+        quality: 100
+        method: 6

@@ -39,7 +39,7 @@ class GlobalExceptionHandler(
         val problemDetail = buildProblemDetail(
             ex.errorCode.httpStatus,
             messages[ex.errorCode.messageKey],
-            messages["${ex.errorCode.messageKey}.detail"]
+            messages.get("${ex.errorCode.messageKey}.detail", *ex.args)
         ).apply {
             // 放入业务数据 (balance, accounts 等)
             ex.extensions.forEach { (key, value) ->

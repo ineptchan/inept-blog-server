@@ -12,10 +12,7 @@ import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.article.model.convert.toArticleVO
 import top.inept.blog.feature.article.model.convert.toHomeArticleVO
-import top.inept.blog.feature.article.model.dto.CreateArticleDTO
-import top.inept.blog.feature.article.model.dto.QueryArticleDTO
-import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
-import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
+import top.inept.blog.feature.article.model.dto.*
 import top.inept.blog.feature.article.model.vo.ArticleVO
 import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
@@ -74,6 +71,13 @@ class AdminArticleController(
     fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ResponseEntity<Boolean> {
         articleService.updateArticleStatus(updateArticleStatusDTO)
         return ResponseEntity.ok(true)
+    }
+
+    @PreAuthorize("hasAuthority('admin:article:write')")
+    @Operation(summary = "上传文章图片")
+    @PostMapping("/{id}/image")
+    fun uploadImage(@PathVariable id: Long, @Valid @ModelAttribute dto: UploadArticleImageDTO): ResponseEntity<String> {
+        return ResponseEntity.ok(articleService.uploadImage(id, dto))
     }
 
     //TODO 添加更换作者接口
