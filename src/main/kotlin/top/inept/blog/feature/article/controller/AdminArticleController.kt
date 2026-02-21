@@ -75,7 +75,7 @@ class AdminArticleController(
 
     @PreAuthorize("hasAuthority('admin:article:write')")
     @Operation(summary = "上传文章图片")
-    @PostMapping("/{id}/image")
+    @PutMapping("/{id}/image")
     fun uploadImage(@PathVariable id: Long, @Valid @ModelAttribute dto: UploadArticleImageDTO): ResponseEntity<String> {
         return ResponseEntity.ok(articleService.uploadImage(id, dto))
     }
