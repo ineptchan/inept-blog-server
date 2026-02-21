@@ -104,7 +104,7 @@ class ObjectStorageServiceImpl(
 
         saveAndFlushOrThrow(objectStorage)
 
-        return S3Util.buildArticleImageUrl(mp.endpoint, mp.bucket, objectKey)
+        return S3Util.buildAvatarUrl(mp.endpoint, mp.bucket, objectKey)
     }
 
     override fun uploadArticleImage(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleImageDTO): String {
