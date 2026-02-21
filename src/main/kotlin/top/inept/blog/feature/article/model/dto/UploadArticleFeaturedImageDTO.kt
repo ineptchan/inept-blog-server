@@ -1,0 +1,9 @@
+package top.inept.blog.feature.article.model.dto
+
+import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.web.multipart.MultipartFile
+
+data class UploadArticleFeaturedImageDTO(
+    @field:Schema(description = "openapi.article.featured_image")
+    val featuredImage: MultipartFile
+)

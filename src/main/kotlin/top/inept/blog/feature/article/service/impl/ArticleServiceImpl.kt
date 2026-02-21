@@ -162,6 +162,31 @@ class ArticleServiceImpl(
         return objectStorageService.uploadArticleImage(user.id, article, dto)
     }
 
+    override fun uploadFeaturedImage(
+        id: Long,
+        dto: UploadArticleFeaturedImageDTO
+    ): String {
+        //从上下文获取用户名
+        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+
+        //根据用户名获取用户
+        val user = userService.getUserByUsername(username)
+
+        val article = getArticleById(id)
+
+        //上传对象存储并返回封面url
+        val featuredImageUrl = objectStorageService.uploadFeaturedImage(user.id, article, dto)
+
+        //保存封面url
+        article.featuredImage = featuredImageUrl
+
+        //保存文章
+        saveAndFlushArticleOrThrow(article)
+
+        return featuredImageUrl
+    }
+
     private fun saveAndFlushArticleOrThrow(dbArticle: Article): Article {
         return try {
             articleRepository.saveAndFlush(dbArticle)

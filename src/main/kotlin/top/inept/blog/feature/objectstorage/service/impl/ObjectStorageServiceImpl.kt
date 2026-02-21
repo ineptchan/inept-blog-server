@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.ObjectStorageErrorCode
+import top.inept.blog.feature.article.model.dto.UploadArticleFeaturedImageDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleImageDTO
 import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
@@ -60,7 +61,7 @@ class ObjectStorageServiceImpl(
         //对象名使用uuid生成
         val objectName = UUID.randomUUID().toString().replace("-", "")
 
-        //对象的在s3中的keu
+        //对象的在s3中的key
         val objectKey = S3Util.buildAvatarPrefix(objectName)
 
         //上传原始文件
@@ -116,7 +117,7 @@ class ObjectStorageServiceImpl(
         //对象名使用uuid生成
         val objectName = UUID.randomUUID().toString().replace("-", "")
 
-        //对象的在s3中的keu
+        //对象的在s3中的key
         val objectKey = S3Util.buildArticleImagePrefix(objectName)
 
         //上传原始文件
@@ -162,6 +163,68 @@ class ObjectStorageServiceImpl(
         saveAndFlushOrThrow(objectStorage)
 
         return S3Util.buildArticleImageUrl(mp.endpoint, mp.bucket, objectKey)
+    }
+
+    override fun uploadFeaturedImage(
+        ownerUserId: Long,
+        ownerArticle: Article,
+        dto: UploadArticleFeaturedImageDTO
+    ): String {
+        //解析传入的文件
+        val parserImageResult = TikaUtil.parserImage(dto.featuredImage)
+
+        val originalBytes = dto.featuredImage.bytes
+
+        //对象名使用uuid生成
+        val objectName = UUID.randomUUID().toString().replace("-", "")
+
+        //对象的在s3中的key
+        val objectKey = S3Util.buildArticleFeaturedImagePrefix(objectName)
+
+        //上传原始文件
+        ByteArrayInputStream(originalBytes).use { bis ->
+            val args = PutObjectArgs.builder()
+                .bucket(mp.bucket)
+                .`object`(S3Util.buildOriginalArticleFeaturedImagePrefix(objectName, parserImageResult.mime))
+                .stream(bis, originalBytes.size.toLong(), -1)
+                .contentType(parserImageResult.mime)
+                .build()
+            mc.putObject(args)
+        }
+
+        //将图片转WebP格式
+        val webpResult =
+            ScrimmageUtil.imageToWebp(originalBytes, ip.articleFeaturedImage.quality, ip.articleFeaturedImage.method)
+
+        //上传 WebP
+        ByteArrayInputStream(webpResult.webpBytes).use { webpStream ->
+            val args = PutObjectArgs.builder()
+                .bucket(mp.bucket)
+                .`object`(objectKey)
+                .stream(webpStream, webpResult.webpBytes.size.toLong(), -1)
+                .contentType("image/webp")
+                .build()
+
+            mc.putObject(args)
+        }
+
+        val objectStorage = ObjectStorage(
+            ownerUserId = ownerUserId,
+            ownerArticle = ownerArticle,
+            purpose = Purpose.ARTICLE_FEATURED_IMAGE,
+            originalFileName = dto.featuredImage.originalFilename ?: objectName,
+            contentType = "image/webp",
+            sizeBytes = webpResult.webpBytes.size.toLong(),
+            sha256 = webpResult.webpSha256,
+            bucket = mp.bucket,
+            objectKey = objectKey,
+            status = ObjectStorageStatus.UPLOADED,
+            visibility = Visibility.PUBLIC
+        )
+
+        saveAndFlushOrThrow(objectStorage)
+
+        return S3Util.buildArticleFeaturedImageUrl(mp.endpoint, mp.bucket, objectKey)
     }
 
     private fun saveAndFlushOrThrow(dbObjectStorage: ObjectStorage): ObjectStorage {

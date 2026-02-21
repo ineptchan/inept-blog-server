@@ -80,5 +80,15 @@ class AdminArticleController(
         return ResponseEntity.ok(articleService.uploadImage(id, dto))
     }
 
+    @PreAuthorize("hasAuthority('admin:article:write')")
+    @Operation(summary = "上传文章封面图片")
+    @PutMapping("/{id}/featured-image")
+    fun uploadFeaturedImage(
+        @PathVariable id: Long,
+        @Valid @ModelAttribute dto: UploadArticleFeaturedImageDTO
+    ): ResponseEntity<String> {
+        return ResponseEntity.ok(articleService.uploadFeaturedImage(id, dto))
+    }
+
     //TODO 添加更换作者接口
 }

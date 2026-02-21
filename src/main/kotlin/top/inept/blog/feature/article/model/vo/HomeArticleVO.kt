@@ -16,6 +16,9 @@ data class HomeArticleVO(
     @field:Schema(description = "openapi.article.slug")
     val slug: String,
 
+    @field:Schema(description = "openapi.article.featured_image")
+    val featuredImage: String?,
+
     @field:Schema(description = "openapi.article.home_content")
     val homeContent: String,
 

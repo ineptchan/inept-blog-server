@@ -60,3 +60,6 @@ top:
       article-image:
         quality: 100
         method: 6
+      article-featured-image:
+        quality: 100
+        method: 6

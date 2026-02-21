@@ -13,6 +13,18 @@ data class ImageProperties(
     val avatar: Avatar,
     @field:Valid
     val articleImage: ArticleImage,
+    @field:Valid
+    val articleFeaturedImage: ArticleFeaturedImage,
+)
+
+data class ArticleFeaturedImage(
+    @field:Max(100)
+    @field:Min(0)
+    val quality: Int,
+
+    @field:Max(6)
+    @field:Min(0)
+    val method: Int,
 )
 
 data class ArticleImage(

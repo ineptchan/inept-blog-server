@@ -34,6 +34,21 @@ object S3Util {
         return "public/article-image/${now.year}/${now.monthValue}/${now.dayOfMonth}/$objectName.webp"
     }
 
+    fun buildOriginalArticleFeaturedImagePrefix(objectName: String, mime: String): String {
+        val now = LocalDateTime.now()
+        val ext = extFromMime(mime)
+        return "private/original/article-featured-image/${now.year}/${now.monthValue}/${now.dayOfMonth}/$objectName.${ext}"
+    }
+
+    fun buildArticleFeaturedImagePrefix(objectName: String): String {
+        val now = LocalDateTime.now()
+        return "public/article-featured-image/${now.year}/${now.monthValue}/${now.dayOfMonth}/$objectName.webp"
+    }
+
     fun buildAvatarUrl(endpoint: String, bucket: String, objectKey: String) = "$endpoint$bucket/$objectKey"
+
     fun buildArticleImageUrl(endpoint: String, bucket: String, objectKey: String) = "$endpoint$bucket/$objectKey"
+
+    fun buildArticleFeaturedImageUrl(endpoint: String, bucket: String, objectKey: String) =
+        "$endpoint$bucket/$objectKey"
 }

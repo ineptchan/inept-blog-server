@@ -31,6 +31,9 @@ class Article(
     @Column(name = "slug", nullable = false)
     var slug: String,
 
+    @Column(name = "featured-image")
+    var featuredImage: String? = null,
+
     //@Basic(fetch = FetchType.LAZY)
     @Column(nullable = false, columnDefinition = "TEXT")
     var content: String,

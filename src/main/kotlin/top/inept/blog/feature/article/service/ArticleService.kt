@@ -17,4 +17,5 @@ interface ArticleService {
     fun existsArticleById(id: Long): Boolean
     fun getHomeArticles(dto: QueryArticleDTO): Page<Article>
     fun uploadImage(id: Long, dto: UploadArticleImageDTO): String
+    fun uploadFeaturedImage(id: Long, dto: UploadArticleFeaturedImageDTO): String
 }

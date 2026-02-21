@@ -14,6 +14,11 @@ enum class Purpose(
     ARTICLE_IMAGE("article_image"),
 
     /**
+     * 文章图片
+     */
+    ARTICLE_FEATURED_IMAGE("article_featured_image"),
+
+    /**
      * 文章视频
      */
     ARTICLE_VIDEO("article_video"),
