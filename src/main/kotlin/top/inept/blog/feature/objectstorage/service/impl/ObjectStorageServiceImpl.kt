@@ -2,6 +2,7 @@ package top.inept.blog.feature.objectstorage.service.impl
 
 import io.minio.MinioClient
 import io.minio.PutObjectArgs
+import org.apache.commons.codec.digest.DigestUtils.sha256Hex
 import org.apache.tika.Tika
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
@@ -12,6 +13,7 @@ import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.ObjectStorageErrorCode
 import top.inept.blog.feature.article.model.dto.UploadArticleFeaturedImageDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleImageDTO
+import top.inept.blog.feature.article.model.dto.UploadArticleVideoDTO
 import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
 import top.inept.blog.feature.objectstorage.model.entity.constraints.ObjectStorageConstraints
@@ -225,6 +227,58 @@ class ObjectStorageServiceImpl(
         saveAndFlushOrThrow(objectStorage)
 
         return S3Util.buildArticleFeaturedImageUrl(mp.endpoint, mp.bucket, objectKey)
+    }
+
+    override fun uploadVideo(
+        ownerUserId: Long,
+        ownerArticle: Article,
+        dto: UploadArticleVideoDTO
+    ): String {
+        val bytes = dto.video.bytes
+
+        //对象名使用uuid生成
+        val objectName = UUID.randomUUID().toString().replace("-", "")
+
+        //获取文件类型
+        val mime = ByteArrayInputStream(bytes).use {
+            tika.detect(it)
+        }
+
+        val objectKey = S3Util.buildArticleVideoPrefix(objectName, mime)
+
+        //检测是不是视频
+        if (!mime.startsWith("video/")) {
+            throw BusinessException(ObjectStorageErrorCode.NOT_VIDEO_FILE, mime)
+        }
+
+        //上传原始文件
+        ByteArrayInputStream(bytes).use { bis ->
+            val args = PutObjectArgs.builder()
+                .bucket(mp.bucket)
+                .`object`(objectKey)
+                .stream(bis, bytes.size.toLong(), -1)
+                .contentType(mime)
+                .build()
+            mc.putObject(args)
+        }
+
+        val objectStorage = ObjectStorage(
+            ownerUserId = ownerUserId,
+            ownerArticle = ownerArticle,
+            purpose = Purpose.ARTICLE_VIDEO,
+            originalFileName = dto.video.originalFilename ?: objectName,
+            contentType = mime,
+            sizeBytes = bytes.size.toLong(),
+            sha256 = sha256Hex(bytes),
+            bucket = mp.bucket,
+            objectKey = objectKey,
+            status = ObjectStorageStatus.UPLOADED,
+            visibility = Visibility.PUBLIC
+        )
+
+        saveAndFlushOrThrow(objectStorage)
+
+        return S3Util.buildArticleVideo(mp.endpoint, mp.bucket, objectKey)
     }
 
     private fun saveAndFlushOrThrow(dbObjectStorage: ObjectStorage): ObjectStorage {

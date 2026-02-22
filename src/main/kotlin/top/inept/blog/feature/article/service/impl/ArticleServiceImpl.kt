@@ -187,6 +187,22 @@ class ArticleServiceImpl(
         return featuredImageUrl
     }
 
+    override fun uploadVideo(
+        id: Long,
+        dto: UploadArticleVideoDTO
+    ): String {
+        //从上下文获取用户名
+        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+
+        //根据用户名获取用户
+        val user = userService.getUserByUsername(username)
+
+        val article = getArticleById(id)
+
+        return objectStorageService.uploadVideo(user.id, article, dto)
+    }
+
     private fun saveAndFlushArticleOrThrow(dbArticle: Article): Article {
         return try {
             articleRepository.saveAndFlush(dbArticle)

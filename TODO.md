@@ -9,10 +9,11 @@
 9. [ ] 添加rbac接口
 10. [ ] 改进permissions，添加permissionType，常见：MENU/REST/OTHER
 11. [ ] 考虑去除错误的code使用msgkey
-12. [X] 完全重构file模块为objectstorage
-13. [X] 处理管理混乱的application
-14. [X] 审计Validated验证
-15. [x] 处理项目中的时间管理混乱的问题
+12. [ ] 压缩文章的视频
+13. [X] 完全重构file模块为objectstorage
+14. [X] 处理管理混乱的application
+15. [X] 审计Validated验证
+16. [x] 处理项目中的时间管理混乱的问题
 
 ## 对象存储
 
@@ -21,6 +22,7 @@
 - [X] 头像 公开
 - [X] 文章的图片 公开
 - [X] 文章的封面 公开
+- [ ] 文章的视频 公开
 - [ ] 文章的附件 公开
 
 删除文章要删除附件和图片
