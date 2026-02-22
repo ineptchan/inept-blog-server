@@ -64,6 +64,11 @@ object S3Util {
         return "public/article/video/${now.year}/${now.monthValue}/${now.dayOfMonth}/$objectName.${ext}"
     }
 
+    fun buildArticleAttachmentPrefix(objectName: String, ext: String): String {
+        val now = LocalDateTime.now()
+        return "public/article/attachment/${now.year}/${now.monthValue}/${now.dayOfMonth}/$objectName.${ext}"
+    }
+
     fun buildAvatarUrl(endpoint: String, bucket: String, objectKey: String) = "$endpoint$bucket/$objectKey"
 
     fun buildArticleImageUrl(endpoint: String, bucket: String, objectKey: String) = "$endpoint$bucket/$objectKey"
@@ -72,4 +77,6 @@ object S3Util {
         "$endpoint$bucket/$objectKey"
 
     fun buildArticleVideo(endpoint: String, bucket: String, objectKey: String) = "$endpoint$bucket/$objectKey"
+
+    fun buildArticleAttachment(endpoint: String, bucket: String, objectKey: String) = "$endpoint$bucket/$objectKey"
 }

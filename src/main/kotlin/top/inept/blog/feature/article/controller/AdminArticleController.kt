@@ -97,5 +97,15 @@ class AdminArticleController(
         return ResponseEntity.ok(articleService.uploadVideo(id, dto))
     }
 
+    @PreAuthorize("hasAuthority('admin:article:write')")
+    @Operation(summary = "上传文章附件")
+    @PutMapping("/{id}/attachment")
+    fun uploadAttachment(
+        @PathVariable id: Long,
+        @Valid @ModelAttribute dto: UploadArticleAttachmentDTO
+    ): ResponseEntity<String> {
+        return ResponseEntity.ok(articleService.uploadAttachment(id, dto))
+    }
+
     //TODO 添加更换作者接口
 }

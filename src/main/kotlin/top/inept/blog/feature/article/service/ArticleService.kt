@@ -19,4 +19,5 @@ interface ArticleService {
     fun uploadImage(id: Long, dto: UploadArticleImageDTO): String
     fun uploadFeaturedImage(id: Long, dto: UploadArticleFeaturedImageDTO): String
     fun uploadVideo(id: Long, dto: UploadArticleVideoDTO): String
+    fun uploadAttachment(id: Long, dto: UploadArticleAttachmentDTO): String
 }

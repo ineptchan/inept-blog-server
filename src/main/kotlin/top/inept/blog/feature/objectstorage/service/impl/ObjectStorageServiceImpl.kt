@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.ObjectStorageErrorCode
+import top.inept.blog.feature.article.model.dto.UploadArticleAttachmentDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleFeaturedImageDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleImageDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleVideoDTO
@@ -241,7 +242,7 @@ class ObjectStorageServiceImpl(
 
         //获取文件类型
         val mime = ByteArrayInputStream(bytes).use {
-            tika.detect(it)
+            tika.detect(it, dto.video.originalFilename)
         }
 
         val objectKey = S3Util.buildArticleVideoPrefix(objectName, mime)
@@ -279,6 +280,63 @@ class ObjectStorageServiceImpl(
         saveAndFlushOrThrow(objectStorage)
 
         return S3Util.buildArticleVideo(mp.endpoint, mp.bucket, objectKey)
+    }
+
+    override fun uploadAttachment(
+        ownerUserId: Long,
+        ownerArticle: Article,
+        dto: UploadArticleAttachmentDTO
+    ): String {
+        val bytes = dto.attachment.bytes
+
+        //查询文件是否存在,如果有直接返回
+        val sha256 = sha256Hex(bytes)
+        val dbObjectStorage = objectStorageRepository.findObjectStoragesBySha256(sha256)
+        if (dbObjectStorage != null && dbObjectStorage.purpose == Purpose.ARTICLE_ATTACHMENT) {
+            return S3Util.buildArticleAttachment(mp.endpoint, mp.bucket, dbObjectStorage.objectKey)
+        }
+
+        //对象名使用uuid生成
+        val objectName = UUID.randomUUID().toString().replace("-", "")
+
+        //获取文件类型
+        val mime = ByteArrayInputStream(bytes).use {
+            tika.detect(it, dto.attachment.originalFilename)
+        }
+
+        val split = dto.attachment.originalFilename?.split(".")
+        val originalFileExt = split?.get(split.size - 1) ?: ".bin"
+
+        val objectKey = S3Util.buildArticleAttachmentPrefix(objectName, originalFileExt)
+
+        //上传原始文件
+        ByteArrayInputStream(bytes).use { bis ->
+            val args = PutObjectArgs.builder()
+                .bucket(mp.bucket)
+                .`object`(objectKey)
+                .stream(bis, bytes.size.toLong(), -1)
+                .contentType(mime)
+                .build()
+            mc.putObject(args)
+        }
+
+        val objectStorage = ObjectStorage(
+            ownerUserId = ownerUserId,
+            ownerArticle = ownerArticle,
+            purpose = Purpose.ARTICLE_ATTACHMENT,
+            originalFileName = dto.attachment.originalFilename ?: objectName,
+            contentType = mime,
+            sizeBytes = bytes.size.toLong(),
+            sha256 = sha256Hex(bytes),
+            bucket = mp.bucket,
+            objectKey = objectKey,
+            status = ObjectStorageStatus.UPLOADED,
+            visibility = Visibility.PUBLIC
+        )
+
+        saveAndFlushOrThrow(objectStorage)
+
+        return S3Util.buildArticleAttachment(mp.endpoint, mp.bucket, objectKey)
     }
 
     private fun saveAndFlushOrThrow(dbObjectStorage: ObjectStorage): ObjectStorage {

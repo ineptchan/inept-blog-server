@@ -1,6 +1,7 @@
 package top.inept.blog.feature.objectstorage.service
 
 import org.springframework.web.multipart.MultipartFile
+import top.inept.blog.feature.article.model.dto.UploadArticleAttachmentDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleFeaturedImageDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleImageDTO
 import top.inept.blog.feature.article.model.dto.UploadArticleVideoDTO
@@ -11,4 +12,5 @@ interface ObjectStorageService {
     fun uploadArticleImage(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleImageDTO): String
     fun uploadFeaturedImage(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleFeaturedImageDTO): String
     fun uploadVideo(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleVideoDTO): String
+    fun uploadAttachment(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleAttachmentDTO): String
 }

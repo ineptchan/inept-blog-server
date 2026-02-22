@@ -8,4 +8,6 @@ import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
 
 @Repository
 interface ObjectStorageRepository : JpaRepository<ObjectStorage, Long>, JpaSpecificationExecutor<ObjectStorage>,
-    QuerydslPredicateExecutor<ObjectStorage>
+    QuerydslPredicateExecutor<ObjectStorage> {
+    fun findObjectStoragesBySha256(sha256: String): ObjectStorage?
+}
