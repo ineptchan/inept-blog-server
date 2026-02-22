@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.ArticleErrorCode
 import top.inept.blog.exception.error.CommonErrorCode
@@ -102,9 +103,13 @@ class ArticleServiceImpl(
         return dbArticle
     }
 
+    @Transactional
     override fun deleteArticle(id: Long) {
         //根据id判断文章是否存在
         if (!existsArticleById(id)) throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, id)
+
+        //返回影响数量
+        objectStorageService.deleteByOwnerArticleId(id)
 
         //删除文章
         articleRepository.deleteById(id)

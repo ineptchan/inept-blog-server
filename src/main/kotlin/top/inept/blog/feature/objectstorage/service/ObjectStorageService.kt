@@ -13,4 +13,5 @@ interface ObjectStorageService {
     fun uploadFeaturedImage(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleFeaturedImageDTO): String
     fun uploadVideo(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleVideoDTO): String
     fun uploadAttachment(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleAttachmentDTO): String
+    fun deleteByOwnerArticleId(id: Long)
 }

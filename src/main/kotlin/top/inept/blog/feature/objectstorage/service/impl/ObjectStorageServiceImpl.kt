@@ -2,6 +2,9 @@ package top.inept.blog.feature.objectstorage.service.impl
 
 import io.minio.MinioClient
 import io.minio.PutObjectArgs
+import io.minio.RemoveObjectsArgs
+import io.minio.messages.DeleteObject
+import jakarta.persistence.EntityManager
 import org.apache.commons.codec.digest.DigestUtils.sha256Hex
 import org.apache.tika.Tika
 import org.hibernate.exception.ConstraintViolationException
@@ -38,6 +41,7 @@ class ObjectStorageServiceImpl(
     private val mp: MinioProperties,
     private val tika: Tika,
     private val ip: ImageProperties,
+    private val entityManager: EntityManager,
 ) : ObjectStorageService {
     private val avatarMaxBytes = 5L * 1024 * 1024
     private val avatarMinSide = 256L
@@ -337,6 +341,32 @@ class ObjectStorageServiceImpl(
         saveAndFlushOrThrow(objectStorage)
 
         return S3Util.buildArticleAttachment(mp.endpoint, mp.bucket, objectKey)
+    }
+
+    override fun deleteByOwnerArticleId(id: Long) {
+        val article = entityManager.getReference(Article::class.java, id)
+
+        val objectStorages = objectStorageRepository.findObjectStoragesByOwnerArticle(article)
+
+        val objects = objectStorages.map { DeleteObject(it.objectKey) }
+
+        val result = mc.removeObjects(
+            RemoveObjectsArgs.builder()
+                .bucket(mp.bucket)
+                .objects(objects)
+                .build()
+        )
+
+        //哪里移除错误
+        result.forEach {
+            throw BusinessException(
+                ObjectStorageErrorCode.REMOVE_ARTICLE_OBJECT_ERROR,
+                it.get().objectName(),
+                it.get().message()
+            )
+        }
+
+        objectStorageRepository.deleteObjectStorageByOwnerArticle(article)
     }
 
     private fun saveAndFlushOrThrow(dbObjectStorage: ObjectStorage): ObjectStorage {

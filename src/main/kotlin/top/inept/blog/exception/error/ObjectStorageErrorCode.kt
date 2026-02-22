@@ -34,4 +34,9 @@ enum class ObjectStorageErrorCode(
 
     NOT_VIDEO_FILE("OBJECT_STORAGE_007", "message.object_storage.not_video_file", HttpStatus.UNSUPPORTED_MEDIA_TYPE),
 
+    REMOVE_ARTICLE_OBJECT_ERROR(
+        "OBJECT_STORAGE_008",
+        "message.object_storage.remove_article_object_error",
+        HttpStatus.INTERNAL_SERVER_ERROR
+    ),
 }
