@@ -8,7 +8,7 @@
 8. [ ] 完善测试
 9. [ ] 添加rbac接口
 10. [ ] 改进permissions，添加permissionType，常见：MENU/REST/OTHER
-11. [ ] 考虑去除错误的code使用msgkey
+11. [X] 考虑去除错误的code使用msgkey
 12. [ ] 压缩文章的视频，尝试使用消息队列
 13. [X] 完全重构file模块为objectstorage
 14. [X] 处理管理混乱的application
@@ -24,5 +24,4 @@
 - [X] 文章的封面 公开
 - [X] 文章的视频 公开
 - [X] 文章的附件 公开
-
-删除文章要删除附件和图片
+- [X] 删除文章要删除附件和图片
