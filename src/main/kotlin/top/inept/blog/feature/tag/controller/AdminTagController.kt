@@ -29,11 +29,7 @@ class AdminTagController(
     @Operation(summary = "获取标签列表")
     @GetMapping()
     fun getTags(@Valid queryTagDTO: QueryTagDTO): ResponseEntity<PageResponse<TagVO>> {
-        return ResponseEntity.ok(
-            tagService
-                .getTags(queryTagDTO)
-                .toPageResponse { it.toTagVO() }
-        )
+        return ResponseEntity.ok(tagService.getTags(queryTagDTO).toPageResponse { it.toTagVO() })
     }
 
     @PreAuthorize("hasAuthority('admin:tag:read')")
