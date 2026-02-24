@@ -29,12 +29,8 @@ class AdminUserController(
     @PreAuthorize("hasAuthority('admin:user:read')")
     @Operation(summary = "获取用户列表")
     @GetMapping
-    fun getUsers(@Valid queryUserDTO: QueryUserDTO): ResponseEntity<PageResponse<UserVO>> {
-        return ResponseEntity.ok(
-            userService
-                .getUsers(queryUserDTO)
-                .toPageResponse { it.toUserVO() }
-        )
+    fun getUsers(@Valid dto: QueryUserDTO): ResponseEntity<PageResponse<UserVO>> {
+        return ResponseEntity.ok(userService.getUsers(dto).toPageResponse { it.toUserVO() })
     }
 
     @PreAuthorize("hasAuthority('admin:user:read')")
@@ -47,15 +43,15 @@ class AdminUserController(
     @PreAuthorize("hasAuthority('admin:user:write')")
     @Operation(summary = "创建用户")
     @PostMapping
-    fun createUser(@Valid @RequestBody createUserDTO: CreateUserDTO): ResponseEntity<UserVO> {
-        return ResponseEntity.ok(userService.createUser(createUserDTO).toUserVO())
+    fun createUser(@Valid @RequestBody dto: CreateUserDTO): ResponseEntity<UserVO> {
+        return ResponseEntity.ok(userService.createUser(dto).toUserVO())
     }
 
     @PreAuthorize("hasAuthority('admin:user:modify')")
     @Operation(summary = "更新用户")
     @PatchMapping("/{id}")
-    fun updateUser(@Valid @RequestBody updateUserDTO: UpdateUserDTO, @PathVariable id: Long): ResponseEntity<UserVO> {
-        return ResponseEntity.ok(userService.updateUser(id, updateUserDTO).toUserVO())
+    fun updateUser(@Valid @RequestBody dto: UpdateUserDTO, @PathVariable id: Long): ResponseEntity<UserVO> {
+        return ResponseEntity.ok(userService.updateUser(id, dto).toUserVO())
     }
 
     @PreAuthorize("hasAuthority('admin:user:delete')")

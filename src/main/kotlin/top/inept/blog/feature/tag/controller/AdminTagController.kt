@@ -27,9 +27,9 @@ class AdminTagController(
 ) {
     @PreAuthorize("hasAuthority('admin:tag:read')")
     @Operation(summary = "获取标签列表")
-    @GetMapping()
-    fun getTags(@Valid queryTagDTO: QueryTagDTO): ResponseEntity<PageResponse<TagVO>> {
-        return ResponseEntity.ok(tagService.getTags(queryTagDTO).toPageResponse { it.toTagVO() })
+    @GetMapping
+    fun getTags(@Valid dto: QueryTagDTO): ResponseEntity<PageResponse<TagVO>> {
+        return ResponseEntity.ok(tagService.getTags(dto).toPageResponse { it.toTagVO() })
     }
 
     @PreAuthorize("hasAuthority('admin:tag:read')")
@@ -42,15 +42,15 @@ class AdminTagController(
     @PreAuthorize("hasAuthority('admin:tag:write')")
     @Operation(summary = "创建标签")
     @PostMapping
-    fun createTag(@Valid @RequestBody createTagDTO: CreateTagDTO): ResponseEntity<TagVO> {
-        return ResponseEntity.ok(tagService.createTag(createTagDTO).toTagVO())
+    fun createTag(@Valid @RequestBody dto: CreateTagDTO): ResponseEntity<TagVO> {
+        return ResponseEntity.ok(tagService.createTag(dto).toTagVO())
     }
 
     @PreAuthorize("hasAuthority('admin:tag:modify')")
     @Operation(summary = "更新标签")
     @PatchMapping("/{id}")
-    fun updateTag(@Valid @RequestBody updateTagDTO: UpdateTagDTO, @PathVariable id: Long): ResponseEntity<TagVO> {
-        return ResponseEntity.ok(tagService.updateTag(id, updateTagDTO).toTagVO())
+    fun updateTag(@Valid @RequestBody dto: UpdateTagDTO, @PathVariable id: Long): ResponseEntity<TagVO> {
+        return ResponseEntity.ok(tagService.updateTag(id, dto).toTagVO())
     }
 
     @PreAuthorize("hasAuthority('admin:tag:delete')")

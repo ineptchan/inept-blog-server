@@ -26,7 +26,7 @@ class UserCommentController(
     @PreAuthorize("hasAuthority('user:comment:write')")
     @Operation(summary = "创建评论")
     @PostMapping
-    fun createComment(@Valid @RequestBody createCommentDTO: CreateCommentDTO): ResponseEntity<CommentVO> {
-        return ResponseEntity.ok(commentService.createComment(createCommentDTO))
+    fun createComment(@Valid @RequestBody dto: CreateCommentDTO): ResponseEntity<CommentVO> {
+        return ResponseEntity.ok(commentService.createComment(dto))
     }
 }

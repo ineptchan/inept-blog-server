@@ -134,11 +134,11 @@ class CommentServiceImpl(
         commentRepository.deleteById(id)
     }
 
-    override fun getCommentReplies(commentId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<CommentReplyVO> {
+    override fun getCommentReplies(commentId: Long, dto: BaseQueryDTO): PageResponse<CommentReplyVO> {
         if (!commentRepository.existsById(commentId))
             throw BusinessException(CommentErrorCode.ID_NOT_FOUND)
 
-        val pageRequest = baseQueryDTO.toPageRequest()
+        val pageRequest = dto.toPageRequest()
         val c = QComment.comment
 
         val builder = BooleanBuilder()
@@ -147,12 +147,12 @@ class CommentServiceImpl(
         return commentRepository.findAll(builder, pageRequest).toPageResponse { it.toCommentReplyVO() }
     }
 
-    override fun getTopComments(articleId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<TopCommentVO> {
+    override fun getTopComments(articleId: Long, dto: BaseQueryDTO): PageResponse<TopCommentVO> {
         //判断文章是否存在
         if (!articleService.existsArticleById(articleId))
             throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, articleId)
 
-        val pageRequest = baseQueryDTO.toPageRequest()
+        val pageRequest = dto.toPageRequest()
         val c = QComment.comment
 
         //根据文章id获取顶级评论

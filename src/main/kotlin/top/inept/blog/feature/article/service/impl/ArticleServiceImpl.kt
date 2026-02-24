@@ -167,10 +167,7 @@ class ArticleServiceImpl(
         return objectStorageService.uploadArticleImage(user.id, article, dto)
     }
 
-    override fun uploadFeaturedImage(
-        id: Long,
-        dto: UploadArticleFeaturedImageDTO
-    ): String {
+    override fun uploadFeaturedImage(id: Long, dto: UploadArticleFeaturedImageDTO): String {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
@@ -192,10 +189,7 @@ class ArticleServiceImpl(
         return featuredImageUrl
     }
 
-    override fun uploadVideo(
-        id: Long,
-        dto: UploadArticleVideoDTO
-    ): String {
+    override fun uploadVideo(id: Long, dto: UploadArticleVideoDTO): String {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
@@ -208,10 +202,7 @@ class ArticleServiceImpl(
         return objectStorageService.uploadVideo(user.id, article, dto)
     }
 
-    override fun uploadAttachment(
-        id: Long,
-        dto: UploadArticleAttachmentDTO
-    ): String {
+    override fun uploadAttachment(id: Long, dto: UploadArticleAttachmentDTO): String {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)

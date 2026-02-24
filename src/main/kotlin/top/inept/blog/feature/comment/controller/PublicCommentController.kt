@@ -26,9 +26,9 @@ class PublicCommentController(
     @GetMapping("/{articleId}")
     fun getTopComments(
         @PathVariable articleId: Long,
-        @Valid baseQueryDTO: BaseQueryDTO
+        @Valid dto: BaseQueryDTO
     ): ResponseEntity<PageResponse<TopCommentVO>> {
-        return ResponseEntity.ok(commentService.getTopComments(articleId, baseQueryDTO))
+        return ResponseEntity.ok(commentService.getTopComments(articleId, dto))
     }
 
     /*    @Operation(summary = "创建匿名评论")
@@ -41,8 +41,8 @@ class PublicCommentController(
     @GetMapping("/{commentId}/replies")
     fun getCommentReplies(
         @PathVariable commentId: Long,
-        @Valid baseQueryDTO: BaseQueryDTO
+        @Valid dto: BaseQueryDTO
     ): ResponseEntity<PageResponse<CommentReplyVO>> {
-        return ResponseEntity.ok(commentService.getCommentReplies(commentId, baseQueryDTO))
+        return ResponseEntity.ok(commentService.getCommentReplies(commentId, dto))
     }
 }

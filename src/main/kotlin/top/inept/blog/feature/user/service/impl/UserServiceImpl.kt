@@ -14,6 +14,7 @@ import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.auth.repository.RefreshTokenRepository
 import top.inept.blog.feature.objectstorage.service.ObjectStorageService
+import top.inept.blog.feature.rbac.repository.RoleRepository
 import top.inept.blog.feature.user.model.convert.toUserInfoVO
 import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.QueryUserDTO
@@ -23,7 +24,6 @@ import top.inept.blog.feature.user.model.entity.QUser
 import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.model.entity.constraints.UserConstraints
 import top.inept.blog.feature.user.model.vo.UserInfoVO
-import top.inept.blog.feature.user.repository.RoleRepository
 import top.inept.blog.feature.user.repository.UserRepository
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.PasswordUtil
@@ -37,12 +37,12 @@ class UserServiceImpl(
     private val roleRepository: RoleRepository,
     private val objectStorageService: ObjectStorageService
 ) : UserService {
-    override fun getUsers(queryUserDTO: QueryUserDTO): Page<User> {
-        val pageRequest = queryUserDTO.toPageRequest()
+    override fun getUsers(dto: QueryUserDTO): Page<User> {
+        val pageRequest = dto.toPageRequest()
         val u = QUser.user
 
         val builder = BooleanBuilder().apply {
-            queryUserDTO.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
+            dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
                 and(
                     u.nickname.contains(kw)
                         .or(u.password.contains(kw))

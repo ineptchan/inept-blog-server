@@ -1,8 +1,9 @@
-package top.inept.blog.feature.user.model.entity
+package top.inept.blog.feature.rbac.model.entity
 
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
+import java.io.Serializable
 import java.time.Instant
 
 @Embeddable
@@ -12,7 +13,7 @@ data class RolePermissionId(
 
     @Column(name = "permission_id")
     var permissionId: Long = 0
-) : java.io.Serializable
+) : Serializable
 
 @Entity
 @Table(name = "roles_permissions")

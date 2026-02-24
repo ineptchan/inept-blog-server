@@ -29,8 +29,8 @@ class AdminCommentController(
     @PreAuthorize("hasAuthority('admin:comment:read')")
     @Operation(summary = "获取评论列表")
     @GetMapping
-    fun getComments(@Valid queryCommentDTO: QueryCommentDTO): ResponseEntity<PageResponse<CommentVO>> {
-        return ResponseEntity.ok(commentService.getComments(queryCommentDTO))
+    fun getComments(@Valid dto: QueryCommentDTO): ResponseEntity<PageResponse<CommentVO>> {
+        return ResponseEntity.ok(commentService.getComments(dto))
     }
 
     @PreAuthorize("hasAuthority('admin:comment:read')")
@@ -43,18 +43,18 @@ class AdminCommentController(
     @PreAuthorize("hasAuthority('admin:comment:write')")
     @Operation(summary = "创建评论")
     @PostMapping
-    fun createComment(@Valid @RequestBody createCommentDTO: CreateCommentDTO): ResponseEntity<CommentVO> {
-        return ResponseEntity.ok(commentService.createComment(createCommentDTO))
+    fun createComment(@Valid @RequestBody dto: CreateCommentDTO): ResponseEntity<CommentVO> {
+        return ResponseEntity.ok(commentService.createComment(dto))
     }
 
     @PreAuthorize("hasAuthority('admin:comment:modify')")
     @Operation(summary = "更新评论")
     @PatchMapping("/{id}")
     fun updateComment(
-        @Valid @RequestBody updateCommentDTO: UpdateCommentDTO,
-        @PathVariable id: Long
+        @PathVariable id: Long,
+        @Valid @RequestBody dto: UpdateCommentDTO,
     ): ResponseEntity<CommentSummaryVO> {
-        return ResponseEntity.ok(commentService.updateComment(id, updateCommentDTO))
+        return ResponseEntity.ok(commentService.updateComment(id, dto))
     }
 
     @PreAuthorize("hasAuthority('admin:comment:delete')")
@@ -70,8 +70,8 @@ class AdminCommentController(
     @GetMapping("/{commentId}/replies")
     fun getCommentReplies(
         @PathVariable commentId: Long,
-        @Valid baseQueryDTO: BaseQueryDTO
+        @Valid dto: BaseQueryDTO
     ): ResponseEntity<PageResponse<CommentReplyVO>> {
-        return ResponseEntity.ok(commentService.getCommentReplies(commentId, baseQueryDTO))
+        return ResponseEntity.ok(commentService.getCommentReplies(commentId, dto))
     }
 }

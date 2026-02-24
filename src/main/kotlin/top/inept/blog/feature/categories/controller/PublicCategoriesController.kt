@@ -24,10 +24,10 @@ class PublicCategoriesController(
 ) {
     @Operation(summary = "获取分类列表")
     @GetMapping
-    fun getCategories(@Valid queryCategoriesDTO: QueryCategoriesDTO): ResponseEntity<PageResponse<CategoriesVO>> {
+    fun getCategories(@Valid dto: QueryCategoriesDTO): ResponseEntity<PageResponse<CategoriesVO>> {
         return ResponseEntity.ok(
             categoriesService
-                .getCategories(queryCategoriesDTO)
+                .getCategories(dto)
                 .toPageResponse { it.toCategoriesVO() }
         )
     }

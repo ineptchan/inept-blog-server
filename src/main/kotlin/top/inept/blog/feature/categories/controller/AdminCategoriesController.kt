@@ -28,12 +28,8 @@ class AdminCategoriesController(
     @PreAuthorize("hasAuthority('admin:categories:read')")
     @Operation(summary = "获取分类列表")
     @GetMapping
-    fun getCategories(@Valid queryCategoriesDTO: QueryCategoriesDTO): ResponseEntity<PageResponse<CategoriesVO>> {
-        return ResponseEntity.ok(
-            categoriesService
-                .getCategories(queryCategoriesDTO)
-                .toPageResponse { it.toCategoriesVO() }
-        )
+    fun getCategories(@Valid dto: QueryCategoriesDTO): ResponseEntity<PageResponse<CategoriesVO>> {
+        return ResponseEntity.ok(categoriesService.getCategories(dto).toPageResponse { it.toCategoriesVO() })
     }
 
     @PreAuthorize("hasAuthority('admin:categories:read')")
@@ -46,18 +42,18 @@ class AdminCategoriesController(
     @PreAuthorize("hasAuthority('admin:categories:write')")
     @Operation(summary = "创建分类")
     @PostMapping
-    fun createCategory(@Valid @RequestBody createCategoriesDTO: CreateCategoriesDTO): ResponseEntity<CategoriesVO> {
-        return ResponseEntity.ok(categoriesService.createCategory(createCategoriesDTO).toCategoriesVO())
+    fun createCategory(@Valid @RequestBody dto: CreateCategoriesDTO): ResponseEntity<CategoriesVO> {
+        return ResponseEntity.ok(categoriesService.createCategory(dto).toCategoriesVO())
     }
 
     @PreAuthorize("hasAuthority('admin:categories:modify')")
     @Operation(summary = "更新分类")
     @PatchMapping("/{id}")
     fun updateCategory(
-        @Valid @RequestBody updateCategoriesDTO: UpdateCategoriesDTO,
-        @PathVariable id: Long
+        @PathVariable id: Long,
+        @Valid @RequestBody dto: UpdateCategoriesDTO
     ): ResponseEntity<CategoriesVO> {
-        return ResponseEntity.ok(categoriesService.updateCategory(id, updateCategoriesDTO).toCategoriesVO())
+        return ResponseEntity.ok(categoriesService.updateCategory(id, dto).toCategoriesVO())
     }
 
     @PreAuthorize("hasAuthority('admin:categories:delete')")

@@ -17,7 +17,7 @@ interface CommentService {
     fun createComment(dto: CreateCommentDTO): CommentVO
     fun updateComment(id: Long, dto: UpdateCommentDTO): CommentSummaryVO
     fun deleteComment(id: Long)
-    fun getCommentReplies(commentId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<CommentReplyVO>
-    fun getTopComments(articleId: Long, baseQueryDTO: BaseQueryDTO): PageResponse<TopCommentVO>
+    fun getCommentReplies(commentId: Long, dto: BaseQueryDTO): PageResponse<CommentReplyVO>
+    fun getTopComments(articleId: Long, dto: BaseQueryDTO): PageResponse<TopCommentVO>
     fun createAnonymousComment(dto: CreateAnonymousCommentDTO): CommentVO
 }

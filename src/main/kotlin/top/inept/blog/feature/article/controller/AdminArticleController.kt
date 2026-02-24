@@ -28,8 +28,8 @@ class AdminArticleController(
     @PreAuthorize("hasAuthority('admin:article:read')")
     @Operation(summary = "获取文章列表")
     @GetMapping
-    fun getArticles(@Valid queryArticleDTO: QueryArticleDTO): ResponseEntity<PageResponse<HomeArticleVO>> {
-        val articlePage = articleService.getHomeArticles(queryArticleDTO)
+    fun getArticles(@Valid dto: QueryArticleDTO): ResponseEntity<PageResponse<HomeArticleVO>> {
+        val articlePage = articleService.getHomeArticles(dto)
         return ResponseEntity.ok(articlePage.toPageResponse { it.toHomeArticleVO() })
     }
 
@@ -43,18 +43,15 @@ class AdminArticleController(
     @PreAuthorize("hasAuthority('admin:article:write')")
     @Operation(summary = "创建文章")
     @PostMapping
-    fun createArticle(@Valid @RequestBody createArticleDTO: CreateArticleDTO): ResponseEntity<ArticleVO> {
-        return ResponseEntity.ok(articleService.createArticle(createArticleDTO).toArticleVO())
+    fun createArticle(@Valid @RequestBody dto: CreateArticleDTO): ResponseEntity<ArticleVO> {
+        return ResponseEntity.ok(articleService.createArticle(dto).toArticleVO())
     }
 
     @PreAuthorize("hasAuthority('admin:article:modify')")
     @Operation(summary = "更新文章")
     @PatchMapping("/{id}")
-    fun updateArticle(
-        @Valid @RequestBody updateArticleDTO: UpdateArticleDTO,
-        @PathVariable id: Long
-    ): ResponseEntity<ArticleVO> {
-        return ResponseEntity.ok(articleService.updateArticle(id, updateArticleDTO).toArticleVO())
+    fun updateArticle(@PathVariable id: Long, @Valid @RequestBody dto: UpdateArticleDTO): ResponseEntity<ArticleVO> {
+        return ResponseEntity.ok(articleService.updateArticle(id, dto).toArticleVO())
     }
 
     @PreAuthorize("hasAuthority('admin:article:delete')")
@@ -68,8 +65,8 @@ class AdminArticleController(
     @PreAuthorize("hasAuthority('admin:article:modify')")
     @Operation(summary = "批量更新文章状态")
     @PutMapping("/status")
-    fun updateArticleStatus(@Valid @RequestBody updateArticleStatusDTO: UpdateArticleStatusDTO): ResponseEntity<Boolean> {
-        articleService.updateArticleStatus(updateArticleStatusDTO)
+    fun updateArticleStatus(@Valid @RequestBody dto: UpdateArticleStatusDTO): ResponseEntity<Boolean> {
+        articleService.updateArticleStatus(dto)
         return ResponseEntity.ok(true)
     }
 

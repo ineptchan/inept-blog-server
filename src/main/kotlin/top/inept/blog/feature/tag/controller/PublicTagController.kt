@@ -24,11 +24,7 @@ class PublicTagController(
 ) {
     @Operation(summary = "获取标签列表")
     @GetMapping()
-    fun getTags(@Valid queryTagDTO: QueryTagDTO): ResponseEntity<PageResponse<TagVO>> {
-        return ResponseEntity.ok(
-            tagService
-                .getTags(queryTagDTO)
-                .toPageResponse { it.toTagVO() }
-        )
+    fun getTags(@Valid dto: QueryTagDTO): ResponseEntity<PageResponse<TagVO>> {
+        return ResponseEntity.ok(tagService.getTags(dto).toPageResponse { it.toTagVO() })
     }
 }

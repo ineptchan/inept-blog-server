@@ -1,10 +1,10 @@
-package top.inept.blog.feature.user.model.entity
+package top.inept.blog.feature.rbac.model.entity
 
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import top.inept.blog.feature.user.model.entity.constraints.PermissionConstraints
+import top.inept.blog.feature.rbac.model.entity.constraints.PermissionConstraints
 import java.time.Instant
 
 /**

@@ -1,25 +1,13 @@
-package top.inept.blog.feature.user.model.entity
+package top.inept.blog.feature.rbac.model.entity
 
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import top.inept.blog.feature.user.model.entity.constraints.RoleConstraints
+import top.inept.blog.feature.rbac.model.entity.constraints.RoleConstraints
+import top.inept.blog.feature.user.model.entity.UserRole
 import java.time.Instant
 
-/**
- * Role
- *
- * @property id
- * @property code
- * @property name
- * @property description
- * @property createdAt
- * @property updatedAt
- * @property userBindings
- * @property permissionBindings
- * @constructor Create empty Role
- */
 @Entity
 @Table(
     name = "roles",
@@ -34,12 +22,21 @@ class Role(
     @Column(name = "id", nullable = false)
     var id: Long = 0,
 
+    /**
+     * code
+     */
     @Column(name = "code", nullable = false, length = 64)
     var code: String,
 
+    /**
+     * 名字
+     */
     @Column(name = "name", nullable = false, length = 32)
     var name: String,
 
+    /**
+     * 描述
+     */
     @Column(name = "description")
     var description: String? = null,
 
