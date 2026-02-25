@@ -60,7 +60,7 @@ class AdminRoleController(
         roleService.deleteRole(id)
     }
 
-    @PreAuthorize("hasAuthority('admin:permissions:read') and hasAuthority('admin:role:read')")
+    @PreAuthorize("hasAuthority('admin:permission:read') and hasAuthority('admin:role:read')")
     @Operation(summary = "获取角色绑定的权限")
     @GetMapping("/{id}/permissions")
     fun getRoleBindPermissions(@PathVariable id: Long): ResponseEntity<List<PermissionVO>> {
