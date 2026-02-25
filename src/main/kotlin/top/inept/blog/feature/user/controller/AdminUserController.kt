@@ -61,4 +61,11 @@ class AdminUserController(
         userService.deleteUserById(id)
         return ResponseEntity.ok(true)
     }
+    /*
+    TODO
+        GET /users/{userId}/role-bindings
+        POST /users/{userId}/role-bindings
+        DELETE /users/{userId}/role-bindings/{bindingId}
+
+    */
 }

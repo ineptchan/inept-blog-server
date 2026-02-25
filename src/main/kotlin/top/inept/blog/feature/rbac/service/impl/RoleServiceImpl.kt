@@ -14,6 +14,7 @@ import top.inept.blog.feature.rbac.model.convert.toRole
 import top.inept.blog.feature.rbac.model.dto.CreateRoleDTO
 import top.inept.blog.feature.rbac.model.dto.QueryRoleDTO
 import top.inept.blog.feature.rbac.model.dto.UpdateRoleDTO
+import top.inept.blog.feature.rbac.model.entity.Permission
 import top.inept.blog.feature.rbac.model.entity.QRole
 import top.inept.blog.feature.rbac.model.entity.Role
 import top.inept.blog.feature.rbac.model.entity.constraints.RoleConstraints
@@ -67,6 +68,13 @@ class RoleServiceImpl(
         if (roleRepository.deleteRoleById(id) != 1L) {
             throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
         }
+    }
+
+    override fun getRoleBindPermissions(id: Long): List<Permission> {
+        val dbRole = roleRepository.findWithPermissionsById(id)
+            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
+
+        return dbRole.permissionBindings.map { it.permission }
     }
 
     private fun saveAndFlushTagOrThrow(dbRole: Role): Role {

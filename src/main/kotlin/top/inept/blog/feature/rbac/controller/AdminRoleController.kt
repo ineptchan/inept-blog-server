@@ -9,10 +9,12 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toPageResponse
+import top.inept.blog.feature.rbac.model.convert.toPermissionVO
 import top.inept.blog.feature.rbac.model.convert.toRoleVO
 import top.inept.blog.feature.rbac.model.dto.CreateRoleDTO
 import top.inept.blog.feature.rbac.model.dto.QueryRoleDTO
 import top.inept.blog.feature.rbac.model.dto.UpdateRoleDTO
+import top.inept.blog.feature.rbac.model.vo.PermissionVO
 import top.inept.blog.feature.rbac.model.vo.RoleVO
 import top.inept.blog.feature.rbac.service.RoleService
 
@@ -20,7 +22,7 @@ import top.inept.blog.feature.rbac.service.RoleService
 @RestController
 @RequestMapping("/role")
 @Validated
-class RoleController(
+class AdminRoleController(
     private val roleService: RoleService
 ) {
     @PreAuthorize("hasAuthority('admin:role:read')")
@@ -57,4 +59,18 @@ class RoleController(
     fun deleteRole(@PathVariable id: Long) {
         roleService.deleteRole(id)
     }
+
+    @PreAuthorize("hasAuthority('admin:permissions:read') and hasAuthority('admin:role:read')")
+    @Operation(summary = "获取角色绑定的权限")
+    @GetMapping("/{id}/permissions")
+    fun getRoleBindPermissions(@PathVariable id: Long): ResponseEntity<List<PermissionVO>> {
+        return ResponseEntity.ok(roleService.getRoleBindPermissions(id).map { it.toPermissionVO() })
+    }
+    /*
+    TODO
+        PUT /roles/{roleId}/permissions（全量替换）
+        POST /roles/{roleId}/permissions（增量添加）
+        DELETE /roles/{roleId}/permissions/{permId}（移除单个）
+
+    */
 }

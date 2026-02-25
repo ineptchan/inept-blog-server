@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page
 import top.inept.blog.feature.rbac.model.dto.CreateRoleDTO
 import top.inept.blog.feature.rbac.model.dto.QueryRoleDTO
 import top.inept.blog.feature.rbac.model.dto.UpdateRoleDTO
+import top.inept.blog.feature.rbac.model.entity.Permission
 import top.inept.blog.feature.rbac.model.entity.Role
 
 interface RoleService {
@@ -12,4 +13,5 @@ interface RoleService {
     fun getRoleById(id: Long): Role
     fun updateRole(id: Long, dto: UpdateRoleDTO): Role
     fun deleteRole(id: Long)
+    fun getRoleBindPermissions(id: Long): List<Permission>
 }

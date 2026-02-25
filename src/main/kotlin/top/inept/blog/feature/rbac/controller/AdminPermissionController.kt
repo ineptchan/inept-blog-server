@@ -19,7 +19,7 @@ import top.inept.blog.feature.rbac.service.PermissionService
 @RestController
 @RequestMapping("/permission")
 @Validated
-class PermissionController(
+class AdminPermissionController(
     private val permissionService: PermissionService
 ) {
     @PreAuthorize("hasAuthority('admin:permission:read')")
