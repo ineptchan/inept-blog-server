@@ -23,7 +23,7 @@ import top.inept.blog.feature.rbac.service.RoleService
 class RoleController(
     private val roleService: RoleService
 ) {
-    @PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAuthority('admin:role:read')")
     @Operation(summary = "获取角色列表")
     @GetMapping
     fun getRoles(@Valid dto: QueryRoleDTO): ResponseEntity<PageResponse<RoleVO>> {
