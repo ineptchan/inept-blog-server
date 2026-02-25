@@ -40,14 +40,14 @@ class AdminCommentController(
         return ResponseEntity.ok(commentService.getCommentById(id))
     }
 
-    @PreAuthorize("hasAuthority('admin:comment:write')")
+    @PreAuthorize("hasAuthority('admin:comment:create')")
     @Operation(summary = "创建评论")
     @PostMapping
     fun createComment(@Valid @RequestBody dto: CreateCommentDTO): ResponseEntity<CommentVO> {
         return ResponseEntity.ok(commentService.createComment(dto))
     }
 
-    @PreAuthorize("hasAuthority('admin:comment:modify')")
+    @PreAuthorize("hasAuthority('admin:comment:update')")
     @Operation(summary = "更新评论")
     @PatchMapping("/{id}")
     fun updateComment(

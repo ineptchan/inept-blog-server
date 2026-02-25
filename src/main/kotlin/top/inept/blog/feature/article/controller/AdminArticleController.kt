@@ -40,14 +40,14 @@ class AdminArticleController(
         return ResponseEntity.ok(articleService.getArticleById(id).toArticleVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:article:write')")
+    @PreAuthorize("hasAuthority('admin:article:create')")
     @Operation(summary = "创建文章")
     @PostMapping
     fun createArticle(@Valid @RequestBody dto: CreateArticleDTO): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.createArticle(dto).toArticleVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:article:modify')")
+    @PreAuthorize("hasAuthority('admin:article:update')")
     @Operation(summary = "更新文章")
     @PatchMapping("/{id}")
     fun updateArticle(@PathVariable id: Long, @Valid @RequestBody dto: UpdateArticleDTO): ResponseEntity<ArticleVO> {
@@ -62,7 +62,7 @@ class AdminArticleController(
         return ResponseEntity.ok(true)
     }
 
-    @PreAuthorize("hasAuthority('admin:article:modify')")
+    @PreAuthorize("hasAuthority('admin:article:update')")
     @Operation(summary = "批量更新文章状态")
     @PutMapping("/status")
     fun updateArticleStatus(@Valid @RequestBody dto: UpdateArticleStatusDTO): ResponseEntity<Boolean> {
@@ -70,14 +70,14 @@ class AdminArticleController(
         return ResponseEntity.ok(true)
     }
 
-    @PreAuthorize("hasAuthority('admin:article:write')")
+    @PreAuthorize("hasAuthority('admin:article:upload:image')")
     @Operation(summary = "上传文章图片")
     @PutMapping("/{id}/image")
     fun uploadImage(@PathVariable id: Long, @Valid @ModelAttribute dto: UploadArticleImageDTO): ResponseEntity<String> {
         return ResponseEntity.ok(articleService.uploadImage(id, dto))
     }
 
-    @PreAuthorize("hasAuthority('admin:article:write')")
+    @PreAuthorize("hasAuthority('admin:article:upload:featured-image')")
     @Operation(summary = "上传文章封面图片")
     @PutMapping("/{id}/featured-image")
     fun uploadFeaturedImage(
@@ -87,14 +87,14 @@ class AdminArticleController(
         return ResponseEntity.ok(articleService.uploadFeaturedImage(id, dto))
     }
 
-    @PreAuthorize("hasAuthority('admin:article:write')")
+    @PreAuthorize("hasAuthority('admin:article:upload:video')")
     @Operation(summary = "上传文章视频")
     @PutMapping("/{id}/video")
     fun uploadVideo(@PathVariable id: Long, @Valid @ModelAttribute dto: UploadArticleVideoDTO): ResponseEntity<String> {
         return ResponseEntity.ok(articleService.uploadVideo(id, dto))
     }
 
-    @PreAuthorize("hasAuthority('admin:article:write')")
+    @PreAuthorize("hasAuthority('admin:article:upload:attachment')")
     @Operation(summary = "上传文章附件")
     @PutMapping("/{id}/attachment")
     fun uploadAttachment(

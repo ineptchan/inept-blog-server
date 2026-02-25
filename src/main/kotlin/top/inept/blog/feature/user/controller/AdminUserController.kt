@@ -40,14 +40,14 @@ class AdminUserController(
         return ResponseEntity.ok(userService.getUserInfoById(id))
     }
 
-    @PreAuthorize("hasAuthority('admin:user:write')")
+    @PreAuthorize("hasAuthority('admin:user:create')")
     @Operation(summary = "创建用户")
     @PostMapping
     fun createUser(@Valid @RequestBody dto: CreateUserDTO): ResponseEntity<UserVO> {
         return ResponseEntity.ok(userService.createUser(dto).toUserVO())
     }
 
-    @PreAuthorize("hasAuthority('admin:user:modify')")
+    @PreAuthorize("hasAuthority('admin:user:update')")
     @Operation(summary = "更新用户")
     @PatchMapping("/{id}")
     fun updateUser(@Valid @RequestBody dto: UpdateUserDTO, @PathVariable id: Long): ResponseEntity<UserVO> {

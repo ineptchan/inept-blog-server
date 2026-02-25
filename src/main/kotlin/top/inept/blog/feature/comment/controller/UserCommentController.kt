@@ -23,7 +23,7 @@ import top.inept.blog.feature.comment.service.CommentService
 class UserCommentController(
     private val commentService: CommentService
 ) {
-    @PreAuthorize("hasAuthority('user:comment:write')")
+    @PreAuthorize("hasAuthority('user:comment:create')")
     @Operation(summary = "创建评论")
     @PostMapping
     fun createComment(@Valid @RequestBody dto: CreateCommentDTO): ResponseEntity<CommentVO> {
