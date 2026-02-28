@@ -1,6 +1,7 @@
 package top.inept.blog.feature.rbac.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -19,6 +20,7 @@ import top.inept.blog.feature.rbac.model.vo.RoleVO
 import top.inept.blog.feature.rbac.service.RoleService
 
 @Tag(name = "角色接口")
+@SecurityRequirement(name = "accessToken")
 @RestController
 @RequestMapping("/role")
 @Validated
