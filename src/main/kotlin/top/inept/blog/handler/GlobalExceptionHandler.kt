@@ -85,7 +85,7 @@ class GlobalExceptionHandler(
         }
 
         val problemDetail = buildProblemDetail(
-            HttpStatus.BAD_REQUEST,
+            HttpStatus.UNPROCESSABLE_CONTENT,
             messages["message.common.validation_failed_title"],
             messages["message.common.parameter_validation"],
         ).apply {
