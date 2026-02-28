@@ -30,7 +30,14 @@ values ('admin:article:read', now(), '管理员读取文章'),
        ('admin:user:delete', now(), '管理员删除用户'),
 
        ('user:user:read', now(), '用户读取用户资料'),
-       ('user:user:update', now(), '用户更新用户资料');
+       ('user:user:update', now(), '用户更新用户资料'),
+
+       ('admin:role:read', now(), '管理员读取角色'),
+       ('admin:role:update', now(), '管理员更新角色'),
+       ('admin:role:delete', now(), '管理员删除角色'),
+
+       ('admin:permission:read', now(), '管理员读取权限'),
+       ('admin:permission:update', now(), '管理员更新权限');
 
 --- 创建角色
 insert into roles(code, created_at, description, name)
