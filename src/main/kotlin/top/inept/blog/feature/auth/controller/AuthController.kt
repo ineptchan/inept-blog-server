@@ -1,6 +1,7 @@
 package top.inept.blog.feature.auth.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletResponse
@@ -52,7 +53,11 @@ class AuthController(
     @Operation(summary = "刷新令牌")
     @SecurityRequirement(name = "refreshToken")
     @PostMapping("/refresh")
-    fun refresh(@CookieValue("X-Refresh-Token") token: String): ResponseEntity<RefreshVO> {
+    fun refresh(
+        @Parameter(hidden = true)
+        @CookieValue("X-Refresh-Token")
+        token: String
+    ): ResponseEntity<RefreshVO> {
         val accessToken = authService.refresh(token)
         return ResponseEntity.ok(RefreshVO(accessToken))
     }
@@ -60,7 +65,12 @@ class AuthController(
     @Operation(summary = "退出登录")
     @SecurityRequirement(name = "refreshToken")
     @PostMapping("/logout")
-    fun logout(@CookieValue("X-Refresh-Token") token: String, response: HttpServletResponse): ResponseEntity<String> {
+    fun logout(
+        @Parameter(hidden = true)
+        @CookieValue("X-Refresh-Token")
+        token: String,
+        response: HttpServletResponse
+    ): ResponseEntity<String> {
         authService.logout(token)
 
         //在prod配置模式下必须https才能用携带cookie
