@@ -42,7 +42,7 @@ class AuthServiceImpl(
     override fun login(dto: AuthLoginDTO): LoginBundle {
         //根据用户名查找用户
         val dbUser = userRepository.findByUsername(dto.username)
-            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, dto.username)
+            ?: throw BusinessException(AuthErrorCode.USERNAME_OR_PASSWORD)
 
         //校验密码
         if (!PasswordUtil.matches(dto.password, dbUser.password))
