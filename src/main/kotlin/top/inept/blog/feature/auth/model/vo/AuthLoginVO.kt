@@ -15,6 +15,6 @@ data class AuthLoginVO(
     @field:Schema(description = "openapi.user.email")
     val email: String?,
 
-    @field:Schema(description = "openai.auth.access_token")
+    @field:Schema(description = "openapi.auth.access_token")
     val accessToken: String,
 )
