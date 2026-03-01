@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import top.inept.blog.base.ValidationError
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.log
@@ -80,8 +81,12 @@ class GlobalExceptionHandler(
     ): ResponseEntity<Any>? {
         log.error("validation 校验异常", ex)
 
-        val errors = ex.bindingResult.fieldErrors.associate { fieldError ->
-            fieldError.field to messages[fieldError.defaultMessage ?: "message.common.unknown_error"]
+        val errors = ex.bindingResult.fieldErrors.map { fieldError ->
+            ValidationError(
+                field = fieldError.field,
+                code = fieldError.defaultMessage ?: "message.common.unknown_error",
+                message = messages[fieldError.defaultMessage ?: "message.common.unknown_error"]
+            )
         }
 
         val problemDetail = buildProblemDetail(
@@ -92,7 +97,7 @@ class GlobalExceptionHandler(
             setProperty("errors", errors)
         }
 
-        return createResponseEntity(problemDetail, headers, status, request)
+        return createResponseEntity(problemDetail, headers, HttpStatus.UNPROCESSABLE_CONTENT, request)
     }
 
     /**
