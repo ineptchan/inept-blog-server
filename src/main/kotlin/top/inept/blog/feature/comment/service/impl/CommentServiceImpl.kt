@@ -79,7 +79,7 @@ class CommentServiceImpl(
         return comment.toCommentVO(articleTitle.toArticleTitleVO())
     }
 
-    override fun createComment(dto: CreateCommentDTO): CommentVO {
+    override fun createComment(articleId: Long, dto: CreateCommentDTO): CommentVO {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
@@ -94,7 +94,7 @@ class CommentServiceImpl(
         }
 
         //获得文章id按父级评论或者DTO的文章id
-        val articleId = parentComment?.article?.id ?: dto.articleId
+        val articleId = parentComment?.article?.id ?: articleId
 
         //获取文章标题
         val articleTitle = articleService.getArticleTitleById(articleId)

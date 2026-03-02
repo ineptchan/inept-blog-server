@@ -14,7 +14,7 @@ import top.inept.blog.feature.comment.model.vo.TopCommentVO
 interface CommentService {
     fun getComments(dto: QueryCommentDTO): PageResponse<CommentVO>
     fun getCommentById(id: Long): CommentVO
-    fun createComment(dto: CreateCommentDTO): CommentVO
+    fun createComment(articleId: Long, dto: CreateCommentDTO): CommentVO
     fun updateComment(id: Long, dto: UpdateCommentDTO): CommentSummaryVO
     fun deleteComment(id: Long)
     fun getCommentReplies(commentId: Long, dto: BaseQueryDTO): PageResponse<CommentReplyVO>
