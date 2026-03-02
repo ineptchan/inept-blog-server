@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [])
-@Pattern(regexp = "^[a-zA-Z0-9_]$", message = "valid.user.username.pattern")
+@Pattern(regexp = "^[a-zA-Z0-9_]+\$", message = "valid.user.username.pattern")
 @Size(min = 3, max = 20, message = "valid.user.username.size")
 annotation class ValidateUserUsername(
     val message: String = "valid.common.unknown_error",

@@ -9,10 +9,7 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [])
-@Pattern(
-    regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9\\s])\\S$",
-    message = "valid.user.password.pattern"
-)
+@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)\\S+$", message = "valid.user.password.pattern")
 @Size(min = 8, max = 64, message = "valid.user.password.size")
 annotation class ValidatedUserPassword(
     val message: String = "valid.common.unknown_error",
