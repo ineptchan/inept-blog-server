@@ -13,6 +13,14 @@
 - `postgres` 数据库
 - `github ci`构建
 
+## 使用
+
+### Docker
+
+```shell
+
+```
+
 ## 开发
 
 ### 1.配置需要的环境变量
@@ -61,4 +69,15 @@ mc mb myminio/inept-blog
 
 ```shell
 mc anonymous set download myminio/inept-blog/public
+```
+
+## 打包为 Docker
+
+```shell
+git clone https://github.com/ineptchan/inept-blog-server.git
+cd inept-blog-server
+#打包为镜像
+docker build -t inept-blog-server:latest .
+# 运行
+docker compose up -d --build
 ```
