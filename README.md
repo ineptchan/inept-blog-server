@@ -1,5 +1,18 @@
 ## inept-blog-server 无能博客后端
 
+## 项目亮点
+
+- ⭐ `kotlin` 语言
+- ⭐ `rbac` 权限模型
+- ⭐ 接口支持 `i18n` 多语言
+- ⭐ 接口 `restful api` 规范
+- ⭐ 自动生成 `openapi 3.1` 文档
+- `springboot` 框架
+- `spring security` 支持
+- `spring data jpa` 支持
+- `postgres` 数据库
+- `github ci`构建
+
 ## 开发
 
 ### 1.配置需要的环境变量
