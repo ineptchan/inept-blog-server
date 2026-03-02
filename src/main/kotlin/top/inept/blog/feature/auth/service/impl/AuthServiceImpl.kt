@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.AuthErrorCode
-import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.feature.auth.model.LoginBundle
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.entity.RefreshToken

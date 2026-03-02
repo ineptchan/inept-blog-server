@@ -29,7 +29,7 @@ class User(
     /**
      * 昵称
      */
-    @Column(name = "nickname", length = 16, nullable = false)
+    @Column(name = "nickname", length = 20, nullable = false)
     var nickname: String,
 
     /**
@@ -41,7 +41,7 @@ class User(
     /**
      * 用户名
      */
-    @Column(name = "username", length = 16, nullable = false)
+    @Column(name = "username", length = 20, nullable = false)
     var username: String,
 
     /**

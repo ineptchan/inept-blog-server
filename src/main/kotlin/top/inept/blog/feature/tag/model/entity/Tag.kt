@@ -16,7 +16,7 @@ class Tag(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 24)
     var name: String,
 
     @Column(name = "slug", nullable = false)
