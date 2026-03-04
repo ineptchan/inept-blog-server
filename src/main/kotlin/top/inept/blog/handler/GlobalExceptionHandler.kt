@@ -42,7 +42,7 @@ class GlobalExceptionHandler(
             status = ex.errorCode.httpStatus,
             title = messages[ex.errorCode.messageKey],
             detail = messages.get("${ex.errorCode.messageKey}.detail", *ex.args),
-            props = mapOf("error" to ex.errorCode.messageKey)
+            errorCode = ex.errorCode.messageKey
         ).apply {
             // 放入业务数据 (balance, accounts 等)
             ex.extensions.forEach { (key, value) ->
@@ -63,7 +63,8 @@ class GlobalExceptionHandler(
         val problemDetail = ProblemDetailUtil.buildProblemDetail(
             status = HttpStatus.FORBIDDEN,
             title = messages["message.common.authorization_denied"],
-            detail = messages["message.common.authorization_denied.detail"]
+            detail = messages["message.common.authorization_denied.detail"],
+            errorCode = "message.common.authorization_denied"
         )
 
         return problemDetail
@@ -157,7 +158,7 @@ class GlobalExceptionHandler(
             status = status,
             title = messages["message.common.bad_request_title"],
             detail = messages["message.common.request_body_missing"],
-            props = mapOf("error" to messages["message.common.json_format_error"])
+            errorCode = "message.common.json_format_error"
         )
 
         return createResponseEntity(problemDetail, headers, status, request)

@@ -75,7 +75,7 @@ class RestBearerAuthEntryPoint(
             status = httpStatus,
             title = messages[titleKey],
             detail = messages[detailKey],
-            props = mapOf("error" to titleKey)
+            errorCode = titleKey
         )
 
 

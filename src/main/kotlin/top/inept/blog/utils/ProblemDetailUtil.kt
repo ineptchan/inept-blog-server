@@ -18,4 +18,18 @@ object ProblemDetailUtil {
         setProperty("timestamp", OffsetDateTime.now().toString())
         props.forEach { (k, v) -> setProperty(k, v) }
     }
+
+    fun buildProblemDetail(
+        status: HttpStatusCode,
+        title: String,
+        detail: String,
+        errorCode: String,
+    ): ProblemDetail = ProblemDetail.forStatusAndDetail(
+        status,
+        detail,
+    ).apply {
+        this.title = title
+        setProperty("timestamp", OffsetDateTime.now().toString())
+        setProperty("errorCode", errorCode)
+    }
 }
