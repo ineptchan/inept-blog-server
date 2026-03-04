@@ -81,3 +81,9 @@ docker build -t inept-blog-server:latest .
 # 运行
 docker compose up -d --build
 ```
+
+## 非商业用途声明
+
+本项目为开源项目，仅供非商业用途。
+
+您可以根据 MIT 许可证使用、修改和重新分发本项目，但未经作者事先书面许可，您不得出售本项目、将其作为付费服务提供，或将其用作商业产品的一部分。

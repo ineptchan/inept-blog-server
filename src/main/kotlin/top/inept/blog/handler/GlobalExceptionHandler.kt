@@ -15,6 +15,7 @@ import top.inept.blog.base.ValidationError
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.log
+import top.inept.blog.utils.ProblemDetailUtil
 
 @RestControllerAdvice
 class GlobalExceptionHandler(
@@ -24,10 +25,10 @@ class GlobalExceptionHandler(
     fun handleException(ex: Exception): ProblemDetail {
         log.error("服务器内部错误", ex)
 
-        val problemDetail = buildProblemDetail(
-            HttpStatus.INTERNAL_SERVER_ERROR,
+        val problemDetail = ProblemDetailUtil.buildProblemDetail(
+            status = HttpStatus.INTERNAL_SERVER_ERROR,
             title = messages["message.common.server_unknown_error"],
-            messages["message.common.server_unknown_error.detail"]
+            detail = messages["message.common.server_unknown_error.detail"]
         )
 
         return problemDetail
@@ -37,11 +38,11 @@ class GlobalExceptionHandler(
     fun handleBusinessException(ex: BusinessException): ProblemDetail {
         log.error("业务错误", ex)
 
-        val problemDetail = buildProblemDetail(
-            ex.errorCode.httpStatus,
-            messages[ex.errorCode.messageKey],
-            messages.get("${ex.errorCode.messageKey}.detail", *ex.args),
-            props = mapOf("errorCode" to ex.errorCode.messageKey)
+        val problemDetail = ProblemDetailUtil.buildProblemDetail(
+            status = ex.errorCode.httpStatus,
+            title = messages[ex.errorCode.messageKey],
+            detail = messages.get("${ex.errorCode.messageKey}.detail", *ex.args),
+            props = mapOf("error" to ex.errorCode.messageKey)
         ).apply {
             // 放入业务数据 (balance, accounts 等)
             ex.extensions.forEach { (key, value) ->
@@ -59,10 +60,10 @@ class GlobalExceptionHandler(
     fun handleAuthorizationDeniedException(ex: AuthorizationDeniedException): ProblemDetail {
         log.error("权限错误", ex)
 
-        val problemDetail = buildProblemDetail(
-            HttpStatus.FORBIDDEN,
-            messages["message.common.authorization_denied"],
-            messages["message.common.authorization_denied.detail"]
+        val problemDetail = ProblemDetailUtil.buildProblemDetail(
+            status = HttpStatus.FORBIDDEN,
+            title = messages["message.common.authorization_denied"],
+            detail = messages["message.common.authorization_denied.detail"]
         )
 
         return problemDetail
@@ -89,13 +90,12 @@ class GlobalExceptionHandler(
             )
         }
 
-        val problemDetail = buildProblemDetail(
-            HttpStatus.UNPROCESSABLE_CONTENT,
-            messages["message.common.validation_failed_title"],
-            messages["message.common.parameter_validation"],
-        ).apply {
-            setProperty("errors", errors)
-        }
+        val problemDetail = ProblemDetailUtil.buildProblemDetail(
+            status = HttpStatus.UNPROCESSABLE_CONTENT,
+            title = messages["message.common.validation_failed_title"],
+            detail = messages["message.common.parameter_validation"],
+            props = mapOf("errors" to errors),
+        )
 
         return createResponseEntity(problemDetail, headers, HttpStatus.UNPROCESSABLE_CONTENT, request)
     }
@@ -109,10 +109,10 @@ class GlobalExceptionHandler(
     fun handleMethodArgumentTypeMismatchException(ex: MethodArgumentTypeMismatchException): ProblemDetail {
         log.error("path 类型不匹配", ex)
 
-        return buildProblemDetail(
-            HttpStatus.BAD_REQUEST,
-            messages["message.common.path_type_mismatch"],
-            messages[
+        return ProblemDetailUtil.buildProblemDetail(
+            status = HttpStatus.BAD_REQUEST,
+            title = messages["message.common.path_type_mismatch"],
+            detail = messages[
                 "message.common.path_type_mismatch.detail",
                 ex.name,
                 ex.requiredType ?: messages["message.common.unknown_type"]
@@ -134,10 +134,10 @@ class GlobalExceptionHandler(
     ): ResponseEntity<Any>? {
         log.error("请求参数缺失", ex)
 
-        val problemDetail = buildProblemDetail(
-            HttpStatus.BAD_REQUEST,
-            messages["message.common.missing_request_parameters"],
-            messages["message.common.missing_request_parameters.detail", ex.parameterName],
+        val problemDetail = ProblemDetailUtil.buildProblemDetail(
+            status = HttpStatus.BAD_REQUEST,
+            title = messages["message.common.missing_request_parameters"],
+            detail = messages["message.common.missing_request_parameters.detail", ex.parameterName],
         )
 
         return createResponseEntity(problemDetail, headers, HttpStatus.BAD_REQUEST, request)
@@ -153,28 +153,13 @@ class GlobalExceptionHandler(
         status: HttpStatusCode,
         request: WebRequest
     ): ResponseEntity<Any>? {
-        val problemDetail = buildProblemDetail(
-            status,
-            messages["message.common.bad_request_title"],
-            messages["message.common.request_body_missing"]
-        ).apply {
-            setProperty("error", messages["message.common.json_format_error"])
-        }
+        val problemDetail = ProblemDetailUtil.buildProblemDetail(
+            status = status,
+            title = messages["message.common.bad_request_title"],
+            detail = messages["message.common.request_body_missing"],
+            props = mapOf("error" to messages["message.common.json_format_error"])
+        )
 
         return createResponseEntity(problemDetail, headers, status, request)
-    }
-
-    private fun buildProblemDetail(
-        status: HttpStatusCode,
-        title: String,
-        detail: String,
-        props: Map<String, Any?> = emptyMap(),
-    ) = ProblemDetail.forStatusAndDetail(
-        status,
-        detail,
-    ).apply {
-        this.title = title
-        setProperty("timestamp", java.time.OffsetDateTime.now().toString())
-        props.forEach { (k, v) -> setProperty(k, v) }
     }
 }

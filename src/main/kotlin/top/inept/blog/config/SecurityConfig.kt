@@ -1,10 +1,9 @@
 package top.inept.blog.config
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret
-import com.nimbusds.jose.proc.SecurityContext
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.support.MessageSourceAccessor
 import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
 import org.springframework.core.env.Profiles
@@ -13,26 +12,23 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwtDecoder
-import org.springframework.security.oauth2.jwt.JwtEncoder
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import top.inept.blog.properties.JwtProperties
-import java.nio.charset.StandardCharsets
-import javax.crypto.SecretKey
-import javax.crypto.spec.SecretKeySpec
+import tools.jackson.databind.ObjectMapper
+import top.inept.blog.base.RestBearerAuthEntryPoint
 
-//TODO分离jwt相关代码
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 class SecurityConfig {
+    @Bean
+    fun restBearerAuthEntryPoint(objectMapper: ObjectMapper, messages: MessageSourceAccessor) =
+        RestBearerAuthEntryPoint(objectMapper, messages)
+
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config = CorsConfiguration().apply {
@@ -79,13 +75,20 @@ class SecurityConfig {
         http: HttpSecurity,
         jwtAuthConverter: JwtAuthenticationConverter,
         @Qualifier("accessJwtDecoder") accessJwtDecoder: JwtDecoder,
-    ): SecurityFilterChain {
+        restBearerAuthEntryPoint: RestBearerAuthEntryPoint,
+
+        ): SecurityFilterChain {
         http
             .cors { }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { it.anyRequest().authenticated() }
+            .exceptionHandling { ex ->
+                ex.authenticationEntryPoint(restBearerAuthEntryPoint)
+            }
             .oauth2ResourceServer { oauth2 ->
+                oauth2.authenticationEntryPoint(restBearerAuthEntryPoint)
+
                 oauth2.jwt { jwt ->
                     jwt.decoder(accessJwtDecoder)
                     jwt.jwtAuthenticationConverter(jwtAuthConverter)
@@ -93,38 +96,6 @@ class SecurityConfig {
             }
 
         return http.build()
-    }
-
-    @Bean("accessJwtSecret")
-    fun accessJwtSecret(props: JwtProperties): SecretKey =
-        SecretKeySpec(props.accessSecretKey.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
-
-    @Bean("refreshJwtSecret")
-    fun refreshJwtSecret(props: JwtProperties): SecretKey =
-        SecretKeySpec(props.refreshSecretKey.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
-
-    @Bean("accessJwtDecoder")
-    fun accessJwtDecoder(@Qualifier("accessJwtSecret") jwtSecret: SecretKey): JwtDecoder =
-        NimbusJwtDecoder.withSecretKey(jwtSecret)
-            .macAlgorithm(MacAlgorithm.HS256)
-            .build()
-
-    @Bean("refreshJwtDecoder")
-    fun refreshJwtDecoder(@Qualifier("refreshJwtSecret") jwtSecret: SecretKey): JwtDecoder =
-        NimbusJwtDecoder.withSecretKey(jwtSecret)
-            .macAlgorithm(MacAlgorithm.HS256)
-            .build()
-
-    @Bean("accessJwtEncoder")
-    fun accessJwtEncoder(@Qualifier("accessJwtSecret") jwtSecret: SecretKey): JwtEncoder {
-        val source = ImmutableSecret<SecurityContext>(jwtSecret.encoded)
-        return NimbusJwtEncoder(source)
-    }
-
-    @Bean("refreshJwtEncoder")
-    fun refreshJwtEncoder(@Qualifier("refreshJwtSecret") jwtSecret: SecretKey): JwtEncoder {
-        val source = ImmutableSecret<SecurityContext>(jwtSecret.encoded)
-        return NimbusJwtEncoder(source)
     }
 
     /**
