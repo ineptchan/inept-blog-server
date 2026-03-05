@@ -9,7 +9,7 @@ import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.model.vo.UserInfoVO
 
 interface UserService {
-    fun getUsers(queryUserDTO: QueryUserDTO): Page<User>
+    fun getUsers(dto: QueryUserDTO): Page<User>
     fun getUserById(id: Long): User
     fun getUserInfoById(id: Long): UserInfoVO
     fun getUserByUsername(username: String): User

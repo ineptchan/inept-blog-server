@@ -45,8 +45,8 @@ class UserServiceImpl(
             dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
                 and(
                     u.nickname.contains(kw)
-                        .or(u.password.contains(kw))
                         .or(u.email.contains(kw))
+                        .or(u.username.contains(kw))
                 )
             }
         }
