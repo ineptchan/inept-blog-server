@@ -18,6 +18,9 @@ data class UserInfoVO(
     @field:Schema(description = "openapi.user.email")
     val email: String?,
 
+    @field:Schema(description = "openapi.user.status")
+    val status: Boolean,
+
     @field:Schema(description = "openapi.permission.permission")
     val permissionCodes: List<String>
 )

@@ -128,6 +128,7 @@ class UserServiceImpl(
                     password = encodePassword
                 }
             }
+            dto.status?.let { status = it }
         }
 
         //角色相关

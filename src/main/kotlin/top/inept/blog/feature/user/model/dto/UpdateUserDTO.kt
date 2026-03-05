@@ -25,4 +25,7 @@ data class UpdateUserDTO(
 
     @field:Schema(description = "openapi.user.role")
     val role: List<Long>?,
+
+    @field:Schema(description = "openapi.user.status")
+    val status: Boolean?,
 )

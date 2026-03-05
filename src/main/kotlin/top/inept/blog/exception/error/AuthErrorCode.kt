@@ -15,4 +15,5 @@ enum class AuthErrorCode(
     TOKEN_VERIFICATION("message.auth.token_verification", HttpStatus.UNAUTHORIZED),
     TOKEN_SUBJECT_VERIFICATION("message.auth.token_subject_verification", HttpStatus.UNAUTHORIZED),
     TOKEN_USE_TYPE_VERIFICATION("message.auth.token_use_type_verification", HttpStatus.UNAUTHORIZED),
+    DISABLE_USER("message.auth.disable_user", HttpStatus.FORBIDDEN),
 }

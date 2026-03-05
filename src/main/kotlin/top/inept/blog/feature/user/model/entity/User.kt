@@ -57,6 +57,12 @@ class User(
     var password: String,
 
     /**
+     * 状态 true启用 false禁用
+     */
+    @Column(name = "status", nullable = false)
+    var status: Boolean = true,
+
+    /**
      * 创建时间
      */
     @CreatedDate

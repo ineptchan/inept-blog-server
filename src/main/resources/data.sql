@@ -67,9 +67,9 @@ where p.code like 'user:%'
                     and rp.role_id = r.id);
 
 --- 创建管理用户 admintest admin123456
-insert into users(created_at, email, nickname, password, updated_at, username)
+insert into users(created_at, email, nickname, password, updated_at, username, status)
 values (now(), 'admin@inept.top', 'inept', '$2a$10$P53CwaeHtpaPxUU9fiBOPOVTHuh7e1PWJ.D3ZV9HSeGMn6ryliQai', null,
-        'admintest');
+        'admintest', true);
 
 --分配角色给admintest
 insert into users_roles(created_at, role_id, user_id)

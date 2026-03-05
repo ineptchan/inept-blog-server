@@ -43,6 +43,11 @@ class AuthServiceImpl(
         val dbUser = userRepository.findByUsername(dto.username)
             ?: throw BusinessException(AuthErrorCode.USERNAME_OR_PASSWORD)
 
+        //判断用户的状态
+        if (!dbUser.status) {
+            throw BusinessException(AuthErrorCode.DISABLE_USER, dbUser.username)
+        }
+
         //校验密码
         if (!PasswordUtil.matches(dto.password, dbUser.password))
             throw BusinessException(AuthErrorCode.USERNAME_OR_PASSWORD)

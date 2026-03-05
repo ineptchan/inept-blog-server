@@ -14,4 +14,7 @@ data class UserVO(
 
     @field:Schema(description = "openapi.user.email")
     val email: String?,
+
+    @field:Schema(description = "openapi.user.status")
+    val status: Boolean,
 )

@@ -10,6 +10,7 @@ fun User.toUserVO() = UserVO(
     nickname = this.nickname,
     username = this.username,
     email = this.email,
+    status = this.status,
 )
 
 fun User.toUserPublicVO() = UserLiteVO(
@@ -23,5 +24,6 @@ fun User.toUserInfoVO(permissionCodes: List<String>) = UserInfoVO(
     username = this.username,
     email = this.email,
     avatar = this.avatar ?: "",
+    status = this.status,
     permissionCodes = permissionCodes
 )
