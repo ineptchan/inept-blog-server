@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -28,7 +29,12 @@ class AdminTagController(
     @PreAuthorize("hasAuthority('admin:tag:read')")
     @Operation(summary = "获取标签列表")
     @GetMapping
-    fun getTags(@Valid dto: QueryTagDTO): ResponseEntity<PageResponse<TagVO>> {
+    fun getTags(
+        @Valid
+        @ParameterObject
+        @ModelAttribute
+        dto: QueryTagDTO
+    ): ResponseEntity<PageResponse<TagVO>> {
         return ResponseEntity.ok(tagService.getTags(dto).toPageResponse { it.toTagVO() })
     }
 

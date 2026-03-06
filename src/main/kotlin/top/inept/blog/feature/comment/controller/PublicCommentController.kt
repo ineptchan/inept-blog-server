@@ -3,12 +3,10 @@ package top.inept.blog.feature.comment.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.BaseQueryDTO
 import top.inept.blog.base.PageResponse
 import top.inept.blog.feature.comment.model.vo.CommentReplyVO
@@ -25,8 +23,12 @@ class PublicCommentController(
     @Operation(summary = "获取顶级评论列表")
     @GetMapping("/{articleId}")
     fun getTopComments(
-        @PathVariable articleId: Long,
-        @Valid dto: BaseQueryDTO
+        @PathVariable
+        articleId: Long,
+        @Valid
+        @ParameterObject
+        @ModelAttribute
+        dto: BaseQueryDTO
     ): ResponseEntity<PageResponse<TopCommentVO>> {
         return ResponseEntity.ok(commentService.getTopComments(articleId, dto))
     }

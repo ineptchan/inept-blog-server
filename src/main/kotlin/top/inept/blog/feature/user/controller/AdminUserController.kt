@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -29,7 +30,12 @@ class AdminUserController(
     @PreAuthorize("hasAuthority('admin:user:read')")
     @Operation(summary = "获取用户列表")
     @GetMapping
-    fun getUsers(@Valid dto: QueryUserDTO): ResponseEntity<PageResponse<UserVO>> {
+    fun getUsers(
+        @Valid
+        @ParameterObject
+        @ModelAttribute
+        dto: QueryUserDTO
+    ): ResponseEntity<PageResponse<UserVO>> {
         return ResponseEntity.ok(userService.getUsers(dto).toPageResponse { it.toUserVO() })
     }
 

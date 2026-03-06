@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -27,7 +28,12 @@ class AdminPermissionController(
     @PreAuthorize("hasAuthority('admin:permission:read')")
     @Operation(summary = "获取权限列表")
     @GetMapping
-    fun getPermissions(@Valid dto: QueryPermissionDTO): ResponseEntity<PageResponse<PermissionVO>> {
+    fun getPermissions(
+        @Valid
+        @ParameterObject
+        @ModelAttribute
+        dto: QueryPermissionDTO
+    ): ResponseEntity<PageResponse<PermissionVO>> {
         return ResponseEntity.ok(permissionService.getPermissions(dto).toPageResponse { it.toPermissionVO() })
     }
 

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -30,7 +31,12 @@ class AdminCommentController(
     @PreAuthorize("hasAuthority('admin:comment:read')")
     @Operation(summary = "获取评论列表")
     @GetMapping
-    fun getComments(@Valid dto: QueryCommentDTO): ResponseEntity<PageResponse<CommentVO>> {
+    fun getComments(
+        @Valid
+        @ParameterObject
+        @ModelAttribute
+        dto: QueryCommentDTO
+    ): ResponseEntity<PageResponse<CommentVO>> {
         return ResponseEntity.ok(commentService.getComments(dto))
     }
 

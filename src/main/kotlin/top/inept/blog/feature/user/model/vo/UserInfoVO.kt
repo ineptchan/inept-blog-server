@@ -21,6 +21,7 @@ data class UserInfoVO(
     @field:Schema(description = "openapi.user.status")
     val status: Boolean,
 
+    //TODO 考虑不返回，单开个接口
     @field:Schema(description = "openapi.permission.permission")
     val permissionCodes: List<String>
 )

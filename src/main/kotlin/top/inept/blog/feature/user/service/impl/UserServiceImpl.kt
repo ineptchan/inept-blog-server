@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -38,7 +39,7 @@ class UserServiceImpl(
     private val objectStorageService: ObjectStorageService
 ) : UserService {
     override fun getUsers(dto: QueryUserDTO): Page<User> {
-        val pageRequest = dto.toPageRequest()
+        val pageRequest = dto.toPageRequest(Sort.by(Sort.Direction.ASC, "id"))
         val u = QUser.user
 
         val builder = BooleanBuilder().apply {

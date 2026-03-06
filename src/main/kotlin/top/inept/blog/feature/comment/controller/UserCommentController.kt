@@ -25,7 +25,9 @@ class UserCommentController(
     @Operation(summary = "创建评论")
     @PostMapping("/{id}")
     fun createComment(
-        @Parameter(description = "openapi.comment.article_id", required = true) @PathVariable id: Long,
+        @Parameter(description = "openapi.comment.article_id", required = true)
+        @PathVariable
+        id: Long,
         @Valid @RequestBody dto: CreateCommentDTO
     ): ResponseEntity<CommentVO> {
         return ResponseEntity.ok(commentService.createComment(id, dto))

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -28,7 +29,12 @@ class AdminCategoriesController(
     @PreAuthorize("hasAuthority('admin:categories:read')")
     @Operation(summary = "获取分类列表")
     @GetMapping
-    fun getCategories(@Valid dto: QueryCategoriesDTO): ResponseEntity<PageResponse<CategoriesVO>> {
+    fun getCategories(
+        @Valid
+        @ParameterObject
+        @ModelAttribute
+        dto: QueryCategoriesDTO
+    ): ResponseEntity<PageResponse<CategoriesVO>> {
         return ResponseEntity.ok(categoriesService.getCategories(dto).toPageResponse { it.toCategoriesVO() })
     }
 
