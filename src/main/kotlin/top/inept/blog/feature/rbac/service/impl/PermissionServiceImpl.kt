@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.BusinessException
@@ -23,7 +24,7 @@ class PermissionServiceImpl(
     private val permissionRepository: PermissionRepository
 ) : PermissionService {
     override fun getPermissions(dto: QueryPermissionDTO): Page<Permission> {
-        val pageRequest = dto.toPageRequest()
+        val pageRequest = dto.toPageRequest(Sort.by(Sort.Direction.ASC, "id"))
         val p = QPermission.permission
 
         val builder = BooleanBuilder().apply {

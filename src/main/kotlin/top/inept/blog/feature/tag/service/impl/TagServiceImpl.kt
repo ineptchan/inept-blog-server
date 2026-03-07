@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.BusinessException
@@ -25,7 +26,7 @@ class TagServiceImpl(
     private val tagRepository: TagRepository,
 ) : TagService {
     override fun getTags(dto: QueryTagDTO): Page<Tag> {
-        val pageRequest = dto.toPageRequest()
+        val pageRequest = dto.toPageRequest(Sort.by(Sort.Direction.ASC, "id"))
         val t = QTag.tag
 
         val builder = BooleanBuilder().apply {

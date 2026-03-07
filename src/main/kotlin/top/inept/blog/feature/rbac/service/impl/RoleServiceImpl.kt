@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.BusinessException
@@ -71,7 +72,7 @@ class RoleServiceImpl(
     }
 
     override fun getRoleBindPermissions(id: Long): List<Permission> {
-        val dbRole = roleRepository.findWithPermissionsById(id)
+        val dbRole = roleRepository.findWithPermissionsById(id, Sort.by(Sort.Direction.DESC, "id"))
             ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
 
         return dbRole.permissionBindings.map { it.permission }
