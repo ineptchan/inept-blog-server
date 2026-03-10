@@ -33,8 +33,10 @@ values ('admin:article:read', now(), '管理员读取文章'),
        ('user:user:update', now(), '用户更新用户资料'),
 
        ('admin:role:read', now(), '管理员读取角色'),
+       ('admin:role:create', now(), '管理员创建角色'),
        ('admin:role:update', now(), '管理员更新角色'),
        ('admin:role:delete', now(), '管理员删除角色'),
+       ('admin:role:permission:update', now(), '管理员更新角色权限'),
 
        ('admin:permission:read', now(), '管理员读取权限'),
        ('admin:permission:update', now(), '管理员更新权限');
