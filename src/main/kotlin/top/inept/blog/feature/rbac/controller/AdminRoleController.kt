@@ -23,7 +23,7 @@ import top.inept.blog.feature.rbac.service.RoleService
 @Tag(name = "角色接口")
 @SecurityRequirement(name = "accessToken")
 @RestController
-@RequestMapping("/role")
+@RequestMapping("/admin/role")
 @Validated
 class AdminRoleController(
     private val roleService: RoleService
@@ -56,7 +56,7 @@ class AdminRoleController(
 
     @PreAuthorize("hasAuthority('admin:role:update')")
     @Operation(summary = "更新角色")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun updateRole(@PathVariable id: Long, @Valid @RequestBody dto: UpdateRoleDTO): ResponseEntity<RoleVO> {
         return ResponseEntity.ok(roleService.updateRole(id, dto).toRoleVO())
     }
@@ -68,7 +68,7 @@ class AdminRoleController(
         roleService.deleteRole(id)
     }
 
-    @PreAuthorize("hasAuthority('admin:permission:read') and hasAuthority('admin:role:read')")
+    @PreAuthorize("hasAuthority('admin:role:permission:update')")
     @Operation(summary = "获取角色绑定的权限")
     @GetMapping("/{id}/permissions")
     fun getRoleBindPermissions(@PathVariable id: Long): ResponseEntity<List<PermissionVO>> {

@@ -20,7 +20,7 @@ import top.inept.blog.feature.rbac.service.PermissionService
 @Tag(name = "权限接口")
 @SecurityRequirement(name = "accessToken")
 @RestController
-@RequestMapping("/permission")
+@RequestMapping("/admin/permission")
 @Validated
 class AdminPermissionController(
     private val permissionService: PermissionService
@@ -46,7 +46,7 @@ class AdminPermissionController(
 
     @PreAuthorize("hasAuthority('admin:permission:update')")
     @Operation(summary = "更新权限")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun updatePermission(
         @PathVariable id: Long,
         @Valid @RequestBody dto: UpdatePermissionDTO
