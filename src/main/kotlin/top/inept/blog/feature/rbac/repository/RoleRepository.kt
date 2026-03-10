@@ -1,6 +1,5 @@
 package top.inept.blog.feature.rbac.repository
 
-import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -14,5 +13,5 @@ interface RoleRepository : JpaRepository<Role, Long>, JpaSpecificationExecutor<R
     fun deleteRoleById(id: Long): Long
 
     @EntityGraph(attributePaths = ["permissionBindings", "permissionBindings.permission"])
-    fun findWithPermissionsById(id: Long, sort: Sort): Role?
+    fun findWithPermissionsById(id: Long): Role?
 }

@@ -9,7 +9,7 @@
 9. [X] 添加rbac接口
 10. [ ] 改进permissions，添加permissionType，常见：MENU/REST/OTHER
 11. [X] 考虑去除错误的code使用msgkey
-12. [ ] 压缩文章的视频，尝试使用消息队列
+12. [ ] 压缩文章的视频，尝试使用消息队列，pgsql也可以完成
 13. [X] 完全重构file模块为objectstorage
 14. [X] 处理管理混乱的application
 15. [X] 审计Validated验证
@@ -19,6 +19,7 @@
 19. [ ] 搜索功能添加排序
 20. [ ] `GET /admin/user`添加返回绑定的角色
 21. [ ] 访问文章ip记录
+22. [ ] Flyway / Liquibase
 
 ## 对象存储
 

@@ -51,5 +51,6 @@ class Role(
     var userBindings: MutableSet<UserRole> = mutableSetOf(),
 
     @OneToMany(mappedBy = "role", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OrderBy("id ASC")
     var permissionBindings: MutableSet<RolePermission> = mutableSetOf()
 )
