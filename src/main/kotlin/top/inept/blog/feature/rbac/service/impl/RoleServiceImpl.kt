@@ -6,24 +6,27 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.CommonErrorCode
+import top.inept.blog.exception.error.PermissionErrorCode
 import top.inept.blog.exception.error.RoleErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.rbac.model.convert.toRole
-import top.inept.blog.feature.rbac.model.dto.CreateRoleDTO
-import top.inept.blog.feature.rbac.model.dto.QueryRoleDTO
-import top.inept.blog.feature.rbac.model.dto.UpdateRoleDTO
-import top.inept.blog.feature.rbac.model.entity.Permission
+import top.inept.blog.feature.rbac.model.convert.toRolePermissionVO
+import top.inept.blog.feature.rbac.model.dto.*
 import top.inept.blog.feature.rbac.model.entity.QRole
 import top.inept.blog.feature.rbac.model.entity.Role
 import top.inept.blog.feature.rbac.model.entity.constraints.RoleConstraints
+import top.inept.blog.feature.rbac.model.vo.RolePermissionVO
+import top.inept.blog.feature.rbac.repository.PermissionRepository
 import top.inept.blog.feature.rbac.repository.RoleRepository
 import top.inept.blog.feature.rbac.service.RoleService
 
 @Service
 class RoleServiceImpl(
     private val roleRepository: RoleRepository,
+    private val permissionRepository: PermissionRepository
 ) : RoleService {
     override fun getRoles(dto: QueryRoleDTO): Page<Role> {
         val pageRequest = dto.toPageRequest()
@@ -70,11 +73,102 @@ class RoleServiceImpl(
         }
     }
 
-    override fun getRoleBindPermissions(id: Long): List<Permission> {
+    override fun getRoleBindPermissions(id: Long): RolePermissionVO {
         val dbRole = roleRepository.findWithPermissionsById(id)
             ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
 
-        return dbRole.permissionBindings.map { it.permission }
+        return dbRole.toRolePermissionVO()
+
+    }
+
+    @Transactional
+    override fun replaceRolePermissions(
+        id: Long,
+        dto: ReplaceRolePermissionsDTO
+    ): RolePermissionVO {
+        val dbRole = roleRepository.findWithPermissionsById(id)
+            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
+
+        val targetIds = dto.permissions.distinct()
+
+        val permissions = permissionRepository.findAllById(targetIds)
+        val permissionMap = permissions.associateBy { it.id }
+
+        //缺少哪些数据库不存在的权限
+        if (permissionMap.size != targetIds.size) {
+            val missingIds = targetIds - permissionMap.keys
+            throw BusinessException(PermissionErrorCode.ID_NOT_FOUND, missingIds.joinToString())
+        }
+
+        //删除不再需要的绑定
+        dbRole.permissionBindings.removeIf { binding ->
+            binding.permission.id !in targetIds
+        }
+
+        // 收集当前还存在的 permissionId
+        val existingPermissionIds = dbRole.permissionBindings
+            .asSequence()
+            .map { it.permission.id }
+            .toSet()
+
+        //只更新新添加的
+        (targetIds - existingPermissionIds).forEach { permissionId ->
+            val permission = permissionMap.getValue(permissionId)
+
+            dbRole.addPermission(permission)
+        }
+
+        roleRepository.saveAndFlush(dbRole)
+
+        return dbRole.toRolePermissionVO()
+    }
+
+    @Transactional
+    override fun addRolePermissions(
+        id: Long,
+        dto: AddRolePermissionsDTO
+    ): RolePermissionVO {
+        val dbRole = roleRepository.findWithPermissionsById(id)
+            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
+
+        val targetIds = dto.permissions.distinct()
+
+        val permissions = permissionRepository.findAllById(targetIds)
+        val permissionMap = permissions.associateBy { it.id }
+
+        //缺少哪些数据库不存在的权限
+        if (permissionMap.size != targetIds.size) {
+            val missingIds = targetIds - permissionMap.keys
+            throw BusinessException(PermissionErrorCode.ID_NOT_FOUND, missingIds.joinToString())
+        }
+
+        val existingPermissionIds = dbRole.permissionBindings
+            .asSequence()
+            .map { it.permission.id }
+            .toSet()
+
+        val idsToAdd = targetIds - existingPermissionIds
+
+        idsToAdd.forEach { permissionId ->
+            val permission = permissionMap.getValue(permissionId)
+            dbRole.addPermission(permission)
+        }
+
+        return roleRepository.saveAndFlush(dbRole).toRolePermissionVO()
+    }
+
+    @Transactional
+    override fun removeRolePermission(
+        roleId: Long,
+        permId: Long
+    ): RolePermissionVO {
+        val dbRole = roleRepository.findWithPermissionsById(roleId)
+            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, roleId)
+
+        val isRemove = dbRole.permissionBindings.removeIf { it.permission.id == permId }
+        if (!isRemove) throw BusinessException(RoleErrorCode.NOT_BINDING_PERMISSION, permId)
+
+        return roleRepository.saveAndFlush(dbRole).toRolePermissionVO()
     }
 
     private fun saveAndFlushTagOrThrow(dbRole: Role): Role {

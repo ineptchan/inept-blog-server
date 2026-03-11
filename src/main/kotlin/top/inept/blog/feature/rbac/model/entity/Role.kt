@@ -40,17 +40,42 @@ class Role(
     @Column(name = "description")
     var description: String? = null,
 
+    /**
+     * 创建时间
+     */
     @CreatedDate
     @Column(updatable = false, nullable = false)
     var createdAt: Instant,
 
+    /**
+     * 更新时间
+     */
     @LastModifiedDate
     var updatedAt: Instant? = null,
 
+    /**
+     * 绑定的用户
+     */
     @OneToMany(mappedBy = "role")
     var userBindings: MutableSet<UserRole> = mutableSetOf(),
 
+    /**
+     * 绑定的权限
+     */
     @OneToMany(mappedBy = "role", cascade = [CascadeType.ALL], orphanRemoval = true)
     @OrderBy("id ASC")
     var permissionBindings: MutableSet<RolePermission> = mutableSetOf()
-)
+) {
+    fun addPermission(permission: Permission) {
+        val binding = RolePermission(
+            id = RolePermissionId(this.id, permission.id),
+            role = this,
+            permission = permission
+        )
+        permissionBindings.add(binding)
+    }
+
+    fun removePermissionById(permissionId: Long) {
+        permissionBindings.removeIf { it.permission.id == permissionId }
+    }
+}

@@ -20,6 +20,7 @@
 20. [ ] `GET /admin/user`添加返回绑定的角色
 21. [ ] 访问文章ip记录
 22. [ ] Flyway / Liquibase
+23. [ ] auth相关接口返回token过期时间
 
 ## 对象存储
 
