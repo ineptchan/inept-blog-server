@@ -1,22 +1,26 @@
 package top.inept.blog.feature.user.service.impl
 
 import com.querydsl.core.BooleanBuilder
+import com.querydsl.jpa.impl.JPAQueryFactory
+import jakarta.persistence.EntityManager
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import top.inept.blog.base.PageResponse
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.auth.repository.RefreshTokenRepository
 import top.inept.blog.feature.objectstorage.service.ObjectStorageService
+import top.inept.blog.feature.rbac.model.convert.toRoleVO
 import top.inept.blog.feature.rbac.repository.RoleRepository
 import top.inept.blog.feature.user.model.convert.toUserInfoVO
+import top.inept.blog.feature.user.model.convert.toUserRolesVO
 import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.QueryUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserDTO
@@ -25,6 +29,7 @@ import top.inept.blog.feature.user.model.entity.QUser
 import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.model.entity.constraints.UserConstraints
 import top.inept.blog.feature.user.model.vo.UserInfoVO
+import top.inept.blog.feature.user.model.vo.UserRolesVO
 import top.inept.blog.feature.user.repository.UserRepository
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.PasswordUtil
@@ -36,12 +41,18 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val refreshRepository: RefreshTokenRepository,
     private val roleRepository: RoleRepository,
-    private val objectStorageService: ObjectStorageService
+    private val objectStorageService: ObjectStorageService,
+    private val entityManager: EntityManager,
 ) : UserService {
-    override fun getUsers(dto: QueryUserDTO): Page<User> {
-        val pageRequest = dto.toPageRequest(Sort.by(Sort.Direction.ASC, "id"))
+    @Transactional(readOnly = true)
+    override fun getUsers(dto: QueryUserDTO): PageResponse<UserRolesVO> {
+        val sort = Sort.by(Sort.Direction.ASC, "id")
+        val pageRequest = dto.toPageRequest(sort)
+
+        val queryFactory = JPAQueryFactory(entityManager)
         val u = QUser.user
 
+        //构建查询Predicate
         val builder = BooleanBuilder().apply {
             dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
                 and(
@@ -52,7 +63,30 @@ class UserServiceImpl(
             }
         }
 
-        return userRepository.findAll(builder, pageRequest)
+        //只查id列表
+        val ids = queryFactory.select(u.id)
+            .from(u)
+            .where(builder)
+            .orderBy(u.id.asc())
+            .offset(pageRequest.offset)
+            .limit(pageRequest.pageSize.toLong())
+            .fetch()
+
+        val total = queryFactory.select(u.count()).from(u).where(builder).fetchOne() ?: 0L
+
+        //检查是不是空的，直接返回
+        if (ids.isEmpty()) {
+            return PageResponse.of(emptyList(), pageRequest, total)
+        }
+
+        //查完整的包含role
+        val users = userRepository.findAllWithRolesByIdIn(ids, sort)
+
+        return PageResponse.of(
+            users.map { user -> user.toUserRolesVO(user.roleBindings.map { role -> role.role.toRoleVO() }) },
+            pageRequest,
+            total
+        )
     }
 
     override fun getUserById(id: Long): User {

@@ -17,7 +17,7 @@
 17. [X] 改进 ProblemDetail 的 props
 18. [X] 添加用户开关是否可用
 19. [ ] 搜索功能添加排序
-20. [ ] `GET /admin/user`添加返回绑定的角色
+20. [X] `GET /admin/user`添加返回绑定的角色
 21. [ ] 访问文章ip记录
 22. [ ] Flyway / Liquibase
 23. [ ] auth相关接口返回token过期时间

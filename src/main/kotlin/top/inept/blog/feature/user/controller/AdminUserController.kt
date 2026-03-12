@@ -10,12 +10,12 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.PageResponse
-import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.user.model.convert.toUserVO
 import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.QueryUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserDTO
 import top.inept.blog.feature.user.model.vo.UserInfoVO
+import top.inept.blog.feature.user.model.vo.UserRolesVO
 import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.feature.user.service.UserService
 
@@ -35,8 +35,8 @@ class AdminUserController(
         @ParameterObject
         @ModelAttribute
         dto: QueryUserDTO
-    ): ResponseEntity<PageResponse<UserVO>> {
-        return ResponseEntity.ok(userService.getUsers(dto).toPageResponse { it.toUserVO() })
+    ): ResponseEntity<PageResponse<UserRolesVO>> {
+        return ResponseEntity.ok(userService.getUsers(dto))
     }
 
     @PreAuthorize("hasAuthority('admin:user:read')")
