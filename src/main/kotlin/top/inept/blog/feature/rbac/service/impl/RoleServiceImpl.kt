@@ -141,7 +141,7 @@ class RoleServiceImpl(
         val dbRole = getRoleWithPermissionsById(roleId)
 
         val isRemove = dbRole.permissionBindings.removeIf { it.permission.id == permId }
-        if (!isRemove) throw BusinessException(RoleErrorCode.NOT_BINDING_PERMISSION, permId)
+        if (!isRemove) throw BusinessException(RoleErrorCode.ROLE_NOT_BINDING_PERMISSION, permId)
 
         return saveAndFlushOrThrow(dbRole).toRolePermissionVO()
     }

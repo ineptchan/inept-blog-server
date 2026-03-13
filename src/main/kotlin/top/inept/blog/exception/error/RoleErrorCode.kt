@@ -9,5 +9,5 @@ enum class RoleErrorCode(
 ) : IErrorCode {
     ID_NOT_FOUND("message.role.id_not_found", HttpStatus.NOT_FOUND),
     CODE_DB_DUPLICATE("message.role.code_db_duplicate", HttpStatus.CONFLICT),
-    NOT_BINDING_PERMISSION("message.role.not_bind_permission", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_BINDING_PERMISSION("message.role.not_bind_permission", HttpStatus.BAD_REQUEST),
 }
