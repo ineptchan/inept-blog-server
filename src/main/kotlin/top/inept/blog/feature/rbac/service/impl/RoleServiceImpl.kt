@@ -50,6 +50,11 @@ class RoleServiceImpl(
             ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
     }
 
+    fun getRoleWithPermissionsById(id: Long): Role {
+        return roleRepository.findWithPermissionsById(id)
+            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
+    }
+
     override fun updateRole(
         id: Long,
         dto: UpdateRoleDTO
@@ -74,8 +79,7 @@ class RoleServiceImpl(
     }
 
     override fun getRoleBindPermissions(id: Long): RolePermissionVO {
-        val dbRole = roleRepository.findWithPermissionsById(id)
-            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
+        val dbRole = getRoleWithPermissionsById(id)
 
         return dbRole.toRolePermissionVO()
 
@@ -86,8 +90,7 @@ class RoleServiceImpl(
         id: Long,
         dto: ReplaceRolePermissionsDTO
     ): RolePermissionVO {
-        val dbRole = roleRepository.findWithPermissionsById(id)
-            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
+        val dbRole = getRoleWithPermissionsById(id)
 
         val targetIds = dto.permissions.distinct()
 
@@ -128,8 +131,7 @@ class RoleServiceImpl(
         id: Long,
         dto: AddRolePermissionsDTO
     ): RolePermissionVO {
-        val dbRole = roleRepository.findWithPermissionsById(id)
-            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
+        val dbRole = getRoleWithPermissionsById(id)
 
         val targetIds = dto.permissions.distinct()
 
@@ -162,8 +164,7 @@ class RoleServiceImpl(
         roleId: Long,
         permId: Long
     ): RolePermissionVO {
-        val dbRole = roleRepository.findWithPermissionsById(roleId)
-            ?: throw BusinessException(RoleErrorCode.ID_NOT_FOUND, roleId)
+        val dbRole = getRoleWithPermissionsById(roleId)
 
         val isRemove = dbRole.permissionBindings.removeIf { it.permission.id == permId }
         if (!isRemove) throw BusinessException(RoleErrorCode.NOT_BINDING_PERMISSION, permId)
