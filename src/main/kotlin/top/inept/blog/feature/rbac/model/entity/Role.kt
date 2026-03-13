@@ -66,16 +66,34 @@ class Role(
     @OrderBy("id ASC")
     var permissionBindings: MutableSet<RolePermission> = mutableSetOf()
 ) {
-    fun addPermission(permission: Permission) {
-        val binding = RolePermission(
-            id = RolePermissionId(this.id, permission.id),
-            role = this,
-            permission = permission
-        )
-        permissionBindings.add(binding)
+    //增量更新
+    fun addPermissions(permissions: Collection<Permission>) {
+        val distinctPermissions = permissions.distinctBy { it.id }
+
+        // 获取已经绑定的权限 ID
+        val existingPermissionIds = this.permissionBindings.map { it.permission.id }.toSet()
+
+        val newBindings = distinctPermissions
+            .filter { it.id !in existingPermissionIds }
+            .map { permission ->
+                RolePermission(
+                    id = RolePermissionId(this.id, permission.id),
+                    role = this,
+                    permission = permission
+                )
+            }
+
+        this.permissionBindings.addAll(newBindings)
     }
 
-    fun removePermissionById(permissionId: Long) {
-        permissionBindings.removeIf { it.permission.id == permissionId }
+    //全量更新
+    fun replacePermissions(newPermissions: Collection<Permission>) {
+        val newPermissionIds = newPermissions.map { it.id }.toSet()
+
+        // 移除不在新列表中的权限
+        permissionBindings.removeIf { it.permission.id !in newPermissionIds }
+
+        // 添加原本不存在的权限
+        addPermissions(newPermissions)
     }
 }

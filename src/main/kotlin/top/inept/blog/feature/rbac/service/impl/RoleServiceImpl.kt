@@ -103,23 +103,7 @@ class RoleServiceImpl(
             throw BusinessException(PermissionErrorCode.ID_NOT_FOUND, missingIds.joinToString())
         }
 
-        //删除不再需要的绑定
-        dbRole.permissionBindings.removeIf { binding ->
-            binding.permission.id !in targetIds
-        }
-
-        // 收集当前还存在的 permissionId
-        val existingPermissionIds = dbRole.permissionBindings
-            .asSequence()
-            .map { it.permission.id }
-            .toSet()
-
-        //只更新新添加的
-        (targetIds - existingPermissionIds).forEach { permissionId ->
-            val permission = permissionMap.getValue(permissionId)
-
-            dbRole.addPermission(permission)
-        }
+        dbRole.replacePermissions(permissions)
 
         roleRepository.saveAndFlush(dbRole)
 
@@ -144,17 +128,7 @@ class RoleServiceImpl(
             throw BusinessException(PermissionErrorCode.ID_NOT_FOUND, missingIds.joinToString())
         }
 
-        val existingPermissionIds = dbRole.permissionBindings
-            .asSequence()
-            .map { it.permission.id }
-            .toSet()
-
-        val idsToAdd = targetIds - existingPermissionIds
-
-        idsToAdd.forEach { permissionId ->
-            val permission = permissionMap.getValue(permissionId)
-            dbRole.addPermission(permission)
-        }
+        dbRole.addPermissions(permissions)
 
         return roleRepository.saveAndFlush(dbRole).toRolePermissionVO()
     }
