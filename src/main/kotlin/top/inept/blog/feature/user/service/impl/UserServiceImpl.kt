@@ -13,22 +13,19 @@ import org.springframework.transaction.annotation.Transactional
 import top.inept.blog.base.PageResponse
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.CommonErrorCode
+import top.inept.blog.exception.error.RoleErrorCode
 import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.feature.auth.repository.RefreshTokenRepository
 import top.inept.blog.feature.objectstorage.service.ObjectStorageService
-import top.inept.blog.feature.rbac.model.convert.toRoleVO
 import top.inept.blog.feature.rbac.repository.RoleRepository
-import top.inept.blog.feature.user.model.convert.toUserInfoVO
+import top.inept.blog.feature.user.model.convert.toUserDetailVO
 import top.inept.blog.feature.user.model.convert.toUserRolesVO
-import top.inept.blog.feature.user.model.dto.CreateUserDTO
-import top.inept.blog.feature.user.model.dto.QueryUserDTO
-import top.inept.blog.feature.user.model.dto.UpdateUserDTO
-import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
+import top.inept.blog.feature.user.model.dto.*
 import top.inept.blog.feature.user.model.entity.QUser
 import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.model.entity.constraints.UserConstraints
-import top.inept.blog.feature.user.model.vo.UserInfoVO
+import top.inept.blog.feature.user.model.vo.UserDetailVO
 import top.inept.blog.feature.user.model.vo.UserRolesVO
 import top.inept.blog.feature.user.repository.UserRepository
 import top.inept.blog.feature.user.service.UserService
@@ -83,7 +80,7 @@ class UserServiceImpl(
         val users = userRepository.findAllWithRolesByIdIn(ids, sort)
 
         return PageResponse.of(
-            users.map { user -> user.toUserRolesVO(user.roleBindings.map { role -> role.role.toRoleVO() }) },
+            users.map { user -> user.toUserRolesVO() },
             pageRequest,
             total
         )
@@ -94,19 +91,30 @@ class UserServiceImpl(
             ?: throw BusinessException(UserErrorCode.ID_NOT_FOUND, id)
     }
 
-    override fun getUserInfoById(id: Long): UserInfoVO {
-        //根据id查找用户
-        val dbUser = userRepository.findByIdOrNull(id)
+    fun getUserWithRolesById(id: Long): User {
+        return userRepository.findWithRolesById(id)
             ?: throw BusinessException(UserErrorCode.ID_NOT_FOUND, id)
+    }
+
+    @Transactional(readOnly = true)
+    override fun getUserDetailById(id: Long): UserDetailVO {
+        //根据id查找用户
+        val dbUser = getUserWithRolesById(id)
 
         val permissionCodes = userRepository.findPermissionCodes(dbUser.id)
 
-        return dbUser.toUserInfoVO(permissionCodes)
+        return dbUser.toUserDetailVO(permissionCodes)
     }
 
     override fun getUserByUsername(username: String): User {
         //根据username查找用户
         return userRepository.findByUsername(username)
+            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
+    }
+
+    fun getUserWithRolesByUsername(username: String): User {
+        //根据username查找用户
+        return userRepository.findWithRolesByUsername(username)
             ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
     }
 
@@ -137,14 +145,14 @@ class UserServiceImpl(
                     throw BusinessException(UserErrorCode.ROLE_NOT_FOUND, notFind)
                 }
 
-                dbUser.bindRoles(dbRoles)
+                dbUser.addRoles(dbRoles)
             }
         }
 
         //TODO 推荐不要传入密码，系统随机生成发邮件通知
 
         //保存用户
-        saveAndFlushUserOrThrow(dbUser)
+        saveAndFlushOrThrow(dbUser)
 
         return dbUser
     }
@@ -182,11 +190,11 @@ class UserServiceImpl(
                     throw BusinessException(UserErrorCode.ROLE_NOT_FOUND, notFind)
                 }
 
-                dbUser.updateRoles(dbRoles)
+                dbUser.replaceRoles(dbRoles)
             }
         }
 
-        saveAndFlushUserOrThrow(dbUser)
+        saveAndFlushOrThrow(dbUser)
 
         //撤销refreshToken
         refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
@@ -202,17 +210,17 @@ class UserServiceImpl(
         userRepository.deleteById(id)
     }
 
-    override fun getProfile(): UserInfoVO {
+    override fun getProfile(): UserDetailVO {
         //从上下文获取用户名
         val contextUsername = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
 
         //根据用户名获取用户
-        val dbUser = getUserByUsername(contextUsername)
+        val dbUser = getUserWithRolesByUsername(contextUsername)
 
         val permissionCodes = userRepository.findPermissionCodes(dbUser.id)
 
-        return dbUser.toUserInfoVO(permissionCodes)
+        return dbUser.toUserDetailVO(permissionCodes)
     }
 
     @Transactional
@@ -238,7 +246,7 @@ class UserServiceImpl(
             }
         }
 
-        saveAndFlushUserOrThrow(dbUser)
+        saveAndFlushOrThrow(dbUser)
 
         //撤销refreshToken
         if (dto.password != null) {
@@ -248,7 +256,66 @@ class UserServiceImpl(
         return dbUser
     }
 
-    private fun saveAndFlushUserOrThrow(dbUser: User): User {
+    // === 用户角色 ===
+
+    @Transactional
+    override fun replaceUserRoles(
+        id: Long,
+        dto: ReplaceUserRolesDTO
+    ): UserRolesVO {
+        val dbUser = getUserWithRolesById(id)
+
+        val targetIds = dto.roles.distinct()
+
+        val roles = roleRepository.findAllById(targetIds)
+        val rolesMap = roles.associateBy { it.id }
+
+        //判断是否传入了数据库没有的id
+        if (rolesMap.size != targetIds.size) {
+            val missingIds = targetIds - rolesMap.keys
+            throw BusinessException(RoleErrorCode.ID_NOT_FOUND, missingIds.joinToString())
+        }
+
+        dbUser.replaceRoles(roles)
+
+        return saveAndFlushOrThrow(dbUser).toUserRolesVO()
+    }
+
+    override fun addUserRoles(
+        id: Long,
+        dto: AddUserRolesDTO
+    ): UserRolesVO {
+        val dbUser = getUserWithRolesById(id)
+
+        val targetIds = dto.roles.distinct()
+
+        val roles = roleRepository.findAllById(targetIds)
+        val rolesMap = roles.associateBy { it.id }
+
+        //判断是否传入了数据库没有的id
+        if (rolesMap.size != targetIds.size) {
+            val missingIds = targetIds - rolesMap.keys
+            throw BusinessException(RoleErrorCode.ID_NOT_FOUND, missingIds.joinToString())
+        }
+
+        dbUser.addRoles(roles)
+
+        return saveAndFlushOrThrow(dbUser).toUserRolesVO()
+    }
+
+    override fun removeUserRole(
+        userId: Long,
+        roleId: Long
+    ): UserRolesVO {
+        val dbUser = getUserWithRolesById(userId)
+
+        val isRemove = dbUser.roleBindings.removeIf { it.role.id == roleId }
+        if (!isRemove) throw BusinessException(UserErrorCode.USER_NOT_BINDING_ROLE, roleId)
+
+        return saveAndFlushOrThrow(dbUser).toUserRolesVO()
+    }
+
+    private fun saveAndFlushOrThrow(dbUser: User): User {
         return try {
             userRepository.saveAndFlush(dbUser)
         } catch (e: DataIntegrityViolationException) {

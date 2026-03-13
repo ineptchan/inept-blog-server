@@ -14,8 +14,11 @@ import top.inept.blog.feature.user.model.entity.User
 interface UserRepository : JpaRepository<User, Long>, JpaSpecificationExecutor<User>,
     QuerydslPredicateExecutor<User> {
     fun existsByUsername(username: String): Boolean
+
     fun findByUsername(username: String): User?
+
     fun existsByEmail(email: String): Boolean
+
     fun existsByNickname(nickname: String): Boolean
 
     @Query(
@@ -33,4 +36,11 @@ where ur.user.id = :userId
     @EntityGraph(attributePaths = ["roleBindings", "roleBindings.role"])
     @Query("select u from User u where u.id in :ids")
     fun findAllWithRolesByIdIn(@Param("ids") ids: Collection<Long>, sort: Sort): List<User>
+
+    @EntityGraph(attributePaths = ["roleBindings", "roleBindings.role"])
+    fun findWithRolesById(id: Long): User?
+
+    @EntityGraph(attributePaths = ["roleBindings", "roleBindings.role"])
+    @Query("select u from User u where u.username = :username")
+    fun findWithRolesByUsername(@Param("username") username: String): User?
 }

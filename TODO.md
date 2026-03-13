@@ -21,6 +21,7 @@
 21. [ ] 访问文章ip记录
 22. [ ] Flyway / Liquibase
 23. [ ] auth相关接口返回token过期时间
+24. [ ] 搜索可以用Elasticsearch
 
 ## 对象存储
 

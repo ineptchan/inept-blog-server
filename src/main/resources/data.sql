@@ -28,6 +28,8 @@ values ('admin:article:read', now(), '管理员读取文章'),
        ('admin:user:create', now(), '管理员创建用户'),
        ('admin:user:update', now(), '管理员更新用户'),
        ('admin:user:delete', now(), '管理员删除用户'),
+       ('admin:user:role:update', now(), '管理员更新用户角色'),
+       ('admin:user:role:delete', now(), '管理员删除用户角色'),
 
        ('user:user:read', now(), '用户读取用户资料'),
        ('user:user:update', now(), '用户更新用户资料'),

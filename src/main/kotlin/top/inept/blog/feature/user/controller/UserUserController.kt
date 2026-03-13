@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.feature.user.model.convert.toUserVO
 import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
-import top.inept.blog.feature.user.model.vo.UserInfoVO
+import top.inept.blog.feature.user.model.vo.UserDetailVO
 import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.feature.user.service.UserService
 
@@ -25,7 +25,7 @@ class UserUserController(
     @PreAuthorize("hasAuthority('user:user:read')")
     @Operation(summary = "获得用户资料")
     @GetMapping
-    fun getProfile(): ResponseEntity<UserInfoVO> {
+    fun getProfile(): ResponseEntity<UserDetailVO> {
         return ResponseEntity.ok(userService.getProfile())
     }
 

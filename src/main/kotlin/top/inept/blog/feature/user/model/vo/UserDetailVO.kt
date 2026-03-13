@@ -1,8 +1,9 @@
 package top.inept.blog.feature.user.model.vo
 
 import io.swagger.v3.oas.annotations.media.Schema
+import top.inept.blog.feature.rbac.model.vo.RoleVO
 
-data class UserInfoVO(
+data class UserDetailVO(
     @field:Schema(description = "openapi.user.id")
     val id: Long,
 
@@ -21,7 +22,9 @@ data class UserInfoVO(
     @field:Schema(description = "openapi.user.status")
     val status: Boolean,
 
-    //TODO 考虑不返回，单开个接口
+    @field:Schema(description = "openapi.user.roles")
+    val roles: List<RoleVO>,
+
     @field:Schema(description = "openapi.permission.permission")
     val permissionCodes: List<String>
 )

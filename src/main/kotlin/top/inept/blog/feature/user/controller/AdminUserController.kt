@@ -11,10 +11,8 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.PageResponse
 import top.inept.blog.feature.user.model.convert.toUserVO
-import top.inept.blog.feature.user.model.dto.CreateUserDTO
-import top.inept.blog.feature.user.model.dto.QueryUserDTO
-import top.inept.blog.feature.user.model.dto.UpdateUserDTO
-import top.inept.blog.feature.user.model.vo.UserInfoVO
+import top.inept.blog.feature.user.model.dto.*
+import top.inept.blog.feature.user.model.vo.UserDetailVO
 import top.inept.blog.feature.user.model.vo.UserRolesVO
 import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.feature.user.service.UserService
@@ -42,8 +40,8 @@ class AdminUserController(
     @PreAuthorize("hasAuthority('admin:user:read')")
     @Operation(summary = "根据id获取用户")
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: Long): ResponseEntity<UserInfoVO> {
-        return ResponseEntity.ok(userService.getUserInfoById(id))
+    fun getUserById(@PathVariable id: Long): ResponseEntity<UserDetailVO> {
+        return ResponseEntity.ok(userService.getUserDetailById(id))
     }
 
     @PreAuthorize("hasAuthority('admin:user:create')")
@@ -67,11 +65,34 @@ class AdminUserController(
         userService.deleteUserById(id)
         return ResponseEntity.ok(true)
     }
-    /*
-    TODO
-        GET /users/{userId}/role-bindings
-        POST /users/{userId}/role-bindings
-        DELETE /users/{userId}/role-bindings/{bindingId}
 
-    */
+    @PreAuthorize("hasAuthority('admin:user:role:update')")
+    @Operation(summary = "全量替换用户绑定的角色")
+    @PutMapping("/{id}/roles")
+    fun replaceUserRoles(
+        @PathVariable id: Long,
+        @Valid @RequestBody dto: ReplaceUserRolesDTO
+    ): ResponseEntity<UserRolesVO> {
+        return ResponseEntity.ok(userService.replaceUserRoles(id, dto))
+    }
+
+    @PreAuthorize("hasAuthority('admin:user:role:update')")
+    @Operation(summary = "增量替换用户绑定的角色")
+    @PostMapping("/{id}/roles")
+    fun addUserRoles(
+        @PathVariable id: Long,
+        @Valid @RequestBody dto: AddUserRolesDTO
+    ): ResponseEntity<UserRolesVO> {
+        return ResponseEntity.ok(userService.addUserRoles(id, dto))
+    }
+
+    @PreAuthorize("hasAuthority('admin:user:role:delete')")
+    @Operation(summary = "移除单个用户绑定的角色")
+    @DeleteMapping("/{userId}/roles/{roleId}")
+    fun removeUserRole(
+        @PathVariable userId: Long,
+        @PathVariable roleId: Long
+    ): ResponseEntity<UserRolesVO> {
+        return ResponseEntity.ok(userService.removeUserRole(userId, roleId))
+    }
 }
