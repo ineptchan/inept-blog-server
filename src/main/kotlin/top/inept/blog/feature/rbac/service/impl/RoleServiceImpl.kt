@@ -42,7 +42,7 @@ class RoleServiceImpl(
     }
 
     override fun createRole(dto: CreateRoleDTO): Role {
-        return saveAndFlushTagOrThrow(dto.toRole())
+        return saveAndFlushOrThrow(dto.toRole())
     }
 
     override fun getRoleById(id: Long): Role {
@@ -67,7 +67,7 @@ class RoleServiceImpl(
             dto.description?.let { description = it }
         }
 
-        saveAndFlushTagOrThrow(dbRole)
+        saveAndFlushOrThrow(dbRole)
 
         return dbRole
     }
@@ -105,7 +105,7 @@ class RoleServiceImpl(
 
         dbRole.replacePermissions(permissions)
 
-        roleRepository.saveAndFlush(dbRole)
+        saveAndFlushOrThrow(dbRole)
 
         return dbRole.toRolePermissionVO()
     }
@@ -130,7 +130,7 @@ class RoleServiceImpl(
 
         dbRole.addPermissions(permissions)
 
-        return roleRepository.saveAndFlush(dbRole).toRolePermissionVO()
+        return saveAndFlushOrThrow(dbRole).toRolePermissionVO()
     }
 
     @Transactional
@@ -143,10 +143,10 @@ class RoleServiceImpl(
         val isRemove = dbRole.permissionBindings.removeIf { it.permission.id == permId }
         if (!isRemove) throw BusinessException(RoleErrorCode.NOT_BINDING_PERMISSION, permId)
 
-        return roleRepository.saveAndFlush(dbRole).toRolePermissionVO()
+        return saveAndFlushOrThrow(dbRole).toRolePermissionVO()
     }
 
-    private fun saveAndFlushTagOrThrow(dbRole: Role): Role {
+    private fun saveAndFlushOrThrow(dbRole: Role): Role {
         return try {
             roleRepository.saveAndFlush(dbRole)
         } catch (e: DataIntegrityViolationException) {
