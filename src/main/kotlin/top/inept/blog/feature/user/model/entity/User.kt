@@ -79,6 +79,7 @@ class User(
      * 角色绑定
      */
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OrderBy("id ASC")
     var roleBindings: MutableSet<UserRole> = mutableSetOf()
 ) {
     //增量更新角色
