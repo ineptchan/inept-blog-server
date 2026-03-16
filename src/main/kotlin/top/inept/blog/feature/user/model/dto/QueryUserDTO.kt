@@ -6,4 +6,6 @@ import top.inept.blog.base.BaseQueryDTO
 data class QueryUserDTO (
     @field:Schema(description = "openapi.user.query_keyword")
     val keyword: String?,
+
+    //TODO 添加更多规则
 ) : BaseQueryDTO()

@@ -72,8 +72,9 @@ class RoleServiceImpl(
         return dbRole
     }
 
+    @Transactional
     override fun deleteRole(id: Long) {
-        if (roleRepository.deleteRoleById(id) != 1L) {
+        if (roleRepository.deleteRoleById(id) != 1) {
             throw BusinessException(RoleErrorCode.ID_NOT_FOUND, id)
         }
     }
