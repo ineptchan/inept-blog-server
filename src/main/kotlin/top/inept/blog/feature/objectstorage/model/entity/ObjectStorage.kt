@@ -14,7 +14,7 @@ import java.time.Instant
 @Table(
     name = "object_storage",
     uniqueConstraints = [
-        UniqueConstraint(name = ObjectStorageConstraints.UNIQUE_SHA_256, columnNames = ["sha256"]),
+        //  UniqueConstraint(name = ObjectStorageConstraints.UNIQUE_SHA_256, columnNames = ["sha256"]),
         UniqueConstraint(name = ObjectStorageConstraints.UNIQUE_OBJECT_KEY, columnNames = ["object_key"]),
     ]
 )

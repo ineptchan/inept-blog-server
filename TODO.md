@@ -22,6 +22,7 @@
 22. [ ] Flyway / Liquibase
 23. [ ] auth相关接口返回token过期时间
 24. [ ] 搜索可以用Elasticsearch
+25. [ ] 添加删除文章附件 视频。。的接口
 
 ## 对象存储
 
