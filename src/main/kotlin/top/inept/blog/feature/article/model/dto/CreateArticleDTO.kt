@@ -1,6 +1,7 @@
 package top.inept.blog.feature.article.model.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.PositiveOrZero
 import top.inept.blog.feature.article.model.validated.ValidatedArticleContent
 import top.inept.blog.feature.article.model.validated.ValidatedArticleSlug
@@ -9,6 +10,7 @@ import top.inept.blog.feature.article.model.validated.ValidatedArticleTitle
 data class CreateArticleDTO(
     @field:Schema(description = "openapi.article.title")
     @field:ValidatedArticleTitle
+    @field:NotBlank(message = "valid.article.title.not_blank")
     val title: String,
 
     @field:Schema(description = "openapi.article.slug")

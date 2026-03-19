@@ -3,7 +3,6 @@ package top.inept.blog.feature.article.model.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.PositiveOrZero
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
-import top.inept.blog.feature.article.model.validated.ValidatedArticleContent
 import top.inept.blog.feature.article.model.validated.ValidatedArticleSlug
 import top.inept.blog.feature.article.model.validated.ValidatedArticleTitle
 
@@ -17,7 +16,6 @@ data class UpdateArticleDTO(
     val slug: String?,
 
     @field:Schema(description = "openapi.article.content")
-    @field:ValidatedArticleContent
     val content: String?,
 
     @field:Schema(description = "openapi.article.category")
