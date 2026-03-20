@@ -18,6 +18,7 @@ values ('admin:article:read', now(), '管理员读取文章'),
        ('admin:comment:update', now(), '管理员更新评论'),
        ('admin:comment:delete', now(), '管理员删除评论'),
        ('user:comment:create', now(), '用户创建评论'),
+       ('user:comment:like', now(), '用户点赞评论'),
 
        ('admin:tag:read', now(), '管理员读取标签'),
        ('admin:tag:create', now(), '管理员创建标签'),

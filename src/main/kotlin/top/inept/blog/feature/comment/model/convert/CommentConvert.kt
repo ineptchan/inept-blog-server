@@ -11,6 +11,7 @@ import top.inept.blog.feature.user.model.convert.toUserPublicVO
 fun Comment.toCommentVO(articleTitleVO: ArticleTitleVO) = CommentVO(
     id = this.id,
     content = this.content,
+    likeCount = this.likeCount,
     article = articleTitleVO,
     user = this.user.toUserPublicVO(),
     parentComment = this.parentComment?.toCommentSummaryVO(),
@@ -20,12 +21,14 @@ fun Comment.toCommentVO(articleTitleVO: ArticleTitleVO) = CommentVO(
 fun Comment.toCommentSummaryVO() = CommentSummaryVO(
     id = this.id,
     content = this.content,
+    likeCount = this.likeCount,
     user = this.user.toUserPublicVO(),
 )
 
 fun Comment.toCommentReplyVO() = CommentReplyVO(
     id = this.id,
     content = this.content,
+    likeCount = this.likeCount,
     user = this.user.toUserPublicVO(),
     createdAt = this.createdAt,
 )
@@ -33,6 +36,7 @@ fun Comment.toCommentReplyVO() = CommentReplyVO(
 fun Comment.toTopCommentVO() = TopCommentVO(
     id = this.id,
     content = this.content,
+    likeCount = this.likeCount,
     user = this.user.toUserPublicVO(),
     createdAt = this.createdAt,
 )

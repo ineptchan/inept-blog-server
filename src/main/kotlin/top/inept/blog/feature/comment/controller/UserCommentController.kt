@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.feature.comment.model.dto.CreateCommentDTO
 import top.inept.blog.feature.comment.model.vo.CommentVO
+import top.inept.blog.feature.comment.model.vo.LikeCommentVO
 import top.inept.blog.feature.comment.service.CommentService
 
 @Tag(name = "评论接口")
@@ -31,5 +32,23 @@ class UserCommentController(
         @Valid @RequestBody dto: CreateCommentDTO
     ): ResponseEntity<CommentVO> {
         return ResponseEntity.ok(commentService.createComment(id, dto))
+    }
+
+    @PreAuthorize("hasAuthority('user:comment:like')")
+    @Operation(summary = "点赞评论")
+    @PostMapping("/{id}/like")
+    fun likeComment(
+        @Parameter(description = "openapi.comment.id", required = true) @PathVariable id: Long
+    ): ResponseEntity<LikeCommentVO> {
+        return ResponseEntity.ok(commentService.likeComment(id))
+    }
+
+    @PreAuthorize("hasAuthority('user:comment:like')")
+    @Operation(summary = "取消点赞评论")
+    @DeleteMapping("/{id}/like")
+    fun cancelLikeComment(
+        @Parameter(description = "openapi.comment.id", required = true) @PathVariable id: Long
+    ): ResponseEntity<LikeCommentVO> {
+        return ResponseEntity.ok(commentService.cancelLikeComment(id))
     }
 }

@@ -112,6 +112,10 @@ class UserServiceImpl(
             ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
     }
 
+    override fun getUserIdByUsername(username: String): Long? {
+        return userRepository.findIdByUsername(username)
+    }
+
     fun getUserWithRolesByUsername(username: String): User {
         //根据username查找用户
         return userRepository.findWithRolesByUsername(username)

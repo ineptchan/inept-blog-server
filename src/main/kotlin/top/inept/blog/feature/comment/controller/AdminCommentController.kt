@@ -61,7 +61,7 @@ class AdminCommentController(
     @Operation(summary = "更新评论")
     @PatchMapping("/{id}")
     fun updateComment(
-        @PathVariable id: Long,
+        @Parameter(description = "openapi.comment.id", required = true) @PathVariable id: Long,
         @Valid @RequestBody dto: UpdateCommentDTO,
     ): ResponseEntity<CommentSummaryVO> {
         return ResponseEntity.ok(commentService.updateComment(id, dto))

@@ -12,6 +12,9 @@ data class CommentVO(
     @field:Schema(description = "openapi.comment.content")
     val content: String,
 
+    @field:Schema(description = "openapi.comment.like_count")
+    val likeCount: Int,
+
     @field:Schema(description = "openapi.comment.article_id")
     val article: ArticleTitleVO,
 

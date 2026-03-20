@@ -21,6 +21,9 @@ interface UserRepository : JpaRepository<User, Long>, JpaSpecificationExecutor<U
 
     fun existsByNickname(nickname: String): Boolean
 
+    @Query("select u.id from User u where u.username = :username")
+    fun findIdByUsername(@Param("username") username: String): Long?
+
     @Query(
         """
 select distinct p.code

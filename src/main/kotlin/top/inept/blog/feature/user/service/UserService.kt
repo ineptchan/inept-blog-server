@@ -11,6 +11,7 @@ interface UserService {
     fun getUserById(id: Long): User
     fun getUserDetailById(id: Long): UserDetailVO
     fun getUserByUsername(username: String): User
+    fun getUserIdByUsername(username: String): Long?
     fun createUser(dto: CreateUserDTO): User
     fun updateUser(id: Long, dto: UpdateUserDTO): User
     fun deleteUserById(id: Long)

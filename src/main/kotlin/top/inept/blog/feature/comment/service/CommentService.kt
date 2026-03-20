@@ -6,10 +6,7 @@ import top.inept.blog.feature.comment.model.dto.CreateAnonymousCommentDTO
 import top.inept.blog.feature.comment.model.dto.CreateCommentDTO
 import top.inept.blog.feature.comment.model.dto.QueryCommentDTO
 import top.inept.blog.feature.comment.model.dto.UpdateCommentDTO
-import top.inept.blog.feature.comment.model.vo.CommentReplyVO
-import top.inept.blog.feature.comment.model.vo.CommentSummaryVO
-import top.inept.blog.feature.comment.model.vo.CommentVO
-import top.inept.blog.feature.comment.model.vo.TopCommentVO
+import top.inept.blog.feature.comment.model.vo.*
 
 interface CommentService {
     fun getComments(dto: QueryCommentDTO): PageResponse<CommentVO>
@@ -20,4 +17,6 @@ interface CommentService {
     fun getCommentReplies(commentId: Long, dto: BaseQueryDTO): PageResponse<CommentReplyVO>
     fun getTopComments(articleId: Long, dto: BaseQueryDTO): PageResponse<TopCommentVO>
     fun createAnonymousComment(dto: CreateAnonymousCommentDTO): CommentVO
+    fun likeComment(commentId: Long): LikeCommentVO
+    fun cancelLikeComment(commentId: Long): LikeCommentVO
 }

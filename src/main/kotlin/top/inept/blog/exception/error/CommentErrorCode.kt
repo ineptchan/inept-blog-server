@@ -9,4 +9,5 @@ enum class CommentErrorCode(
 ) : IErrorCode {
     ID_NOT_FOUND("message.comment.id_not_found", HttpStatus.NOT_FOUND),
     PARENT_COMMENT_ID_NOT_FOUND("message.comment.parent_comment_id_not_found", HttpStatus.NOT_FOUND),
+    ALREADY_LIKED("message.comment.already_liked", HttpStatus.CONFLICT),
 }

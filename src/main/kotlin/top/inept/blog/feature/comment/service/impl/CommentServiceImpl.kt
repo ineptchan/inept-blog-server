@@ -2,13 +2,17 @@ package top.inept.blog.feature.comment.service.impl
 
 import com.querydsl.core.BooleanBuilder
 import jakarta.persistence.EntityManager
+import org.hibernate.exception.ConstraintViolationException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import top.inept.blog.base.BaseQueryDTO
 import top.inept.blog.base.PageResponse
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.ArticleErrorCode
 import top.inept.blog.exception.error.CommentErrorCode
+import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
 import top.inept.blog.extensions.toPageResponse
@@ -25,13 +29,14 @@ import top.inept.blog.feature.comment.model.dto.CreateCommentDTO
 import top.inept.blog.feature.comment.model.dto.QueryCommentDTO
 import top.inept.blog.feature.comment.model.dto.UpdateCommentDTO
 import top.inept.blog.feature.comment.model.entity.Comment
+import top.inept.blog.feature.comment.model.entity.CommentLike
 import top.inept.blog.feature.comment.model.entity.QComment
-import top.inept.blog.feature.comment.model.vo.CommentReplyVO
-import top.inept.blog.feature.comment.model.vo.CommentSummaryVO
-import top.inept.blog.feature.comment.model.vo.CommentVO
-import top.inept.blog.feature.comment.model.vo.TopCommentVO
+import top.inept.blog.feature.comment.model.entity.constraints.CommentLikeConstraints
+import top.inept.blog.feature.comment.model.vo.*
+import top.inept.blog.feature.comment.repository.CommentLikeRepository
 import top.inept.blog.feature.comment.repository.CommentRepository
 import top.inept.blog.feature.comment.service.CommentService
+import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.SecurityUtil
 
@@ -41,6 +46,7 @@ class CommentServiceImpl(
     private val articleService: ArticleService,
     private val userService: UserService,
     private val entityManager: EntityManager,
+    private val commentLikeRepository: CommentLikeRepository
 ) : CommentService {
     override fun getComments(dto: QueryCommentDTO): PageResponse<CommentVO> {
         val pageRequest = dto.toPageRequest()
@@ -70,7 +76,7 @@ class CommentServiceImpl(
 
     override fun getCommentById(id: Long): CommentVO {
         //根据id查找评论
-        val comment = commentRepository.findCommentsById(id)
+        val comment = commentRepository.findCommentById(id)
             ?: throw BusinessException(CommentErrorCode.ID_NOT_FOUND)
 
         //获得文章标题
@@ -89,7 +95,7 @@ class CommentServiceImpl(
 
         //判断有没有父级评论
         val parentComment = dto.parentCommentId?.let {
-            commentRepository.findCommentsById(it)
+            commentRepository.findCommentById(it)
                 ?: throw BusinessException(CommentErrorCode.PARENT_COMMENT_ID_NOT_FOUND, it)
         }
 
@@ -114,11 +120,13 @@ class CommentServiceImpl(
 
     override fun updateComment(id: Long, dto: UpdateCommentDTO): CommentSummaryVO {
         //根据id查找评论
-        val dbComment = commentRepository.findCommentsById(id)
+        val dbComment = commentRepository.findCommentById(id)
             ?: throw BusinessException(CommentErrorCode.ID_NOT_FOUND)
 
         dbComment.apply {
             dto.content?.let { content = it }
+            dto.status?.let { status = it }
+            dto.likeCount?.let { likeCount = it }
         }
 
         commentRepository.saveAndFlush(dbComment)
@@ -161,6 +169,91 @@ class CommentServiceImpl(
             .and(c.parentComment.isNull)
 
         return commentRepository.findAll(builder, pageRequest).toPageResponse { it.toTopCommentVO() }
+    }
+
+    @Transactional
+    override fun likeComment(commentId: Long): LikeCommentVO {
+        //从上下文获取用户名
+        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+
+        //获取用户id
+        val userId = userService.getUserIdByUsername(username)
+            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
+
+        //检查评论是否存在
+        if (!commentRepository.existsById(commentId))
+            throw BusinessException(CommentErrorCode.ID_NOT_FOUND, commentId)
+
+        //判断用户是否点过赞
+        val isLike = commentLikeRepository.existsByComment_IdAndUser_Id(commentId, userId)
+
+        //未点赞
+        if (!isLike) {
+            val comment = entityManager.getReference(Comment::class.java, commentId)
+            val user = entityManager.getReference(User::class.java, userId)
+            val commentLike = CommentLike(
+                comment = comment,
+                user = user
+            )
+            saveAndFlushCommentLikeOrThrow(commentLike)
+
+            //判断是否变更
+            if (commentRepository.increaseLikeCount(commentId) != 1)
+                throw BusinessException(CommonErrorCode.UNKNOWN)
+        }
+
+        val likeCount = commentRepository.findCommentLikeCountById(commentId)
+            ?: throw BusinessException(CommonErrorCode.UNKNOWN)
+
+        return LikeCommentVO(true, likeCount)
+    }
+
+    @Transactional
+    override fun cancelLikeComment(commentId: Long): LikeCommentVO {
+        //从上下文获取用户名
+        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+
+        //获取用户id
+        val userId = userService.getUserIdByUsername(username)
+            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
+
+        //检查评论是否存在
+        if (!commentRepository.existsById(commentId))
+            throw BusinessException(CommentErrorCode.ID_NOT_FOUND, commentId)
+
+        //判断用户是否点过赞
+        val dbCommentLike = commentLikeRepository.findByComment_IdAndUser_Id(commentId, userId)
+        val isLike = dbCommentLike != null
+
+        if (isLike) {
+            //取消点赞
+            commentLikeRepository.deleteById(dbCommentLike.id)
+
+            //判断是否变更
+            if (commentRepository.decreaseLikeCount(commentId) != 1)
+                throw BusinessException(CommonErrorCode.UNKNOWN)
+        }
+
+        val likeCount = commentRepository.findCommentLikeCountById(commentId)
+            ?: throw BusinessException(CommonErrorCode.UNKNOWN)
+
+        return LikeCommentVO(false, likeCount)
+    }
+
+    private fun saveAndFlushCommentLikeOrThrow(commentLike: CommentLike): CommentLike {
+        return try {
+            commentLikeRepository.saveAndFlush(commentLike)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                CommentLikeConstraints.UNIQUE_COMMENT_LIKE_USER_COMMENT ->
+                    throw BusinessException(CommentErrorCode.ALREADY_LIKED, commentLike.comment.id)
+
+                else -> throw BusinessException(CommonErrorCode.UNKNOWN)
+            }
+        }
     }
 
     override fun createAnonymousComment(dto: CreateAnonymousCommentDTO): CommentVO {
