@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.BaseQueryDTO
 import top.inept.blog.base.PageResponse
+import top.inept.blog.feature.comment.model.entity.enums.CommentStatus
 import top.inept.blog.feature.comment.model.vo.CommentReplyVO
 import top.inept.blog.feature.comment.model.vo.TopCommentVO
 import top.inept.blog.feature.comment.service.CommentService
@@ -45,6 +46,6 @@ class PublicCommentController(
         @PathVariable commentId: Long,
         @Valid dto: BaseQueryDTO
     ): ResponseEntity<PageResponse<CommentReplyVO>> {
-        return ResponseEntity.ok(commentService.getCommentReplies(commentId, dto))
+        return ResponseEntity.ok(commentService.getCommentReplies(commentId, dto, CommentStatus.PUBLISHED))
     }
 }

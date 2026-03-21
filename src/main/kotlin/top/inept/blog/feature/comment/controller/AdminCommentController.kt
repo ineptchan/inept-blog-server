@@ -82,6 +82,6 @@ class AdminCommentController(
         @PathVariable commentId: Long,
         @Valid dto: BaseQueryDTO
     ): ResponseEntity<PageResponse<CommentReplyVO>> {
-        return ResponseEntity.ok(commentService.getCommentReplies(commentId, dto))
+        return ResponseEntity.ok(commentService.getCommentReplies(commentId, dto, null))
     }
 }

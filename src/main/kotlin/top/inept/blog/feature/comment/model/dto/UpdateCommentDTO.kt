@@ -9,7 +9,4 @@ data class UpdateCommentDTO(
 
     @field:Schema(description = "openapi.comment.status")
     val status: CommentStatus?,
-
-    @field:Schema(description = "openapi.comment.like_count")
-    val likeCount: Int?
 )

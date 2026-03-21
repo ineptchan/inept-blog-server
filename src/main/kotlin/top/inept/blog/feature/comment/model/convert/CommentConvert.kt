@@ -11,6 +11,7 @@ import top.inept.blog.feature.user.model.convert.toUserPublicVO
 fun Comment.toCommentVO(articleTitleVO: ArticleTitleVO) = CommentVO(
     id = this.id,
     content = this.content,
+    status = this.status,
     likeCount = this.likeCount,
     article = articleTitleVO,
     user = this.user.toUserPublicVO(),

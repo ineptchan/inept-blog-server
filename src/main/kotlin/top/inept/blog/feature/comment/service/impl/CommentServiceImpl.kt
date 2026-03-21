@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import jakarta.persistence.EntityManager
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.domain.Sort
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,6 +33,7 @@ import top.inept.blog.feature.comment.model.entity.Comment
 import top.inept.blog.feature.comment.model.entity.CommentLike
 import top.inept.blog.feature.comment.model.entity.QComment
 import top.inept.blog.feature.comment.model.entity.constraints.CommentLikeConstraints
+import top.inept.blog.feature.comment.model.entity.enums.CommentStatus
 import top.inept.blog.feature.comment.model.vo.*
 import top.inept.blog.feature.comment.repository.CommentLikeRepository
 import top.inept.blog.feature.comment.repository.CommentRepository
@@ -49,12 +51,17 @@ class CommentServiceImpl(
     private val commentLikeRepository: CommentLikeRepository
 ) : CommentService {
     override fun getComments(dto: QueryCommentDTO): PageResponse<CommentVO> {
-        val pageRequest = dto.toPageRequest()
+        val sort = Sort.by(Sort.Direction.ASC, "id")
+
+        val pageRequest = dto.toPageRequest(sort)
         val c = QComment.comment
 
         val builder = BooleanBuilder().apply {
             dto.keyword?.takeIf { it.isNotBlank() }?.let { kw ->
                 and(c.content.containsIgnoreCase(kw))
+            }
+            dto.status?.let { status ->
+                and(c.status.eq(status))
             }
         }
 
@@ -85,6 +92,7 @@ class CommentServiceImpl(
         return comment.toCommentVO(articleTitle.toArticleTitleVO())
     }
 
+    @Transactional
     override fun createComment(articleId: Long, dto: CreateCommentDTO): CommentVO {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
@@ -110,6 +118,7 @@ class CommentServiceImpl(
 
         val comment = Comment(
             content = dto.content,
+            status = CommentStatus.PENDING,
             article = article,
             user = user,
             parentComment = parentComment
@@ -118,6 +127,7 @@ class CommentServiceImpl(
         return commentRepository.save(comment).toCommentVO(articleTitle.toArticleTitleVO())
     }
 
+    @Transactional
     override fun updateComment(id: Long, dto: UpdateCommentDTO): CommentSummaryVO {
         //根据id查找评论
         val dbComment = commentRepository.findCommentById(id)
@@ -126,7 +136,6 @@ class CommentServiceImpl(
         dbComment.apply {
             dto.content?.let { content = it }
             dto.status?.let { status = it }
-            dto.likeCount?.let { likeCount = it }
         }
 
         commentRepository.saveAndFlush(dbComment)
@@ -142,7 +151,12 @@ class CommentServiceImpl(
         commentRepository.deleteById(id)
     }
 
-    override fun getCommentReplies(commentId: Long, dto: BaseQueryDTO): PageResponse<CommentReplyVO> {
+    @Transactional(readOnly = true)
+    override fun getCommentReplies(
+        commentId: Long,
+        dto: BaseQueryDTO,
+        status: CommentStatus?
+    ): PageResponse<CommentReplyVO> {
         if (!commentRepository.existsById(commentId))
             throw BusinessException(CommentErrorCode.ID_NOT_FOUND)
 
@@ -152,9 +166,12 @@ class CommentServiceImpl(
         val builder = BooleanBuilder()
             .and(c.parentComment.id.eq(commentId))
 
+        status?.let { c.status.eq(it) }
+
         return commentRepository.findAll(builder, pageRequest).toPageResponse { it.toCommentReplyVO() }
     }
 
+    @Transactional(readOnly = true)
     override fun getTopComments(articleId: Long, dto: BaseQueryDTO): PageResponse<TopCommentVO> {
         //判断文章是否存在
         if (!articleService.existsArticleById(articleId))
@@ -167,6 +184,7 @@ class CommentServiceImpl(
         val builder = BooleanBuilder()
             .and(c.article.id.eq(articleId))
             .and(c.parentComment.isNull)
+            .and(c.status.eq(CommentStatus.PUBLISHED))
 
         return commentRepository.findAll(builder, pageRequest).toPageResponse { it.toTopCommentVO() }
     }
