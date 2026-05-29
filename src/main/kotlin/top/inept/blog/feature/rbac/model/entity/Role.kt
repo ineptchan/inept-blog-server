@@ -10,7 +10,7 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name = "roles",
+    name = "role_table",
     uniqueConstraints = [
         UniqueConstraint(name = RoleConstraints.UNIQUE_CODE, columnNames = ["code"]),
     ]
@@ -44,13 +44,14 @@ class Role(
      * 创建时间
      */
     @CreatedDate
-    @Column(updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     var createdAt: Instant,
 
     /**
      * 更新时间
      */
     @LastModifiedDate
+    @Column(name = "updated_at")
     var updatedAt: Instant? = null,
 
     /**

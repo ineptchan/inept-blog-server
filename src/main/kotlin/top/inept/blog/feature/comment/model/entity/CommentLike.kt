@@ -9,7 +9,7 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name = "comment_like",
+    name = "comment_like_table",
     uniqueConstraints = [
         UniqueConstraint(
             name = CommentLikeConstraints.UNIQUE_COMMENT_LIKE_USER_COMMENT,

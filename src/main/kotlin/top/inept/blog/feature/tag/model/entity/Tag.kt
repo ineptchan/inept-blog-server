@@ -5,7 +5,7 @@ import top.inept.blog.feature.tag.model.entity.constraints.TagConstraints
 
 @Entity
 @Table(
-    name = "tags",
+    name = "tag_table",
     uniqueConstraints = [
         UniqueConstraint(name = TagConstraints.UNIQUE_NAME, columnNames = ["name"]),
         UniqueConstraint(name = TagConstraints.UNIQUE_SLUG, columnNames = ["slug"]),

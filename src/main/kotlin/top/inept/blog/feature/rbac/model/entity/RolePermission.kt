@@ -1,11 +1,8 @@
 package top.inept.blog.feature.rbac.model.entity
 
 import jakarta.persistence.*
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
-import java.time.Instant
 
 @Embeddable
 data class RolePermissionId(
@@ -17,7 +14,7 @@ data class RolePermissionId(
 ) : Serializable
 
 @Entity
-@Table(name = "roles_permissions")
+@Table(name = "role_permission_table")
 @EntityListeners(AuditingEntityListener::class)
 class RolePermission(
     @EmbeddedId
@@ -26,7 +23,7 @@ class RolePermission(
     /**
      * 角色
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("roleId")
     @JoinColumn(name = "role_id", nullable = false)
     var role: Role,
@@ -34,21 +31,8 @@ class RolePermission(
     /**
      * 权限
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("permissionId")
     @JoinColumn(name = "permission_id", nullable = false)
     var permission: Permission,
-
-    /**
-     * 创建时间
-     */
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    var createdAt: Instant = Instant.now(),
-
-    /**
-     * 更新时间
-     */
-    @LastModifiedDate
-    var updatedAt: Instant? = null,
 )

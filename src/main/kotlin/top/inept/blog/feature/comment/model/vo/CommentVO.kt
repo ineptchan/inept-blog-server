@@ -17,7 +17,7 @@ data class CommentVO(
     val status: CommentStatus,
 
     @field:Schema(description = "openapi.comment.like_count")
-    val likeCount: Int,
+    val likeCount: Long,
 
     @field:Schema(description = "openapi.comment.article_id")
     val article: ArticleTitleVO,

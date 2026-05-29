@@ -17,13 +17,7 @@ data class UserRoleId(
 ) : java.io.Serializable
 
 @Entity
-@Table(
-    name = "users_roles",
-    indexes = [
-        Index(name = "idx_users_roles_user", columnList = "user_id"),
-        Index(name = "idx_users_roles_role", columnList = "role_id")
-    ]
-)
+@Table(name = "user_role_table")
 @EntityListeners(value = [AuditingEntityListener::class])
 class UserRole(
     @EmbeddedId

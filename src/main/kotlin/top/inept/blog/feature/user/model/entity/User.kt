@@ -13,7 +13,7 @@ import java.time.Instant
  */
 @Entity
 @Table(
-    name = "users",
+    name = "user_table",
     uniqueConstraints = [
         UniqueConstraint(name = UserConstraints.UNIQUE_USERNAME, columnNames = ["username"]),
         UniqueConstraint(name = UserConstraints.UNIQUE_EMAIL, columnNames = ["email"]),
@@ -47,13 +47,13 @@ class User(
     /**
      * 邮箱
      */
-    @Column(name = "email", nullable = true)
+    @Column(name = "email", length = 254, nullable = true)
     var email: String? = null,
 
     /**
      * 密码   BCrypt
      */
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", length = 60, nullable = false)
     var password: String,
 
     /**
@@ -66,13 +66,14 @@ class User(
      * 创建时间
      */
     @CreatedDate
-    @Column(updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     var createdAt: Instant = Instant.now(),
 
     /**
      * 更新时间
      */
     @LastModifiedDate
+    @Column(name = "updated_at")
     var updatedAt: Instant? = null,
 
     /**

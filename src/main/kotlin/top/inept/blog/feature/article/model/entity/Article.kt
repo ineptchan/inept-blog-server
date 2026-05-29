@@ -14,7 +14,7 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name = "articles",
+    name = "article_table",
     uniqueConstraints = [
         UniqueConstraint(name = ArticleConstraints.UNIQUE_SLUG, columnNames = ["slug"])
     ]
@@ -25,45 +25,46 @@ class Article(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
 
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false)
     var title: String,
 
     @Column(name = "slug", nullable = false)
     var slug: String,
 
-    @Column(name = "featured-image")
+    @Column(name = "featured_image")
     var featuredImage: String? = null,
 
     //@Basic(fetch = FetchType.LAZY)
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     var content: String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
     var author: User,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
     var category: Categories,
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "article_tags",
-        joinColumns = [JoinColumn(name = "article_id")],
-        inverseJoinColumns = [JoinColumn(name = "tag_id")]
-    )
-    var tags: MutableSet<Tag> = mutableSetOf(),
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var articleStatus: ArticleStatus = ArticleStatus.DRAFT,
 
     @CreatedDate
-    @Column(updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     var createdAt: Instant = Instant.now(),
 
     @LastModifiedDate
+    @Column(name = "updated_at")
     var updatedAt: Instant? = null,
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "article_tag_table",
+        joinColumns = [JoinColumn(name = "article_id")],
+        inverseJoinColumns = [JoinColumn(name = "tag_id")]
+    )
+    var tags: MutableSet<Tag> = mutableSetOf(),
 
     @OneToMany(mappedBy = "ownerArticle", orphanRemoval = true)
     var objectStorages: MutableSet<ObjectStorage> = mutableSetOf(),

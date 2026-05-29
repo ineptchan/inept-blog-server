@@ -12,7 +12,7 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name = "object_storage",
+    name = "object_storage_table",
     uniqueConstraints = [
         //  UniqueConstraint(name = ObjectStorageConstraints.UNIQUE_SHA_256, columnNames = ["sha256"]),
         UniqueConstraint(name = ObjectStorageConstraints.UNIQUE_OBJECT_KEY, columnNames = ["object_key"]),
@@ -77,7 +77,7 @@ class ObjectStorage(
     /**
      * 对象的key
      */
-    @Column(name = "object_key")
+    @Column(name = "object_key", nullable = false)
     var objectKey: String,
 
     /**

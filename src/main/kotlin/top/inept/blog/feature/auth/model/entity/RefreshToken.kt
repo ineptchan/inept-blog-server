@@ -2,6 +2,7 @@ package top.inept.blog.feature.auth.model.entity
 
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.auth.model.entity.constraints.RefreshTokenConstraints
 import top.inept.blog.feature.user.model.entity.User
@@ -18,13 +19,13 @@ import java.time.Instant
  * @property lastUsedAt 最后使用时间
  * @property revokedAt  撤销时间
  * @property userAgent  浏览器Agent
- * @property ip         ip
+ * @property ip_address ip
  * @property replacedBy 旧token，防止窃取token
  * @constructor Create empty Refresh token
  */
 @Entity
 @Table(
-    name = "refresh_token",
+    name = "refresh_token_table",
     uniqueConstraints = [
         UniqueConstraint(name = RefreshTokenConstraints.UNIQUE_TOKEN_HASH, columnNames = ["token_hash"]),
         UniqueConstraint(columnNames = ["replaced_by_id"])
@@ -51,6 +52,9 @@ class RefreshToken(
     @Column(name = "created_at", updatable = false, nullable = false)
     var createdAt: Instant = Instant.now(),
 
+    @LastModifiedDate
+    var updatedAt: Instant? = null,
+
     @Column(name = "last_used_at")
     var lastUsedAt: Instant? = null,
 
@@ -60,8 +64,8 @@ class RefreshToken(
     @Column(name = "user_agent")
     var userAgent: String? = null,
 
-    @Column(name = "ip", length = 45)
-    var ip: String? = null,
+    @Column(name = "ip_address", length = 45)
+    var ip_address: String? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "replaced_by_id")

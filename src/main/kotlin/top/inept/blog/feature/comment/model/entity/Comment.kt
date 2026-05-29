@@ -10,7 +10,7 @@ import top.inept.blog.feature.user.model.entity.User
 import java.time.Instant
 
 @Entity
-@Table(name = "comments")
+@Table(name = "comment_table")
 @EntityListeners(value = [AuditingEntityListener::class])
 class Comment(
     @Id
@@ -35,7 +35,7 @@ class Comment(
      * 点赞数
      */
     @Column(nullable = false)
-    var likeCount: Int = 0,
+    var likeCount: Long = 0,
 
     /**
      * 评论的文章
@@ -59,6 +59,26 @@ class Comment(
     var parentComment: Comment? = null,
 
     /**
+     * 创建时间
+     */
+    @CreatedDate
+    @Column(name = "created_at", updatable = false, nullable = false)
+    var createdAt: Instant = Instant.now(),
+
+    /**
+     * 更新时间
+     */
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    var updatedAt: Instant? = null,
+
+    /**
+     * 软删除时间
+     */
+    @Column(name = "deleted_at")
+    var deletedAt: Instant? = null,
+
+    /**
      * 子评论
      */
     @OneToMany(
@@ -78,24 +98,6 @@ class Comment(
         fetch = FetchType.LAZY
     )
     var commentLikes: MutableSet<CommentLike> = mutableSetOf(),
-
-    /**
-     * 创建时间
-     */
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    var createdAt: Instant = Instant.now(),
-
-    /**
-     * 更新时间
-     */
-    @LastModifiedDate
-    var updatedAt: Instant? = null,
-
-    /**
-     * 软删除时间
-     */
-    var deletedAt: Instant? = null,
 
     //TODO 可添加 评论 IP，设备信息
 )

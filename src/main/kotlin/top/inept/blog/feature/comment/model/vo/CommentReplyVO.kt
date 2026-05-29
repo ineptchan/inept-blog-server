@@ -12,7 +12,7 @@ data class CommentReplyVO(
     val content: String,
 
     @field:Schema(description = "openapi.comment.like_count")
-    val likeCount: Int,
+    val likeCount: Long,
 
     @field:Schema(description = "openapi.comment.user")
     val user: UserLiteVO,

@@ -68,10 +68,6 @@ class PermissionServiceImpl(
                     dbPermission.code
                 )
 
-                PermissionConstraints.UNIQUE_NAME -> throw BusinessException(
-                    PermissionErrorCode.NAME_DB_DUPLICATE, dbPermission.name
-                )
-
                 else -> throw BusinessException(CommonErrorCode.UNKNOWN)
             }
         }

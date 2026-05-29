@@ -21,10 +21,9 @@ import java.time.Instant
  */
 @Entity
 @Table(
-    name = "permissions",
+    name = "permission_table",
     uniqueConstraints = [
         UniqueConstraint(name = PermissionConstraints.UNIQUE_CODE, columnNames = ["code"]),
-        UniqueConstraint(name = PermissionConstraints.UNIQUE_NAME, columnNames = ["name"])
     ]
 )
 @EntityListeners(value = [AuditingEntityListener::class])
@@ -34,20 +33,21 @@ class Permission(
     @Column(name = "id", nullable = false)
     var id: Long = 0,
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", length = 64, nullable = false)
     var code: String,
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", length = 32, nullable = false)
     var name: String,
 
     @Column(name = "description")
     var description: String? = null,
 
     @CreatedDate
-    @Column(updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     var createdAt: Instant = Instant.now(),
 
     @LastModifiedDate
+    @Column(name = "updated_at")
     var updatedAt: Instant? = null,
 
     @OneToMany(mappedBy = "permission")

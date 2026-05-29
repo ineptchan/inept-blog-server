@@ -2,8 +2,13 @@ spring:
   application:
     name: inept-blog-server
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    clean-disabled: true
+
   jpa:
-    defer-datasource-initialization: true
     properties:
       hibernate:
         jdbc:

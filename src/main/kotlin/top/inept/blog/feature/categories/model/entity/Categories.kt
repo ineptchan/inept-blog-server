@@ -5,7 +5,7 @@ import top.inept.blog.feature.categories.model.entity.constraints.CategoriesCons
 
 @Entity
 @Table(
-    name = "categories",
+    name = "categories_table",
     uniqueConstraints = [
         UniqueConstraint(name = CategoriesConstraints.UNIQUE_NAME, columnNames = ["name"]),
         UniqueConstraint(name = CategoriesConstraints.UNIQUE_SLUG, columnNames = ["slug"]),
