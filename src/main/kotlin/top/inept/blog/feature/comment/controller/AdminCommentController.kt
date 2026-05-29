@@ -80,7 +80,10 @@ class AdminCommentController(
     @GetMapping("/{commentId}/replies")
     fun getCommentReplies(
         @PathVariable commentId: Long,
-        @Valid dto: BaseQueryDTO
+        @Valid
+        @ParameterObject
+        @ModelAttribute
+        dto: BaseQueryDTO
     ): ResponseEntity<PageResponse<CommentReplyVO>> {
         return ResponseEntity.ok(commentService.getCommentReplies(commentId, dto, null))
     }
