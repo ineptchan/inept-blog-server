@@ -16,4 +16,6 @@ interface RoleRepository : JpaRepository<Role, Long>, JpaSpecificationExecutor<R
 
     @EntityGraph(attributePaths = ["permissionBindings", "permissionBindings.permission"])
     fun findWithPermissionsById(id: Long): Role?
+
+    fun findByCode(code: String): Role?
 }

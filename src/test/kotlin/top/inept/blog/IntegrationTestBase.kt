@@ -5,6 +5,8 @@ import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTe
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.web.servlet.client.RestTestClient
+import top.inept.blog.feature.rbac.repository.RoleRepository
+import top.inept.blog.feature.user.service.UserService
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
@@ -15,4 +17,10 @@ abstract class IntegrationTestBase {
 
     @Autowired
     lateinit var jdbcTemplate: JdbcTemplate
+
+    @Autowired
+    lateinit var userService: UserService
+
+    @Autowired
+    lateinit var roleRepository: RoleRepository
 }
