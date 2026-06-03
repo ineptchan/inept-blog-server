@@ -1,4 +1,4 @@
-package top.inept.blog.featrue.user
+package top.inept.blog.feature.auth
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
@@ -43,7 +43,6 @@ class AuthControllerTest : IntegrationTestBase() {
     fun `测试刷新令牌`() {
         val refreshToken = loginAndGetRefreshToken()
 
-
         client.post()
             .uri("/auth/refresh")
             .cookie("X-Refresh-Token", refreshToken)
@@ -54,4 +53,22 @@ class AuthControllerTest : IntegrationTestBase() {
             .jsonPath("$.accessToken").isNotEmpty
     }
 
+    @Test
+    fun `测试退出登录`() {
+        val refreshToken = loginAndGetRefreshToken()
+
+        client.post().uri("/auth/logout")
+            .cookie("X-Refresh-Token", refreshToken)
+            .exchange()
+            .expectStatus().isOk
+            .expectCookie().valueEquals("X-Refresh-Token", "")
+
+        //尝试用退出登录后的令牌刷新应该为401 令牌已被撤销
+        client.post().uri("/auth/refresh")
+            .cookie("X-Refresh-Token", refreshToken)
+            .exchange()
+            .expectStatus().isUnauthorized
+            .expectBody()
+            .jsonPath("$.errorCode").isEqualTo("message.auth.token_has_been_revoked")
+    }
 }
