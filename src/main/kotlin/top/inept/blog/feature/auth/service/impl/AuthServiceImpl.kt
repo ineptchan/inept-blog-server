@@ -21,6 +21,7 @@ import top.inept.blog.utils.PasswordUtil
 import top.inept.blog.utils.ShaUtil
 import java.time.Duration
 import java.time.Instant
+import java.util.*
 
 @Service
 class AuthServiceImpl(
@@ -64,10 +65,10 @@ class AuthServiceImpl(
             expiresAt = jwt.expiresAt!!,
             createdAt = jwt.issuedAt!!,
         )
-        refreshTokenRepository.save(dbRefreshToken)
+        refreshTokenRepository.saveAndFlush(dbRefreshToken)
 
         //生成accessToken
-        val accessToken = refresh(refreshToken)
+        val accessToken = refreshAccessTokenByRefreshToken(refreshToken)
 
         val vo = AuthLoginVO(
             id = dbUser.id,
@@ -86,7 +87,7 @@ class AuthServiceImpl(
      * @param refreshToken
      * @return accessToken
      */
-    override fun refresh(refreshToken: String): String {
+    override fun refreshAccessTokenByRefreshToken(refreshToken: String): String {
         if (refreshToken.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
 
         val now = Instant.now()
@@ -178,6 +179,7 @@ class AuthServiceImpl(
 
         //TODO  字符串改为常量
         val claims = JwtClaimsSet.builder().apply {
+            id(UUID.randomUUID().toString())
             issuer(jwtProperties.issuer)
             issuedAt(now)
             expiresAt(exp)

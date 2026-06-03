@@ -58,7 +58,7 @@ class AuthController(
         @CookieValue("X-Refresh-Token")
         token: String
     ): ResponseEntity<RefreshVO> {
-        val accessToken = authService.refresh(token)
+        val accessToken = authService.refreshAccessTokenByRefreshToken(token)
         return ResponseEntity.ok(RefreshVO(accessToken))
     }
 
