@@ -5,9 +5,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import top.inept.blog.IntegrationTestBase
-import top.inept.blog.feature.user.model.dto.CreateUserDTO
 import top.inept.blog.feature.user.model.dto.UpdateUserDTO
 import top.inept.blog.util.AuthUtil
+import top.inept.blog.util.DTOGeneration
 import java.util.*
 
 class RbacAuthorizationTest : IntegrationTestBase() {
@@ -23,17 +23,14 @@ class RbacAuthorizationTest : IntegrationTestBase() {
             fail("找不到user角色")
         }
 
-        val user = userService.createUser(
-            CreateUserDTO(
-                "test$random",
-                "test$random",
-                "test$random",
-                "test$random@inept.top",
-                listOf(userRole.id)
-            )
-        )
+        val createUserDTO = DTOGeneration.createUserDTO()
+        val user = userService.createUser(createUserDTO)
 
-        val (refreshToken, accessToken) = AuthUtil.loginAndGetRefreshToken(client, "test$random", "test$random")
+        val (refreshToken, accessToken) = AuthUtil.loginAndGetRefreshToken(
+            client,
+            createUserDTO.username,
+            createUserDTO.password
+        )
         userId = user.id
         token = accessToken
     }

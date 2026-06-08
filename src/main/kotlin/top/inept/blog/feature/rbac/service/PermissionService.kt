@@ -6,7 +6,7 @@ import top.inept.blog.feature.rbac.model.dto.UpdatePermissionDTO
 import top.inept.blog.feature.rbac.model.entity.Permission
 
 interface PermissionService {
-    fun getPermissions(dto: QueryPermissionDTO): Page<Permission>
+    fun getPermissions(dto: QueryPermissionDTO = QueryPermissionDTO(null)): Page<Permission>
     fun getPermissionById(id: Long): Permission
     fun updatePermission(id: Long, dto: UpdatePermissionDTO): Permission
 }

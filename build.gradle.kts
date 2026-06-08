@@ -61,6 +61,9 @@ dependencies {
     //scrimage
     implementation("com.sksamuel.scrimage:scrimage-core:4.3.6")
     implementation("com.sksamuel.scrimage:scrimage-webp:4.3.6")
+
+    //test
+    testImplementation("net.datafaker:datafaker:2.5.4")
 }
 
 kotlin {
