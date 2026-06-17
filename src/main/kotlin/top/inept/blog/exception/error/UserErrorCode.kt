@@ -15,4 +15,5 @@ enum class UserErrorCode(
     EMAIL_DB_DUPLICATE("message.user.email_db_duplicate", HttpStatus.CONFLICT),
     ROLE_NOT_FOUND("message.user.role_not_found", HttpStatus.NOT_FOUND),
     USER_NOT_BINDING_ROLE("message.user.not_bind_role", HttpStatus.BAD_REQUEST),
+    USER_ID_MISSING_CONTEXT("message.user.id_missing_context", HttpStatus.INTERNAL_SERVER_ERROR),
 }

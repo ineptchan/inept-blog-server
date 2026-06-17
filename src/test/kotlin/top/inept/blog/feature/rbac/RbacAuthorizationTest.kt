@@ -27,7 +27,7 @@ class RbacAuthorizationTest : IntegrationTestBase() {
         val user = userService.createUser(createUserDTO)
 
         val (refreshToken, accessToken) = AuthUtil.loginAndGetRefreshToken(
-            client,
+            httpClient,
             createUserDTO.username,
             createUserDTO.password
         )
@@ -48,7 +48,7 @@ class RbacAuthorizationTest : IntegrationTestBase() {
 
     @Test
     fun `测试rabc权限不足拒绝`() {
-        client.get().uri("admin/user")
+        httpClient.get().uri("admin/user")
             .header("Authorization", "Bearer $token")
             .exchange()
             .expectStatus().isForbidden

@@ -1,388 +1,213 @@
 package top.inept.blog.feature.objectstorage.service.impl
 
+import io.minio.GetObjectArgs
+import io.minio.GetPresignedObjectUrlArgs
 import io.minio.MinioClient
-import io.minio.PutObjectArgs
-import io.minio.RemoveObjectsArgs
-import io.minio.messages.DeleteObject
+import io.minio.RemoveObjectArgs
+import io.minio.http.Method
 import jakarta.persistence.EntityManager
-import org.apache.commons.codec.digest.DigestUtils.sha256Hex
-import org.apache.tika.Tika
-import org.hibernate.exception.ConstraintViolationException
-import org.springframework.dao.DataIntegrityViolationException
+import jakarta.transaction.Transactional
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 import top.inept.blog.exception.BusinessException
+import top.inept.blog.exception.error.ArticleErrorCode
 import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.ObjectStorageErrorCode
-import top.inept.blog.feature.article.model.dto.UploadArticleAttachmentDTO
-import top.inept.blog.feature.article.model.dto.UploadArticleFeaturedImageDTO
-import top.inept.blog.feature.article.model.dto.UploadArticleImageDTO
-import top.inept.blog.feature.article.model.dto.UploadArticleVideoDTO
+import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.article.model.entity.ArticleObjectStorage
+import top.inept.blog.feature.article.repository.ArticleObjectStorageRepository
+import top.inept.blog.feature.article.repository.ArticleRepository
+import top.inept.blog.feature.auth.constant.JwtClaimConstants
+import top.inept.blog.feature.objectstorage.handler.UploadCompletionHandler
+import top.inept.blog.feature.objectstorage.model.dto.CompleteUploadDTO
+import top.inept.blog.feature.objectstorage.model.dto.PresignUploadDTO
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
-import top.inept.blog.feature.objectstorage.model.entity.constraints.ObjectStorageConstraints
-import top.inept.blog.feature.objectstorage.model.entity.enums.ObjectStorageStatus
-import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
-import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
+import top.inept.blog.feature.objectstorage.model.entity.enums.*
+import top.inept.blog.feature.objectstorage.model.vo.PresignUploadVO
 import top.inept.blog.feature.objectstorage.repository.ObjectStorageRepository
+import top.inept.blog.feature.objectstorage.service.ObjectStorageManager
 import top.inept.blog.feature.objectstorage.service.ObjectStorageService
-import top.inept.blog.properties.ImageProperties
-import top.inept.blog.properties.MinioProperties
-import top.inept.blog.utils.S3Util
-import top.inept.blog.utils.ScrimmageUtil
-import top.inept.blog.utils.TikaUtil
-import java.io.ByteArrayInputStream
+import top.inept.blog.feature.user.model.entity.User
+import top.inept.blog.properties.ObjectStorageProperties
+import top.inept.blog.utils.SecurityUtil
+import java.io.File
+import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Service
 class ObjectStorageServiceImpl(
     private val objectStorageRepository: ObjectStorageRepository,
     private val mc: MinioClient,
-    private val mp: MinioProperties,
-    private val tika: Tika,
-    private val ip: ImageProperties,
+    private val osp: ObjectStorageProperties,
     private val entityManager: EntityManager,
+    private val objectStorageManager: ObjectStorageManager,
+    private val handlers: List<UploadCompletionHandler>,
+    private val articleRepository: ArticleRepository,
+    private val articleObjectStorageRepository: ArticleObjectStorageRepository,
 ) : ObjectStorageService {
-    private val avatarMaxBytes = 5L * 1024 * 1024
-    private val avatarMinSide = 256L
-    private val avatarMaxSide = 1024L
-
-    override fun saveAvatar(file: MultipartFile, ownerUserId: Long): String {
-        val originalBytes = file.bytes
-
-        //限制上传的文件大小
-        if (originalBytes.size.toLong() > avatarMaxBytes) {
-            throw BusinessException(
-                ObjectStorageErrorCode.AVATAR_FILE_TOO_LARGE,
-                originalBytes.size.toLong() / 1024 * 1024
-            )
+    override fun presignUpload(dto: PresignUploadDTO): PresignUploadVO {
+        val maxSize = dto.purpose.getMaxSize(osp)
+        //判断内容大小
+        if (dto.fileSize > maxSize) {
+            throw BusinessException(ObjectStorageErrorCode.CONTENT_SIZE_EXCEEDED, dto.fileSize, maxSize)
         }
 
-        val parserImageResult = TikaUtil.parserImage(file)
-
-        //限制头像分辨率
-        if (parserImageResult.width !in avatarMinSide..avatarMaxSide || parserImageResult.height !in avatarMinSide..avatarMaxSide) {
-            throw BusinessException(ObjectStorageErrorCode.AVATAR_RESOLUTION_INVALID)
+        if (dto.purpose in listOf(
+                Purpose.ARTICLE_IMAGE,
+                Purpose.ARTICLE_FEATURED_IMAGE,
+                Purpose.ARTICLE_VIDEO,
+                Purpose.ARTICLE_ATTACHMENT
+            ) && dto.articleId == null
+        ) {
+            throw BusinessException(ObjectStorageErrorCode.ARTICLE_ID_REQUIRED, dto.purpose)
         }
 
-        //对象名使用uuid生成
-        val objectName = UUID.randomUUID().toString().replace("-", "")
-
-        //对象的在s3中的key
-        val objectKey = S3Util.buildAvatarPrefix(objectName)
-
-        //上传原始文件
-        ByteArrayInputStream(originalBytes).use { bis ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(S3Util.buildOriginalAvatarPrefix(objectName, parserImageResult.mime))
-                .stream(bis, originalBytes.size.toLong(), -1)
-                .contentType(parserImageResult.mime)
-                .build()
-            mc.putObject(args)
-        }
-
-        //将图片转WebP格式
-        val webpResult = ScrimmageUtil.imageToWebp(originalBytes, ip.avatar.quality, ip.avatar.method)
-
-        // 上传 WebP
-        ByteArrayInputStream(webpResult.webpBytes).use { webpStream ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(objectKey)
-                .stream(webpStream, webpResult.webpBytes.size.toLong(), -1)
-                .contentType("image/webp")
-                .build()
-
-            mc.putObject(args)
-        }
-
-        val objectStorage = ObjectStorage(
-            ownerUserId = ownerUserId,
-            purpose = Purpose.AVATAR,
-            originalFileName = file.originalFilename ?: objectName,
-            contentType = "image/webp",
-            sizeBytes = webpResult.webpBytes.size.toLong(),
-            sha256 = webpResult.webpSha256,
-            bucket = mp.bucket,
-            objectKey = objectKey,
-            status = ObjectStorageStatus.UPLOADED,
-            visibility = Visibility.PUBLIC
-        )
-
-        saveAndFlushOrThrow(objectStorage)
-
-        return S3Util.buildAvatarUrl(mp.endpoint, mp.bucket, objectKey)
-    }
-
-    override fun uploadArticleImage(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleImageDTO): String {
-        //解析传入的文件
-        val parserImageResult = TikaUtil.parserImage(dto.image)
-
-        val originalBytes = dto.image.bytes
-
-        //对象名使用uuid生成
-        val objectName = UUID.randomUUID().toString().replace("-", "")
-
-        //对象的在s3中的key
-        val objectKey = S3Util.buildArticleImagePrefix(objectName)
-
-        //上传原始文件
-        ByteArrayInputStream(originalBytes).use { bis ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(S3Util.buildOriginalArticleImagePrefix(objectName, parserImageResult.mime))
-                .stream(bis, originalBytes.size.toLong(), -1)
-                .contentType(parserImageResult.mime)
-                .build()
-            mc.putObject(args)
-        }
-
-        //将图片转WebP格式
-        val webpResult = ScrimmageUtil.imageToWebp(originalBytes, ip.articleImage.quality, ip.articleImage.method)
-
-        //上传 WebP
-        ByteArrayInputStream(webpResult.webpBytes).use { webpStream ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(objectKey)
-                .stream(webpStream, webpResult.webpBytes.size.toLong(), -1)
-                .contentType("image/webp")
-                .build()
-
-            mc.putObject(args)
-        }
-
-        val objectStorage = ObjectStorage(
-            ownerUserId = ownerUserId,
-            ownerArticle = ownerArticle,
-            purpose = Purpose.ARTICLE_IMAGE,
-            originalFileName = dto.image.originalFilename ?: objectName,
-            contentType = "image/webp",
-            sizeBytes = webpResult.webpBytes.size.toLong(),
-            sha256 = webpResult.webpSha256,
-            bucket = mp.bucket,
-            objectKey = objectKey,
-            status = ObjectStorageStatus.UPLOADED,
-            visibility = Visibility.PUBLIC
-        )
-
-        saveAndFlushOrThrow(objectStorage)
-
-        return S3Util.buildArticleImageUrl(mp.endpoint, mp.bucket, objectKey)
-    }
-
-    override fun uploadFeaturedImage(
-        ownerUserId: Long,
-        ownerArticle: Article,
-        dto: UploadArticleFeaturedImageDTO
-    ): String {
-        //解析传入的文件
-        val parserImageResult = TikaUtil.parserImage(dto.featuredImage)
-
-        val originalBytes = dto.featuredImage.bytes
-
-        //对象名使用uuid生成
-        val objectName = UUID.randomUUID().toString().replace("-", "")
-
-        //对象的在s3中的key
-        val objectKey = S3Util.buildArticleFeaturedImagePrefix(objectName)
-
-        //上传原始文件
-        ByteArrayInputStream(originalBytes).use { bis ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(S3Util.buildOriginalArticleFeaturedImagePrefix(objectName, parserImageResult.mime))
-                .stream(bis, originalBytes.size.toLong(), -1)
-                .contentType(parserImageResult.mime)
-                .build()
-            mc.putObject(args)
-        }
-
-        //将图片转WebP格式
-        val webpResult =
-            ScrimmageUtil.imageToWebp(originalBytes, ip.articleFeaturedImage.quality, ip.articleFeaturedImage.method)
-
-        //上传 WebP
-        ByteArrayInputStream(webpResult.webpBytes).use { webpStream ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(objectKey)
-                .stream(webpStream, webpResult.webpBytes.size.toLong(), -1)
-                .contentType("image/webp")
-                .build()
-
-            mc.putObject(args)
-        }
-
-        val objectStorage = ObjectStorage(
-            ownerUserId = ownerUserId,
-            ownerArticle = ownerArticle,
-            purpose = Purpose.ARTICLE_FEATURED_IMAGE,
-            originalFileName = dto.featuredImage.originalFilename ?: objectName,
-            contentType = "image/webp",
-            sizeBytes = webpResult.webpBytes.size.toLong(),
-            sha256 = webpResult.webpSha256,
-            bucket = mp.bucket,
-            objectKey = objectKey,
-            status = ObjectStorageStatus.UPLOADED,
-            visibility = Visibility.PUBLIC
-        )
-
-        saveAndFlushOrThrow(objectStorage)
-
-        return S3Util.buildArticleFeaturedImageUrl(mp.endpoint, mp.bucket, objectKey)
-    }
-
-    override fun uploadVideo(
-        ownerUserId: Long,
-        ownerArticle: Article,
-        dto: UploadArticleVideoDTO
-    ): String {
-        val bytes = dto.video.bytes
-
-        //对象名使用uuid生成
-        val objectName = UUID.randomUUID().toString().replace("-", "")
-
-        //获取文件类型
-        val mime = ByteArrayInputStream(bytes).use {
-            tika.detect(it, dto.video.originalFilename)
-        }
-
-        val objectKey = S3Util.buildArticleVideoPrefix(objectName, mime)
-
-        //检测是不是视频
-        if (!mime.startsWith("video/")) {
-            throw BusinessException(ObjectStorageErrorCode.NOT_VIDEO_FILE, mime)
-        }
-
-        //上传原始文件
-        ByteArrayInputStream(bytes).use { bis ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(objectKey)
-                .stream(bis, bytes.size.toLong(), -1)
-                .contentType(mime)
-                .build()
-            mc.putObject(args)
-        }
-
-        val objectStorage = ObjectStorage(
-            ownerUserId = ownerUserId,
-            ownerArticle = ownerArticle,
-            purpose = Purpose.ARTICLE_VIDEO,
-            originalFileName = dto.video.originalFilename ?: objectName,
-            contentType = mime,
-            sizeBytes = bytes.size.toLong(),
-            sha256 = sha256Hex(bytes),
-            bucket = mp.bucket,
-            objectKey = objectKey,
-            status = ObjectStorageStatus.UPLOADED,
-            visibility = Visibility.PUBLIC
-        )
-
-        saveAndFlushOrThrow(objectStorage)
-
-        return S3Util.buildArticleVideo(mp.endpoint, mp.bucket, objectKey)
-    }
-
-    override fun uploadAttachment(
-        ownerUserId: Long,
-        ownerArticle: Article,
-        dto: UploadArticleAttachmentDTO
-    ): String {
-        val bytes = dto.attachment.bytes
-
-        //查询文件是否存在,如果有直接返回
-        val sha256 = sha256Hex(bytes)
-        val dbObjectStorage = objectStorageRepository.findObjectStoragesBySha256(sha256)
-        if (dbObjectStorage != null && dbObjectStorage.purpose == Purpose.ARTICLE_ATTACHMENT) {
-            return S3Util.buildArticleAttachment(mp.endpoint, mp.bucket, dbObjectStorage.objectKey)
-        }
-
-        //对象名使用uuid生成
-        val objectName = UUID.randomUUID().toString().replace("-", "")
-
-        //获取文件类型
-        val mime = ByteArrayInputStream(bytes).use {
-            tika.detect(it, dto.attachment.originalFilename)
-        }
-
-        val split = dto.attachment.originalFilename?.split(".")
-        val originalFileExt = split?.get(split.size - 1) ?: ".bin"
-
-        val objectKey = S3Util.buildArticleAttachmentPrefix(objectName, originalFileExt)
-
-        //上传原始文件
-        ByteArrayInputStream(bytes).use { bis ->
-            val args = PutObjectArgs.builder()
-                .bucket(mp.bucket)
-                .`object`(objectKey)
-                .stream(bis, bytes.size.toLong(), -1)
-                .contentType(mime)
-                .build()
-            mc.putObject(args)
-        }
-
-        val objectStorage = ObjectStorage(
-            ownerUserId = ownerUserId,
-            ownerArticle = ownerArticle,
-            purpose = Purpose.ARTICLE_ATTACHMENT,
-            originalFileName = dto.attachment.originalFilename ?: objectName,
-            contentType = mime,
-            sizeBytes = bytes.size.toLong(),
-            sha256 = sha256Hex(bytes),
-            bucket = mp.bucket,
-            objectKey = objectKey,
-            status = ObjectStorageStatus.UPLOADED,
-            visibility = Visibility.PUBLIC
-        )
-
-        saveAndFlushOrThrow(objectStorage)
-
-        return S3Util.buildArticleAttachment(mp.endpoint, mp.bucket, objectKey)
-    }
-
-    override fun deleteByOwnerArticleId(id: Long) {
-        val article = entityManager.getReference(Article::class.java, id)
-
-        val objectStorages = objectStorageRepository.findObjectStoragesByOwnerArticle(article)
-
-        val objects = objectStorages.map { DeleteObject(it.objectKey) }
-
-        val result = mc.removeObjects(
-            RemoveObjectsArgs.builder()
-                .bucket(mp.bucket)
-                .objects(objects)
-                .build()
-        )
-
-        //哪里移除错误
-        result.forEach {
-            throw BusinessException(
-                ObjectStorageErrorCode.REMOVE_ARTICLE_OBJECT_ERROR,
-                it.get().objectName(),
-                it.get().message()
-            )
-        }
-
-        objectStorageRepository.deleteObjectStorageByOwnerArticle(article)
-    }
-
-    private fun saveAndFlushOrThrow(dbObjectStorage: ObjectStorage): ObjectStorage {
-        return try {
-            objectStorageRepository.saveAndFlush(dbObjectStorage)
-        } catch (e: DataIntegrityViolationException) {
-            val violation = e.cause as? ConstraintViolationException
-            when (violation?.constraintName) {
-                ObjectStorageConstraints.UNIQUE_OBJECT_KEY ->
-                    throw BusinessException(ObjectStorageErrorCode.OBJECT_KEY_DB_DUPLICATE, dbObjectStorage.objectKey)
-
-                ObjectStorageConstraints.UNIQUE_SHA_256 ->
-                    throw BusinessException(ObjectStorageErrorCode.SHA_256_DB_DUPLICATE, dbObjectStorage.sha256)
-
-                else -> throw BusinessException(CommonErrorCode.UNKNOWN)
+        //判断文章在数据库是否存在
+        dto.articleId?.let { articleId ->
+            if (!articleRepository.existsById(articleId)) {
+                throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, articleId)
             }
         }
+
+        val objectKey = "${UUID.randomUUID()}.${File(dto.fileName).extension}"
+        val bucketName = dto.purpose.getPendingBucketName()
+        val method = Method.PUT
+        val duration = 5
+        val unit = TimeUnit.MINUTES
+        val now = LocalDateTime.now()
+
+        val uploadUrl = mc.getPresignedObjectUrl(
+            GetPresignedObjectUrlArgs.builder()
+                .method(method)
+                .bucket(bucketName)
+                .`object`(objectKey)
+                .expiry(duration, unit)
+                .extraHeaders(mapOf("Content-Type" to dto.contentType))
+                .build()
+        )
+
+        val userId = SecurityUtil.currentJwt()?.getClaimAsString(JwtClaimConstants.USER_ID)?.toLongOrNull()
+            ?: throw BusinessException(UserErrorCode.USER_ID_MISSING_CONTEXT)
+
+        val objectStorage = ObjectStorage(
+            ownerUser = entityManager.getReference(User::class.java, userId),
+            objectKey = objectKey,
+            purpose = dto.purpose,
+            originalFileName = dto.fileName,
+            contentType = dto.contentType,
+            fileSize = dto.fileSize,
+            bucket = bucketName,
+            status = Status.PREPARED,
+            visibility = Visibility.PRIVATE,
+        )
+
+        objectStorageManager.saveAndFlushOrThrow(objectStorage)
+
+        val expiresInSeconds = unit.toSeconds(duration.toLong())
+
+        dto.articleId?.let { articleId ->
+            val articleObjectStorage = ArticleObjectStorage(
+                article = entityManager.getReference(Article::class.java, articleId),
+                objectStorage = objectStorage,
+            )
+            articleObjectStorageRepository.save(articleObjectStorage)
+        }
+
+        return PresignUploadVO(
+            id = objectStorage.id,
+            bucket = bucketName,
+            objectKey = objectKey,
+            method = method.name,
+            url = uploadUrl,
+            expiresInSeconds = expiresInSeconds,
+            expiresAt = now.plusSeconds(expiresInSeconds)
+        )
+    }
+
+    @Transactional
+    override fun completeUpload(dto: CompleteUploadDTO): String {
+        val pendingObjectStorage = (objectStorageRepository.findByIdOrNull(dto.id)
+            ?: throw BusinessException(ObjectStorageErrorCode.ID_NOT_FOUND, dto.id))
+
+        //判断防止重放
+        if (pendingObjectStorage.status !in setOf(Status.PREPARED, Status.UPLOADING)) {
+            throw BusinessException(ObjectStorageErrorCode.INVALID_UPLOAD_STATUS, pendingObjectStorage.status)
+        }
+
+        //判断预签名与完成上传是不是一个用户
+        val userId = SecurityUtil.currentJwt()?.getClaimAsString(JwtClaimConstants.USER_ID)?.toLongOrNull()
+            ?: throw BusinessException(UserErrorCode.USER_ID_MISSING_CONTEXT)
+        if (pendingObjectStorage.ownerUser.id != userId) {
+            throw BusinessException(ObjectStorageErrorCode.UPLOAD_OWNER_MISMATCH)
+        }
+
+        val url = try {
+            mc.getObject(
+                GetObjectArgs.builder()
+                    .bucket(pendingObjectStorage.bucket)
+                    .`object`(pendingObjectStorage.objectKey)
+                    .build()
+            ).use { response ->
+                //判断对象大小
+                val objectSize = response.headers().get("Content-Length")
+                    ?.toLongOrNull()
+                    ?: throw BusinessException(CommonErrorCode.REQUIRED_DATA_MISSING, "Content-Length")
+
+                //大小与预签名的请求是否一致
+                if (objectSize != pendingObjectStorage.fileSize) {
+                    throw BusinessException(
+                        ObjectStorageErrorCode.OBJECT_SIZE_MISMATCH,
+                        objectSize,
+                        pendingObjectStorage.fileSize
+                    )
+                }
+
+                //是否在规定范围内
+                val maxSize = pendingObjectStorage.purpose.getMaxSize(osp)
+                if (objectSize !in 0..maxSize) {
+                    throw BusinessException(ObjectStorageErrorCode.OBJECT_SIZE_INVALID, objectSize, maxSize)
+                }
+
+                //类型与预签名的请求是否一致
+                val contentType = response.headers().get("Content-Type")
+                    ?: throw BusinessException(CommonErrorCode.REQUIRED_DATA_MISSING, "Content-Type")
+
+                if (contentType != pendingObjectStorage.contentType) {
+                    throw BusinessException(
+                        ObjectStorageErrorCode.CONTENT_TYPE_MISMATCH,
+                        contentType,
+                        pendingObjectStorage.contentType
+                    )
+                }
+
+                //开始实际的处理
+                val handler = handlers.singleOrNull {
+                    it.supports(pendingObjectStorage.purpose)
+                } ?: throw BusinessException(
+                    ObjectStorageErrorCode.UNKNOWN_PURPOSE,
+                    pendingObjectStorage.purpose
+                )
+
+                handler.handle(pendingObjectStorage, response.buffered(bufferSize = 64 * 1024))
+            }
+        } catch (e: Exception) {
+            throw e
+        } finally {
+            //将Pending版本删除
+            mc.removeObject(
+                RemoveObjectArgs.builder()
+                    .bucket(pendingObjectStorage.bucket)
+                    .`object`(pendingObjectStorage.objectKey)
+                    .build()
+            )
+
+            //更新数据库状态
+            pendingObjectStorage.status = Status.DELETED
+            objectStorageManager.saveAndFlushOrThrow(pendingObjectStorage)
+        }
+
+        return url
     }
 }

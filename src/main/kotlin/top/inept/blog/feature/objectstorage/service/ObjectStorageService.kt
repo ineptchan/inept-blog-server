@@ -1,17 +1,10 @@
 package top.inept.blog.feature.objectstorage.service
 
-import org.springframework.web.multipart.MultipartFile
-import top.inept.blog.feature.article.model.dto.UploadArticleAttachmentDTO
-import top.inept.blog.feature.article.model.dto.UploadArticleFeaturedImageDTO
-import top.inept.blog.feature.article.model.dto.UploadArticleImageDTO
-import top.inept.blog.feature.article.model.dto.UploadArticleVideoDTO
-import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.objectstorage.model.dto.CompleteUploadDTO
+import top.inept.blog.feature.objectstorage.model.dto.PresignUploadDTO
+import top.inept.blog.feature.objectstorage.model.vo.PresignUploadVO
 
 interface ObjectStorageService {
-    fun saveAvatar(file: MultipartFile, ownerUserId: Long): String
-    fun uploadArticleImage(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleImageDTO): String
-    fun uploadFeaturedImage(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleFeaturedImageDTO): String
-    fun uploadVideo(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleVideoDTO): String
-    fun uploadAttachment(ownerUserId: Long, ownerArticle: Article, dto: UploadArticleAttachmentDTO): String
-    fun deleteByOwnerArticleId(id: Long)
+    fun presignUpload(dto: PresignUploadDTO): PresignUploadVO
+    fun completeUpload(dto: CompleteUploadDTO): String
 }

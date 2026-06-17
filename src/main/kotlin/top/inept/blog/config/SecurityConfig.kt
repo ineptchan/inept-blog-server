@@ -34,7 +34,8 @@ class SecurityConfig {
         val config = CorsConfiguration().apply {
             allowedOriginPatterns = listOf(
                 "http://localhost:*",
-                "http://127.0.0.1:*"
+                "http://127.0.0.1:*",
+                "https://app.apifox.com"    //TODO 删除
             )
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
@@ -76,7 +77,6 @@ class SecurityConfig {
         jwtAuthConverter: JwtAuthenticationConverter,
         @Qualifier("accessJwtDecoder") accessJwtDecoder: JwtDecoder,
         restBearerAuthEntryPoint: RestBearerAuthEntryPoint,
-
         ): SecurityFilterChain {
         http
             .cors { }

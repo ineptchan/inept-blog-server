@@ -1,6 +1,6 @@
 package top.inept.blog.feature.objectstorage.model.entity.enums
 
-enum class ObjectStorageStatus {
+enum class Status {
     /**
      * 准备就绪
      */

@@ -243,11 +243,6 @@ class UserServiceImpl(
                     password = encodePassword
                 }
             }
-            //上传头像到s3中
-            dto.avatar?.let { file ->
-                //TODO 最好是异步上传
-                avatar = objectStorageService.saveAvatar(file, dbUser.id)
-            }
         }
 
         saveAndFlushOrThrow(dbUser)

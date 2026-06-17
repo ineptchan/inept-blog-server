@@ -9,5 +9,7 @@ enum class CommonErrorCode(
 ) : IErrorCode {
     UNKNOWN("message.common.unknown_error", HttpStatus.INTERNAL_SERVER_ERROR),
     ENTITY_NOT_FOUND("message.common.entity_not_found", HttpStatus.NOT_FOUND),
-    INVALID_DATA("message.common.invalid_data", HttpStatus.BAD_REQUEST);
+    INVALID_DATA("message.common.invalid_data", HttpStatus.BAD_REQUEST),
+    REQUIRED_DATA_MISSING("message.common.required_data_missing", HttpStatus.BAD_REQUEST)
+
 }

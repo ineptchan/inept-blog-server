@@ -13,7 +13,10 @@ import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toPageResponse
 import top.inept.blog.feature.article.model.convert.toArticleVO
 import top.inept.blog.feature.article.model.convert.toHomeArticleVO
-import top.inept.blog.feature.article.model.dto.*
+import top.inept.blog.feature.article.model.dto.CreateArticleDTO
+import top.inept.blog.feature.article.model.dto.QueryArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.vo.ArticleVO
 import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
@@ -74,40 +77,6 @@ class AdminArticleController(
     fun updateArticleStatus(@Valid @RequestBody dto: UpdateArticleStatusDTO): ResponseEntity<Boolean> {
         articleService.updateArticleStatus(dto)
         return ResponseEntity.ok(true)
-    }
-
-    @PreAuthorize("hasAuthority('admin:article:upload:image')")
-    @Operation(summary = "上传文章图片")
-    @PutMapping("/{id}/image")
-    fun uploadImage(@PathVariable id: Long, @Valid @ModelAttribute dto: UploadArticleImageDTO): ResponseEntity<String> {
-        return ResponseEntity.ok(articleService.uploadImage(id, dto))
-    }
-
-    @PreAuthorize("hasAuthority('admin:article:upload:featured-image')")
-    @Operation(summary = "上传文章封面图片")
-    @PutMapping("/{id}/featured-image")
-    fun uploadFeaturedImage(
-        @PathVariable id: Long,
-        @Valid @ModelAttribute dto: UploadArticleFeaturedImageDTO
-    ): ResponseEntity<String> {
-        return ResponseEntity.ok(articleService.uploadFeaturedImage(id, dto))
-    }
-
-    @PreAuthorize("hasAuthority('admin:article:upload:video')")
-    @Operation(summary = "上传文章视频")
-    @PutMapping("/{id}/video")
-    fun uploadVideo(@PathVariable id: Long, @Valid @ModelAttribute dto: UploadArticleVideoDTO): ResponseEntity<String> {
-        return ResponseEntity.ok(articleService.uploadVideo(id, dto))
-    }
-
-    @PreAuthorize("hasAuthority('admin:article:upload:attachment')")
-    @Operation(summary = "上传文章附件")
-    @PutMapping("/{id}/attachment")
-    fun uploadAttachment(
-        @PathVariable id: Long,
-        @Valid @ModelAttribute dto: UploadArticleAttachmentDTO
-    ): ResponseEntity<String> {
-        return ResponseEntity.ok(articleService.uploadAttachment(id, dto))
     }
 
     //TODO 添加更换作者接口

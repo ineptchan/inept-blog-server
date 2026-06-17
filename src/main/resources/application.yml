@@ -9,6 +9,7 @@ spring:
     clean-disabled: false
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         jdbc:
@@ -51,20 +52,56 @@ top:
       access-expires-minutes: 15
       refresh-expires-minutes: 10080 # 7d
 
-    minio:
+    object-storage:
       endpoint: ${MINIO_ENDPOINT}
       access-key: ${MINIO_ACCESS_KEY}
       secret-key: ${MINIO_SECRET_KEY}
-      bucket: ${MINIO_BUCKET:inept-blog}
       region: ${MINIO_REGION:}
-
-    image:
+      buckets:
+        - name: blog-avatar
+          public-read: true
+          create-pending: true
+          pending-retention: 1d
+        - name: blog-article-image
+          public-read: true
+          create-pending: true
+          pending-retention: 1d
+        - name: blog-article-featured-image
+          public-read: true
+          create-pending: true
+          pending-retention: 1d
+        - name: blog-article-video
+          public-read: true
+          create-pending: true
+          pending-retention: 1d
+        - name: blog-article-attachment
+          public-read: true
+          create-pending: true
+          pending-retention: 1d
       avatar:
-        quality: 100
-        method: 6
+        quality: 82
+        method: 4
+        max-file-size: 5242880        # 5 MiB
+        max-side: 1024
+        min-side: 128
+
       article-image:
-        quality: 100
-        method: 6
+        quality: 82
+        method: 4
+        max-file-size: 20971520       # 20 MiB
+        max-side: 2560
+        min-side: 64
+
       article-featured-image:
-        quality: 100
-        method: 6
+        quality: 85
+        method: 4
+        max-file-size: 15728640       # 15 MiB
+        max-side: 1920
+        min-side: 320
+
+      article-video:
+        max-file-size: 524288000      # 500 MiB
+        is-compress: true
+
+      article-attachment:
+        max-file-size: 104857600      # 100 MiB

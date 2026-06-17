@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.AuthErrorCode
+import top.inept.blog.feature.auth.constant.JwtClaimConstants
 import top.inept.blog.feature.auth.model.LoginBundle
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.entity.RefreshToken
@@ -84,16 +85,16 @@ class AuthServiceImpl(
     /**
      * Refresh
      *
-     * @param refreshToken
+     * @param refreshTokenString
      * @return accessToken
      */
-    override fun refreshAccessTokenByRefreshToken(refreshToken: String): String {
-        if (refreshToken.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
+    override fun refreshAccessTokenByRefreshToken(refreshTokenString: String): String {
+        if (refreshTokenString.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
 
         val now = Instant.now()
 
         //根据sha256去数据库查找refreshToken
-        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshToken)
+        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshTokenString)
         val dbRefreshToken = refreshTokenRepository.findByTokenHash(refreshTokenSha256)
             ?: throw BusinessException(AuthErrorCode.REFRESH_TOKEN_DB_NOT_FOUND)
 
@@ -108,7 +109,7 @@ class AuthServiceImpl(
         //校验refreshToken是否合法
         val jwt =
             try {
-                refreshDecoder.decode(refreshToken)
+                refreshDecoder.decode(refreshTokenString)
             } catch (_: JwtException) {
                 throw BusinessException(AuthErrorCode.TOKEN_VERIFICATION)
             }
@@ -119,9 +120,13 @@ class AuthServiceImpl(
 
         //TODO  字符串改为常量
         //校验token的使用类型
-        val tokenUse = jwt.claims["token_use"] as? String
-        if (tokenUse != "refresh") {
-            throw BusinessException(AuthErrorCode.TOKEN_USE_TYPE_VERIFICATION, "refresh", tokenUse ?: "null")
+        val tokenUse = jwt.claims[JwtClaimConstants.TOKEN_USE] as? String
+        if (tokenUse != JwtClaimConstants.TOKEN_USE_REFRESH) {
+            throw BusinessException(
+                AuthErrorCode.TOKEN_USE_TYPE_VERIFICATION,
+                JwtClaimConstants.TOKEN_USE_REFRESH,
+                tokenUse ?: "null"
+            )
         }
 
         //构建用户拥有的权限
@@ -131,7 +136,7 @@ class AuthServiceImpl(
             UsernamePasswordAuthenticationToken(dbRefreshToken.user.username, null, authorities)
 
         //构建token
-        val token = createAccessToken(auth)
+        val token = createAccessToken(auth, dbRefreshToken.user.id)
 
         //记录使用情况
         dbRefreshToken.lastUsedAt = Instant.now()
@@ -161,9 +166,13 @@ class AuthServiceImpl(
 
         //TODO  字符串改为常量
         //校验token的使用类型
-        val tokenUse = jwt.claims["token_use"] as? String
-        if (tokenUse != "refresh") {
-            throw BusinessException(AuthErrorCode.TOKEN_USE_TYPE_VERIFICATION, "refresh", tokenUse ?: "null")
+        val tokenUse = jwt.claims[JwtClaimConstants.TOKEN_USE] as? String
+        if (tokenUse != JwtClaimConstants.TOKEN_USE_REFRESH) {
+            throw BusinessException(
+                AuthErrorCode.TOKEN_USE_TYPE_VERIFICATION,
+                JwtClaimConstants.TOKEN_USE_REFRESH,
+                tokenUse ?: "null"
+            )
         }
 
         //撤销写入数据库
@@ -191,7 +200,7 @@ class AuthServiceImpl(
         return refreshEncoder.encode(JwtEncoderParameters.from(headers, claims))
     }
 
-    private fun createAccessToken(auth: Authentication): String {
+    private fun createAccessToken(auth: Authentication, userId: Long): String {
         //现在的时间
         val now = Instant.now()
         //过期时间
@@ -204,7 +213,8 @@ class AuthServiceImpl(
             issuedAt(now)
             expiresAt(exp)
             subject(auth.name)
-            claim("auth", authorities)
+            claim(JwtClaimConstants.AUTH, authorities)
+            claim(JwtClaimConstants.USER_ID, userId.toString())
         }.build()
 
         val headers = JwsHeader.with(MacAlgorithm.HS256).build()

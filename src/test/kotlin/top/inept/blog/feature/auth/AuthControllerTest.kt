@@ -8,14 +8,14 @@ class AuthControllerTest : IntegrationTestBase() {
 
     @Test
     fun `测试登录`() {
-        AuthUtil.loginAndGetRefreshToken(client, "admintest", "admin123456")
+        AuthUtil.loginAndGetRefreshToken(httpClient, "admintest", "admin123456")
     }
 
     @Test
     fun `测试刷新令牌`() {
-        val (refreshToken, _) = AuthUtil.loginAndGetRefreshToken(client, "admintest", "admin123456")
+        val (refreshToken, _) = AuthUtil.loginAndGetRefreshToken(httpClient, "admintest", "admin123456")
 
-        client.post()
+        httpClient.post()
             .uri("/auth/refresh")
             .cookie("X-Refresh-Token", refreshToken)
             .exchange()
@@ -27,16 +27,16 @@ class AuthControllerTest : IntegrationTestBase() {
 
     @Test
     fun `测试退出登录`() {
-        val (refreshToken, _) = AuthUtil.loginAndGetRefreshToken(client, "admintest", "admin123456")
+        val (refreshToken, _) = AuthUtil.loginAndGetRefreshToken(httpClient, "admintest", "admin123456")
 
-        client.post().uri("/auth/logout")
+        httpClient.post().uri("/auth/logout")
             .cookie("X-Refresh-Token", refreshToken)
             .exchange()
             .expectStatus().isOk
             .expectCookie().valueEquals("X-Refresh-Token", "")
 
         //尝试用退出登录后的令牌刷新应该为401 令牌已被撤销
-        client.post().uri("/auth/refresh")
+        httpClient.post().uri("/auth/refresh")
             .cookie("X-Refresh-Token", refreshToken)
             .exchange()
             .expectStatus().isUnauthorized

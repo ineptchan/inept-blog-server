@@ -1,10 +1,7 @@
 package top.inept.blog.feature.user.repository
 
 import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.repository.EntityGraph
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.jpa.repository.Query
+import org.springframework.data.jpa.repository.*
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -46,4 +43,8 @@ where ur.user.id = :userId
     @EntityGraph(attributePaths = ["roleBindings", "roleBindings.role"])
     @Query("select u from User u where u.username = :username")
     fun findWithRolesByUsername(@Param("username") username: String): User?
+
+    @Modifying
+    @Query("update User u set u.avatar = :avatar where u.id = :id")
+    fun updateAvatarById(@Param("id") id: Long, @Param("avatar") avatar: String)
 }

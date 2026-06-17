@@ -5,6 +5,6 @@ import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 
 interface AuthService {
     fun login(dto: AuthLoginDTO): LoginBundle
-    fun refreshAccessTokenByRefreshToken(refreshToken: String): String
+    fun refreshAccessTokenByRefreshToken(refreshTokenString: String): String
     fun logout(refreshToken: String)
 }

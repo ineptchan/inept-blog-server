@@ -1,13 +1,15 @@
 package top.inept.blog.feature.objectstorage.model.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
-import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.objectstorage.model.entity.constraints.ObjectStorageConstraints
-import top.inept.blog.feature.objectstorage.model.entity.enums.ObjectStorageStatus
 import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
+import top.inept.blog.feature.objectstorage.model.entity.enums.Status
 import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
+import top.inept.blog.feature.user.model.entity.User
 import java.time.Instant
 
 @Entity
@@ -18,30 +20,27 @@ import java.time.Instant
         UniqueConstraint(name = ObjectStorageConstraints.UNIQUE_OBJECT_KEY, columnNames = ["object_key"]),
     ]
 )
-//TODO 考虑可重复的sha256
 class ObjectStorage(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
 
-    /**
-     * 归属用户
-     */
-    @Column(name = "owner_user_id", nullable = false)
-    var ownerUserId: Long,
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_user_id", nullable = false)
+    var ownerUser: User,
 
     /**
-     * 归属文章
+     * 对象的key
      */
-    @ManyToOne
-    @JoinColumn(name = "owner_article_id")
-    var ownerArticle: Article? = null,
+    @Column(name = "object_key", nullable = false)
+    var objectKey: String,
 
     /**
      * 使用目的
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "purpose", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "purpose", nullable = false, columnDefinition = "object_storage_purpose")
     var purpose: Purpose,
 
     /**
@@ -59,14 +58,14 @@ class ObjectStorage(
     /**
      * 对象大小
      */
-    @Column(name = "size_bytes", nullable = false)
-    var sizeBytes: Long,
+    @Column(name = "file_size", nullable = false)
+    var fileSize: Long,
 
     /**
-     * 用于 秒传/去重/校验
+     * 文件hash
      */
-    @Column(name = "sha256", nullable = false)
-    var sha256: String,
+    @Column(name = "file_hash", length = 64)
+    var fileHash: String? = null,
 
     /**
      * 桶
@@ -75,34 +74,30 @@ class ObjectStorage(
     var bucket: String,
 
     /**
-     * 对象的key
-     */
-    @Column(name = "object_key", nullable = false)
-    var objectKey: String,
-
-    /**
      * 状态
      */
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false)
-    var status: ObjectStorageStatus,
+    var status: Status,
 
     /**
      * 保留字段业务层语义
      */
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "visibility", nullable = false)
     var visibility: Visibility,
 
     /**
-     * 创建时间,这里值的是数据库实体的
+     * 创建时间
      */
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
     var createdAt: Instant = Instant.now(),
 
     /**
-     * 更新时间,这里值的是数据库实体的
+     * 更新时间
      */
     @LastModifiedDate
     @Column(name = "updated_at")

@@ -13,15 +13,18 @@ import top.inept.blog.exception.error.ArticleErrorCode
 import top.inept.blog.exception.error.CommonErrorCode
 import top.inept.blog.exception.error.UserErrorCode
 import top.inept.blog.extensions.toPageRequest
-import top.inept.blog.feature.article.model.dto.*
+import top.inept.blog.feature.article.model.dto.CreateArticleDTO
+import top.inept.blog.feature.article.model.dto.QueryArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.article.model.entity.QArticle
 import top.inept.blog.feature.article.model.entity.constraints.ArticleConstraints
 import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.service.ArticleService
+import top.inept.blog.feature.auth.constant.JwtClaimConstants
 import top.inept.blog.feature.categories.service.CategoriesService
-import top.inept.blog.feature.objectstorage.service.ObjectStorageService
 import top.inept.blog.feature.tag.service.TagService
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.SecurityUtil
@@ -32,7 +35,6 @@ class ArticleServiceImpl(
     private val userService: UserService,
     private val categoriesService: CategoriesService,
     private val tagService: TagService,
-    private val objectStorageService: ObjectStorageService
 ) : ArticleService {
     override fun getArticles(): List<Article> = articleRepository.findAll()
 
@@ -44,11 +46,11 @@ class ArticleServiceImpl(
 
     override fun createArticle(dto: CreateArticleDTO): Article {
         //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+        val userId = SecurityUtil.currentJwt()?.getClaimAsString(JwtClaimConstants.USER_ID)?.toLongOrNull()
+            ?: throw BusinessException(UserErrorCode.USER_ID_MISSING_CONTEXT)
 
         //根据用户名获取用户
-        val user = userService.getUserByUsername(username)
+        val user = userService.getUserById(userId)
 
         //根据id查找分类
         val categories = categoriesService.getCategoriesById(dto.categoryId)
@@ -108,9 +110,6 @@ class ArticleServiceImpl(
         //根据id判断文章是否存在
         if (!existsArticleById(id)) throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, id)
 
-        //返回影响数量
-        objectStorageService.deleteByOwnerArticleId(id)
-
         //删除文章
         articleRepository.deleteById(id)
     }
@@ -152,67 +151,6 @@ class ArticleServiceImpl(
         }
 
         return articleRepository.findAll(predicate, pageRequest)
-    }
-
-    override fun uploadImage(id: Long, dto: UploadArticleImageDTO): String {
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
-
-        //根据用户名获取用户
-        val user = userService.getUserByUsername(username)
-
-        val article = getArticleById(id)
-
-        return objectStorageService.uploadArticleImage(user.id, article, dto)
-    }
-
-    override fun uploadFeaturedImage(id: Long, dto: UploadArticleFeaturedImageDTO): String {
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
-
-        //根据用户名获取用户
-        val user = userService.getUserByUsername(username)
-
-        val article = getArticleById(id)
-
-        //上传对象存储并返回封面url
-        val featuredImageUrl = objectStorageService.uploadFeaturedImage(user.id, article, dto)
-
-        //保存封面url
-        article.featuredImage = featuredImageUrl
-
-        //保存文章
-        saveAndFlushArticleOrThrow(article)
-
-        return featuredImageUrl
-    }
-
-    override fun uploadVideo(id: Long, dto: UploadArticleVideoDTO): String {
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
-
-        //根据用户名获取用户
-        val user = userService.getUserByUsername(username)
-
-        val article = getArticleById(id)
-
-        return objectStorageService.uploadVideo(user.id, article, dto)
-    }
-
-    override fun uploadAttachment(id: Long, dto: UploadArticleAttachmentDTO): String {
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
-
-        //根据用户名获取用户
-        val user = userService.getUserByUsername(username)
-
-        val article = getArticleById(id)
-
-        return objectStorageService.uploadAttachment(user.id, article, dto)
     }
 
     private fun saveAndFlushArticleOrThrow(dbArticle: Article): Article {

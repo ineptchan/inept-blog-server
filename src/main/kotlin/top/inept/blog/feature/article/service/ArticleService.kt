@@ -1,7 +1,10 @@
 package top.inept.blog.feature.article.service
 
 import org.springframework.data.domain.Page
-import top.inept.blog.feature.article.model.dto.*
+import top.inept.blog.feature.article.model.dto.CreateArticleDTO
+import top.inept.blog.feature.article.model.dto.QueryArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
+import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 
@@ -16,8 +19,4 @@ interface ArticleService {
     fun getArticleTitleById(id: Long): ArticleTitleDTO
     fun existsArticleById(id: Long): Boolean
     fun getHomeArticles(dto: QueryArticleDTO): Page<Article>
-    fun uploadImage(id: Long, dto: UploadArticleImageDTO): String
-    fun uploadFeaturedImage(id: Long, dto: UploadArticleFeaturedImageDTO): String
-    fun uploadVideo(id: Long, dto: UploadArticleVideoDTO): String
-    fun uploadAttachment(id: Long, dto: UploadArticleAttachmentDTO): String
 }
