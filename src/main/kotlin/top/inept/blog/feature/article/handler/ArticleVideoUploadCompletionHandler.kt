@@ -13,6 +13,7 @@ import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.objectstorage.handler.UploadCompletionHandler
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
 import top.inept.blog.feature.objectstorage.model.entity.enums.*
+import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.service.ObjectStorageManager
 import top.inept.blog.properties.ObjectStorageProperties
 import top.inept.blog.utils.ShaUtil
@@ -37,7 +38,7 @@ class ArticleVideoUploadCompletionHandler(
     override fun handle(
         pendingObjectStorage: ObjectStorage,
         buffered: BufferedInputStream
-    ): String {
+    ): CompleteUploadVO {
         val originalFileMessageDigest = MessageDigest.getInstance("SHA-256")
         val tikaInputStream = DigestInputStream(buffered, originalFileMessageDigest)
         val mime = Tika().detect(tikaInputStream, pendingObjectStorage.originalFileName)
@@ -96,6 +97,13 @@ class ArticleVideoUploadCompletionHandler(
                 .build()
         )
 
-        return "${osp.endpoint}${newObjectStorage.bucket}/${newObjectStorage.objectKey}"
+        val url = "${osp.endpoint}${newObjectStorage.bucket}/${newObjectStorage.objectKey}"
+
+        return CompleteUploadVO(
+            id = newObjectStorage.id,
+            bucket = newObjectStorage.bucket,
+            objectKey = newObjectStorage.objectKey,
+            url = url
+        )
     }
 }

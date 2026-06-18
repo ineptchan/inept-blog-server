@@ -11,5 +11,8 @@ interface ArticleObjectStorageRepository :
     JpaRepository<ArticleObjectStorage, Long>,
     JpaSpecificationExecutor<ArticleObjectStorage>,
     QuerydslPredicateExecutor<ArticleObjectStorage> {
+
     fun findByObjectStorage_Id(id: Long): ArticleObjectStorage?
+
+    fun existsByObjectStorage_Id_AndArticle_Id(objectStorageId: Long, articleId: Long): Boolean
 }

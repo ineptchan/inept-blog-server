@@ -15,6 +15,7 @@ import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
 import top.inept.blog.feature.objectstorage.model.entity.enums.Status
 import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
 import top.inept.blog.feature.objectstorage.model.entity.enums.getBucketName
+import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.service.ObjectStorageManager
 import top.inept.blog.properties.ObjectStorageProperties
 import top.inept.blog.utils.ScrimageUtil
@@ -39,7 +40,7 @@ class ArticleFeaturedImageUploadCompletionHandler(
     override fun handle(
         pendingObjectStorage: ObjectStorage,
         buffered: BufferedInputStream
-    ): String {
+    ): CompleteUploadVO {
         //获取原始文件的hash
         val originalFileMessageDigest = MessageDigest.getInstance("SHA-256")
         val tikaInputStream = DigestInputStream(buffered, originalFileMessageDigest)
@@ -121,6 +122,11 @@ class ArticleFeaturedImageUploadCompletionHandler(
             mc.putObject(args)
         }
 
-        return url
+        return CompleteUploadVO(
+            id = newObjectStorage.id,
+            bucket = newObjectStorage.bucket,
+            objectKey = newObjectStorage.objectKey,
+            url = url
+        )
     }
 }

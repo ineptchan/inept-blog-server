@@ -11,6 +11,7 @@ import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
 import top.inept.blog.feature.objectstorage.model.entity.enums.Status
 import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
 import top.inept.blog.feature.objectstorage.model.entity.enums.getBucketName
+import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.service.ObjectStorageManager
 import top.inept.blog.feature.user.repository.UserRepository
 import top.inept.blog.properties.ObjectStorageProperties
@@ -34,7 +35,7 @@ class AvatarUploadCompletionHandler(
     override fun handle(
         pendingObjectStorage: ObjectStorage,
         buffered: BufferedInputStream
-    ): String {
+    ): CompleteUploadVO {
         val originalBytes = buffered.readBytes()
 
         //解析图片
@@ -104,6 +105,11 @@ class AvatarUploadCompletionHandler(
             mc.putObject(args)
         }
 
-        return avatarUrl
+        return CompleteUploadVO(
+            id = newObjectStorage.id,
+            bucket = newObjectStorage.bucket,
+            objectKey = newObjectStorage.objectKey,
+            url = avatarUrl
+        )
     }
 }

@@ -24,6 +24,7 @@ import top.inept.blog.feature.objectstorage.model.dto.CompleteUploadDTO
 import top.inept.blog.feature.objectstorage.model.dto.PresignUploadDTO
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
 import top.inept.blog.feature.objectstorage.model.entity.enums.*
+import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.model.vo.PresignUploadVO
 import top.inept.blog.feature.objectstorage.repository.ObjectStorageRepository
 import top.inept.blog.feature.objectstorage.service.ObjectStorageManager
@@ -127,7 +128,7 @@ class ObjectStorageServiceImpl(
     }
 
     @Transactional
-    override fun completeUpload(dto: CompleteUploadDTO): String {
+    override fun completeUpload(dto: CompleteUploadDTO): CompleteUploadVO {
         val pendingObjectStorage = (objectStorageRepository.findByIdOrNull(dto.id)
             ?: throw BusinessException(ObjectStorageErrorCode.ID_NOT_FOUND, dto.id))
 
@@ -143,7 +144,7 @@ class ObjectStorageServiceImpl(
             throw BusinessException(ObjectStorageErrorCode.UPLOAD_OWNER_MISMATCH)
         }
 
-        val url = try {
+        val vo = try {
             mc.getObject(
                 GetObjectArgs.builder()
                     .bucket(pendingObjectStorage.bucket)
@@ -208,6 +209,6 @@ class ObjectStorageServiceImpl(
             objectStorageManager.saveAndFlushOrThrow(pendingObjectStorage)
         }
 
-        return url
+        return vo
     }
 }

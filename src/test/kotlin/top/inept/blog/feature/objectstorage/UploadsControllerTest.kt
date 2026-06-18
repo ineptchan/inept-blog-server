@@ -15,7 +15,9 @@ import top.inept.blog.feature.categories.model.vo.CategoriesVO
 import top.inept.blog.feature.objectstorage.model.dto.CompleteUploadDTO
 import top.inept.blog.feature.objectstorage.model.dto.PresignUploadDTO
 import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
+import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.model.vo.PresignUploadVO
+import top.inept.blog.feature.user.model.vo.UserDetailVO
 import java.net.URI
 import java.util.*
 import kotlin.test.junit5.JUnit5Asserter.fail
@@ -28,44 +30,59 @@ class UploadsControllerTest : IntegrationTestBase() {
         val image = mediaResource("images/avatar-valid.png")
         val file = image.file
         val length = file.length()
+        val mimeType = "image/png"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.AVATAR,
-                    contentType = MediaType.IMAGE_PNG_VALUE,
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name
                 )
             )
-            .exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>()
+            .returnResult()
+            .responseBody
             ?: fail("上传头像测试返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.IMAGE_PNG)
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(image)
             .exchange()
             .expectStatus().isOk
-            .returnResult()
 
         //完成上传
-        val completeUploadResult = httpClient.post().uri("/uploads/complete-upload")
+        val completeUploadBody = httpClient.post().uri("/uploads/complete-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
             .expectStatus().isOk
-            .expectBody<String>()
+            .expectBody<CompleteUploadVO>()
             .returnResult()
-
-        val completeUploadBody = completeUploadResult.responseBody
+            .responseBody
             ?: fail("完成上传头像测试返回body为空")
 
-        httpClient.get().uri(completeUploadBody).exchange().expectStatus().isOk
+        //判断头像是否可访问
+        httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
+
+        //判断头像是否绑定成功
+        val userDetailVO = (httpClient.get().uri("/user/user")
+            .header("Authorization", "Bearer $adminToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<UserDetailVO>()
+            .returnResult()
+            .responseBody
+            ?: fail("/user/user 接口回去body失败"))
+
+        if (userDetailVO.avatar != completeUploadBody.url) {
+            fail("头像与实际不符")
+        }
     }
 
     @Test
@@ -74,30 +91,31 @@ class UploadsControllerTest : IntegrationTestBase() {
         val image = mediaResource("images/avatar-too-large.png")
         val file = image.file
         val length = file.length()
+        val mimeType = "image/png"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.AVATAR,
-                    contentType = MediaType.IMAGE_PNG_VALUE,
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name
                 )
             )
-            .exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>()
+            .returnResult()
+            .responseBody
             ?: fail("上传头像测试返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.IMAGE_PNG)
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(image)
             .exchange()
             .expectStatus().isOk
-            .returnResult()
 
         //完成上传
         httpClient.post().uri("/uploads/complete-upload")
@@ -115,30 +133,30 @@ class UploadsControllerTest : IntegrationTestBase() {
         val image = mediaResource("images/avatar-too-small.png")
         val file = image.file
         val length = file.length()
+        val mimeType = "image/png"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.AVATAR,
-                    contentType = MediaType.IMAGE_PNG_VALUE,
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name
                 )
             )
-            .exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>().returnResult()
+            .responseBody
             ?: fail("上传头像测试返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.IMAGE_PNG)
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(image)
             .exchange()
             .expectStatus().isOk
-            .returnResult()
 
         //完成上传
         httpClient.post().uri("/uploads/complete-upload")
@@ -156,19 +174,20 @@ class UploadsControllerTest : IntegrationTestBase() {
         val image = mediaResource("images/empty.png")
         val file = image.file
         val length = file.length()
+        val mimeType = "image/png"
 
         httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.AVATAR,
-                    contentType = MediaType.IMAGE_PNG_VALUE,
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name
                 )
             )
-            .exchange().expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT)
-            .expectBody()
+            .exchange()
+            .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT)
     }
 
     @Test
@@ -177,25 +196,27 @@ class UploadsControllerTest : IntegrationTestBase() {
         val image = mediaResource("images/empty.png")
         val file = image.file
         val length = (3 * 1024 * 1024).toLong()
+        val mimeType = "image/png"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.AVATAR,
-                    contentType = MediaType.IMAGE_PNG_VALUE,
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name
                 )
             )
-            .exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>()
+            .returnResult()
+            .responseBody
             ?: fail("上传头像测试返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.IMAGE_PNG)
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(image)
             .exchange()
@@ -218,8 +239,9 @@ class UploadsControllerTest : IntegrationTestBase() {
         val image = mediaResource("images/fake-image.png")
         val file = image.file
         val length = image.file.length()
+        val mimeType = "image/png"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
@@ -229,19 +251,19 @@ class UploadsControllerTest : IntegrationTestBase() {
                     fileName = file.name
                 )
             )
-            .exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>()
+            .returnResult()
+            .responseBody
             ?: fail("上传头像测试返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.IMAGE_PNG)
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(image)
             .exchange()
             .expectStatus().isOk
-            .returnResult()
 
         //完成上传
         httpClient.post().uri("/uploads/complete-upload")
@@ -257,7 +279,7 @@ class UploadsControllerTest : IntegrationTestBase() {
 
     @BeforeAll
     fun `创建文章给对象存储绑定`() {
-        val categoriesResult = httpClient.post().uri("/admin/categories")
+        val categoriesBody = httpClient.post().uri("/admin/categories")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 CreateCategoriesDTO(
@@ -269,12 +291,11 @@ class UploadsControllerTest : IntegrationTestBase() {
             .expectStatus().isOk
             .expectBody<CategoriesVO>()
             .returnResult()
-
-        val categoriesBody = categoriesResult.responseBody
+            .responseBody
             ?: fail("创建类别返回body为空")
 
 
-        val articleResult = httpClient.post().uri("/admin/articles")
+        val articleBody = httpClient.post().uri("/admin/articles")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 CreateArticleDTO(
@@ -289,8 +310,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             .expectStatus().isOk
             .expectBody<ArticleVO>()
             .returnResult()
-
-        val articleBody = articleResult.responseBody
+            .responseBody
             ?: fail("创建文章返回body为空")
 
         articleId = articleBody.id
@@ -298,150 +318,370 @@ class UploadsControllerTest : IntegrationTestBase() {
 
     @Test
     fun `文章正文图片上传测试`() {
-        if (articleId == null) {
-            fail("文章id为空 无法测试")
-        }
+        articleId ?: fail("文章id为空 无法测试")
 
         val image = mediaResource("images/article-image-valid.jpg")
         val file = image.file
         val length = image.file.length()
+        val mimeType = "image/jpeg"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.ARTICLE_IMAGE,
-                    contentType = MediaType.IMAGE_JPEG_VALUE,
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name,
                     articleId = articleId
                 )
-            ).exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            ).exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>()
+            .returnResult()
+            .responseBody
             ?: fail("返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.IMAGE_JPEG)
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(image)
             .exchange()
             .expectStatus().isOk
-            .returnResult()
 
         //完成上传
-        val completeUploadResult = httpClient.post().uri("/uploads/complete-upload")
+        val completeUploadBody = httpClient.post().uri("/uploads/complete-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
-            .expectStatus().isOk.expectBody<String>().returnResult()
-
-        val completeUploadBody = completeUploadResult.responseBody
+            .expectStatus().isOk.expectBody<CompleteUploadVO>().returnResult()
+            .responseBody
             ?: fail("完成上传返回body为空")
 
-        httpClient.get().uri(completeUploadBody).exchange().expectStatus().isOk
+        //判断图片是否可访问
+        httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
+
+        //判断对象与文章是否绑定
+        if (!articleObjectStorageRepository.existsByObjectStorage_Id_AndArticle_Id(
+                completeUploadBody.id,
+                articleId!!
+            )
+        ) fail("对象与文章实际未绑定")
     }
 
     @Test
     fun `文章封面图片上传测试`() {
-        if (articleId == null) {
-            fail("文章id为空 无法测试")
-        }
+        articleId ?: fail("文章id为空 无法测试")
 
         val image = mediaResource("images/article-featured-image-valid.jpg")
         val file = image.file
         val length = image.file.length()
+        val mimeType = "image/jpeg"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.ARTICLE_FEATURED_IMAGE,
-                    contentType = MediaType.IMAGE_JPEG_VALUE,
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name,
                     articleId = articleId
                 )
-            ).exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            ).exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>()
+            .returnResult()
+            .responseBody
             ?: fail("返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.IMAGE_JPEG)
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(image)
             .exchange()
             .expectStatus().isOk
-            .returnResult()
 
         //完成上传
-        val completeUploadResult = httpClient.post().uri("/uploads/complete-upload")
+        val completeUploadBody = httpClient.post().uri("/uploads/complete-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
-            .expectStatus().isOk.expectBody<String>().returnResult()
-
-        val completeUploadBody = completeUploadResult.responseBody
+            .expectStatus().isOk
+            .expectBody<CompleteUploadVO>()
+            .returnResult()
+            .responseBody
             ?: fail("完成上传返回body为空")
 
         //判断文章封面是否修改成功
         val article = articleService.getArticleById(articleId!!)
-        if (article.featuredImage != completeUploadBody) {
-            fail("文章封面未修改")
-        }
+        if (article.featuredImage != completeUploadBody.url) fail("文章封面未修改")
 
         //封面是否可访问
-        httpClient.get().uri(completeUploadBody).exchange().expectStatus().isOk
+        httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
+
+        //判断对象与文章是否绑定
+        if (!articleObjectStorageRepository.existsByObjectStorage_Id_AndArticle_Id(
+                completeUploadBody.id,
+                articleId!!
+            )
+        ) fail("对象与文章实际未绑定")
     }
 
     @Test
     fun `上传文章视频测试`() {
-        if (articleId == null) {
-            fail("文章id为空 无法测试")
-        }
+        articleId ?: fail("文章id为空 无法测试")
 
         val video = mediaResource("videos/video-valid.mp4")
         val file = video.file
         val length = video.file.length()
+        val mimeType = "video/mp4"
 
-        val presignUploadResult = httpClient.post().uri("/uploads/presign-upload")
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(
                 PresignUploadDTO(
                     purpose = Purpose.ARTICLE_VIDEO,
-                    contentType = "video/mp4",
+                    contentType = mimeType,
                     fileSize = length,
                     fileName = file.name,
                     articleId = articleId
                 )
-            ).exchange().expectStatus().isOk.expectBody<PresignUploadVO>().returnResult()
-
-        val presignUploadBody = presignUploadResult.responseBody
+            )
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>().returnResult()
+            .responseBody
             ?: fail("返回body为空")
 
-        //对象存储的预签名
+        //预签名上传对象存储
         httpClient.put().uri(URI.create(presignUploadBody.url))
-            .contentType(MediaType.valueOf("video/mp4"))
+            .contentType(MediaType.valueOf(mimeType))
             .contentLength(length)
             .body(video)
             .exchange()
             .expectStatus().isOk
-            .returnResult()
 
         //完成上传
-        val completeUploadResult = httpClient.post().uri("/uploads/complete-upload")
+        val completeUploadBody = httpClient.post().uri("/uploads/complete-upload")
             .header("Authorization", "Bearer $adminToken")
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
-            .expectStatus().isOk.expectBody<String>().returnResult()
-
-        val completeUploadBody = completeUploadResult.responseBody
+            .expectStatus().isOk
+            .expectBody<CompleteUploadVO>().returnResult()
+            .responseBody
             ?: fail("完成上传返回body为空")
 
-        //是否可访问
-        httpClient.get().uri(completeUploadBody).exchange().expectStatus().isOk
+        //视频是否可访问
+        httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
+
+        //判断对象与文章是否绑定
+        if (!articleObjectStorageRepository.existsByObjectStorage_Id_AndArticle_Id(
+                completeUploadBody.id,
+                articleId!!
+            )
+        ) fail("对象与文章实际未绑定")
+    }
+
+    @Test
+    fun `上传文章附件测试`() {
+        articleId ?: fail("文章id为空 无法测试")
+
+        val attachment = attachmentResource("attachment-valid.zip")
+        val file = attachment.file
+        val length = attachment.file.length()
+        val mimeType = "application/zip"
+
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(
+                PresignUploadDTO(
+                    purpose = Purpose.ARTICLE_ATTACHMENT,
+                    contentType = mimeType,
+                    fileSize = length,
+                    fileName = file.name,
+                    articleId = articleId
+                )
+            )
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>().returnResult()
+            .responseBody
+            ?: fail("返回body为空")
+
+        //预签名上传对象存储
+        httpClient.put().uri(URI.create(presignUploadBody.url))
+            .contentType(MediaType.valueOf(mimeType))
+            .contentLength(length)
+            .body(attachment)
+            .exchange()
+            .expectStatus().isOk
+
+        //完成上传
+        val completeUploadBody = httpClient.post().uri("/uploads/complete-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(CompleteUploadDTO(presignUploadBody.id))
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<CompleteUploadVO>().returnResult()
+            .responseBody
+            ?: fail("完成上传返回body为空")
+
+        //附件是否可访问
+        httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
+
+        //判断对象与文章是否绑定
+        if (!articleObjectStorageRepository.existsByObjectStorage_Id_AndArticle_Id(
+                completeUploadBody.id,
+                articleId!!
+            )
+        ) fail("对象与文章实际未绑定")
+    }
+
+    @Test
+    fun `上传文章伪 PDF 附件测试`() {
+        articleId ?: fail("文章id为空 无法测试")
+
+        val attachment = attachmentResource("attachment-fake.pdf")
+        val file = attachment.file
+        val length = attachment.file.length()
+        val mimeType = "application/pdf"
+
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(
+                PresignUploadDTO(
+                    purpose = Purpose.ARTICLE_ATTACHMENT,
+                    contentType = mimeType,
+                    fileSize = length,
+                    fileName = file.name,
+                    articleId = articleId
+                )
+            )
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>().returnResult()
+            .responseBody
+            ?: fail("返回body为空")
+
+        //预签名上传对象存储
+        httpClient.put().uri(URI.create(presignUploadBody.url))
+            .contentType(MediaType.valueOf(mimeType))
+            .contentLength(length)
+            .body(attachment)
+            .exchange()
+            .expectStatus().isOk
+
+        //完成上传
+        httpClient.post().uri("/uploads/complete-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(CompleteUploadDTO(presignUploadBody.id))
+            .exchange()
+            .expectStatus().isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    }
+
+    @Test
+    fun `上传文章多点文件名附件测试`() {
+        articleId ?: fail("文章id为空 无法测试")
+
+        val attachment = attachmentResource("attachment.multiple.dots.test.txt")
+        val file = attachment.file
+        val length = attachment.file.length()
+        val mimeType = "text/plain"
+
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(
+                PresignUploadDTO(
+                    purpose = Purpose.ARTICLE_ATTACHMENT,
+                    contentType = mimeType,
+                    fileSize = length,
+                    fileName = file.name,
+                    articleId = articleId
+                )
+            )
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>().returnResult()
+            .responseBody
+            ?: fail("返回body为空")
+
+        //预签名上传对象存储
+        httpClient.put().uri(URI.create(presignUploadBody.url))
+            .contentType(MediaType.valueOf(mimeType))
+            .contentLength(length)
+            .body(attachment)
+            .exchange()
+            .expectStatus().isOk
+
+        //完成上传
+        val completeUploadBody = httpClient.post().uri("/uploads/complete-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(CompleteUploadDTO(presignUploadBody.id))
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<CompleteUploadVO>().returnResult()
+            .responseBody
+            ?: fail("完成上传返回body为空")
+
+        //附件是否可访问
+        httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
+
+        //判断对象与文章是否绑定
+        if (!articleObjectStorageRepository.existsByObjectStorage_Id_AndArticle_Id(
+                completeUploadBody.id,
+                articleId!!
+            )
+        ) fail("对象与文章实际未绑定")
+    }
+
+    @Test
+    fun `上传文章中文及空格文件名附件测试`() {
+        articleId ?: fail("文章id为空 无法测试")
+
+        val attachment = attachmentResource("附件 中文 空格.txt")
+        val file = attachment.file
+        val length = attachment.file.length()
+        val mimeType = "text/plain"
+
+        val presignUploadBody = httpClient.post().uri("/uploads/presign-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(
+                PresignUploadDTO(
+                    purpose = Purpose.ARTICLE_ATTACHMENT,
+                    contentType = mimeType,
+                    fileSize = length,
+                    fileName = file.name,
+                    articleId = articleId
+                )
+            )
+            .exchange().expectStatus().isOk
+            .expectBody<PresignUploadVO>().returnResult()
+            .responseBody
+            ?: fail("返回body为空")
+
+        //预签名上传对象存储
+        httpClient.put().uri(URI.create(presignUploadBody.url))
+            .contentType(MediaType.valueOf(mimeType))
+            .contentLength(length)
+            .body(attachment)
+            .exchange()
+            .expectStatus().isOk
+
+        //完成上传
+        val completeUploadBody = httpClient.post().uri("/uploads/complete-upload")
+            .header("Authorization", "Bearer $adminToken")
+            .body(CompleteUploadDTO(presignUploadBody.id))
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<CompleteUploadVO>().returnResult()
+            .responseBody
+            ?: fail("完成上传返回body为空")
+
+        //附件是否可访问
+        httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
+
+        //判断对象与文章是否绑定
+        if (!articleObjectStorageRepository.existsByObjectStorage_Id_AndArticle_Id(
+                completeUploadBody.id,
+                articleId!!
+            )
+        ) fail("对象与文章实际未绑定")
     }
 }

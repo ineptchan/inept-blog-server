@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import top.inept.blog.feature.objectstorage.model.dto.CompleteUploadDTO
 import top.inept.blog.feature.objectstorage.model.dto.PresignUploadDTO
+import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.model.vo.PresignUploadVO
 import top.inept.blog.feature.objectstorage.service.ObjectStorageService
 
@@ -29,9 +30,7 @@ class UploadsController(
 
     @Operation(summary = "完成对象上传")
     @PostMapping("/complete-upload")
-    fun completeUpload(@Valid @RequestBody dto: CompleteUploadDTO): ResponseEntity<String> {
+    fun completeUpload(@Valid @RequestBody dto: CompleteUploadDTO): ResponseEntity<CompleteUploadVO> {
         return ResponseEntity.ok(objectStorageService.completeUpload(dto))
     }
-
-
 }

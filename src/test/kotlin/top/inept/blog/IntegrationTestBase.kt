@@ -14,6 +14,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.web.servlet.client.RestTestClient
 import top.inept.blog.extensions.log
+import top.inept.blog.feature.article.repository.ArticleObjectStorageRepository
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.vo.AuthLoginVO
@@ -64,6 +65,9 @@ abstract class IntegrationTestBase {
     @Autowired
     lateinit var categoriesService: CategoriesService
 
+    @Autowired
+    lateinit var articleObjectStorageRepository: ArticleObjectStorageRepository
+
     @AfterAll
     fun afterAll() {
         log.info("开始清理数据库")
@@ -91,6 +95,14 @@ abstract class IntegrationTestBase {
         return ClassPathResource("fixtures/media/$path").also {
             check(it.exists()) {
                 "测试资源不存在：fixtures/media/$path"
+            }
+        }
+    }
+
+    protected fun attachmentResource(path: String): ClassPathResource {
+        return ClassPathResource("fixtures/attachment/$path").also {
+            check(it.exists()) {
+                "测试资源不存在：fixtures/attachment/$path"
             }
         }
     }
