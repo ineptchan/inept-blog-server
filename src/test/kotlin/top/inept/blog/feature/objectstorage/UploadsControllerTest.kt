@@ -44,8 +44,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             )
             .exchange().expectStatus().isOk
             .expectBody<PresignUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("上传头像测试返回body为空")
 
         //预签名上传对象存储
@@ -63,8 +62,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             .exchange()
             .expectStatus().isOk
             .expectBody<CompleteUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("完成上传头像测试返回body为空")
 
         //判断头像是否可访问
@@ -76,8 +74,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             .exchange()
             .expectStatus().isOk
             .expectBody<UserDetailVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("/user/user 接口回去body失败"))
 
         if (userDetailVO.avatar != completeUploadBody.url) {
@@ -105,8 +102,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             )
             .exchange().expectStatus().isOk
             .expectBody<PresignUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("上传头像测试返回body为空")
 
         //预签名上传对象存储
@@ -146,8 +142,8 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             )
             .exchange().expectStatus().isOk
-            .expectBody<PresignUploadVO>().returnResult()
-            .responseBody
+            .expectBody<PresignUploadVO>()
+            .returnResult().responseBody
             ?: fail("上传头像测试返回body为空")
 
         //预签名上传对象存储
@@ -210,8 +206,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             )
             .exchange().expectStatus().isOk
             .expectBody<PresignUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("上传头像测试返回body为空")
 
         //预签名上传对象存储
@@ -253,8 +248,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             )
             .exchange().expectStatus().isOk
             .expectBody<PresignUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("上传头像测试返回body为空")
 
         //预签名上传对象存储
@@ -290,8 +284,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             .exchange()
             .expectStatus().isOk
             .expectBody<CategoriesVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("创建类别返回body为空")
 
 
@@ -309,8 +302,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             .exchange()
             .expectStatus().isOk
             .expectBody<ArticleVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("创建文章返回body为空")
 
         articleId = articleBody.id
@@ -337,8 +329,7 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             ).exchange().expectStatus().isOk
             .expectBody<PresignUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("返回body为空")
 
         //预签名上传对象存储
@@ -354,8 +345,8 @@ class UploadsControllerTest : IntegrationTestBase() {
             .header("Authorization", "Bearer $adminToken")
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
-            .expectStatus().isOk.expectBody<CompleteUploadVO>().returnResult()
-            .responseBody
+            .expectStatus().isOk.expectBody<CompleteUploadVO>()
+            .returnResult().responseBody
             ?: fail("完成上传返回body为空")
 
         //判断图片是否可访问
@@ -390,8 +381,7 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             ).exchange().expectStatus().isOk
             .expectBody<PresignUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("返回body为空")
 
         //预签名上传对象存储
@@ -409,8 +399,7 @@ class UploadsControllerTest : IntegrationTestBase() {
             .exchange()
             .expectStatus().isOk
             .expectBody<CompleteUploadVO>()
-            .returnResult()
-            .responseBody
+            .returnResult().responseBody
             ?: fail("完成上传返回body为空")
 
         //判断文章封面是否修改成功
@@ -449,8 +438,8 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             )
             .exchange().expectStatus().isOk
-            .expectBody<PresignUploadVO>().returnResult()
-            .responseBody
+            .expectBody<PresignUploadVO>()
+            .returnResult().responseBody
             ?: fail("返回body为空")
 
         //预签名上传对象存储
@@ -467,8 +456,8 @@ class UploadsControllerTest : IntegrationTestBase() {
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
             .expectStatus().isOk
-            .expectBody<CompleteUploadVO>().returnResult()
-            .responseBody
+            .expectBody<CompleteUploadVO>()
+            .returnResult().responseBody
             ?: fail("完成上传返回body为空")
 
         //视频是否可访问
@@ -503,8 +492,8 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             )
             .exchange().expectStatus().isOk
-            .expectBody<PresignUploadVO>().returnResult()
-            .responseBody
+            .expectBody<PresignUploadVO>()
+            .returnResult().responseBody
             ?: fail("返回body为空")
 
         //预签名上传对象存储
@@ -521,8 +510,8 @@ class UploadsControllerTest : IntegrationTestBase() {
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
             .expectStatus().isOk
-            .expectBody<CompleteUploadVO>().returnResult()
-            .responseBody
+            .expectBody<CompleteUploadVO>()
+            .returnResult().responseBody
             ?: fail("完成上传返回body为空")
 
         //附件是否可访问
@@ -557,8 +546,8 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             )
             .exchange().expectStatus().isOk
-            .expectBody<PresignUploadVO>().returnResult()
-            .responseBody
+            .expectBody<PresignUploadVO>()
+            .returnResult().responseBody
             ?: fail("返回body为空")
 
         //预签名上传对象存储
@@ -598,8 +587,8 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             )
             .exchange().expectStatus().isOk
-            .expectBody<PresignUploadVO>().returnResult()
-            .responseBody
+            .expectBody<PresignUploadVO>()
+            .returnResult().responseBody
             ?: fail("返回body为空")
 
         //预签名上传对象存储
@@ -616,8 +605,8 @@ class UploadsControllerTest : IntegrationTestBase() {
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
             .expectStatus().isOk
-            .expectBody<CompleteUploadVO>().returnResult()
-            .responseBody
+            .expectBody<CompleteUploadVO>()
+            .returnResult().responseBody
             ?: fail("完成上传返回body为空")
 
         //附件是否可访问
@@ -652,8 +641,8 @@ class UploadsControllerTest : IntegrationTestBase() {
                 )
             )
             .exchange().expectStatus().isOk
-            .expectBody<PresignUploadVO>().returnResult()
-            .responseBody
+            .expectBody<PresignUploadVO>()
+            .returnResult().responseBody
             ?: fail("返回body为空")
 
         //预签名上传对象存储
@@ -670,8 +659,8 @@ class UploadsControllerTest : IntegrationTestBase() {
             .body(CompleteUploadDTO(presignUploadBody.id))
             .exchange()
             .expectStatus().isOk
-            .expectBody<CompleteUploadVO>().returnResult()
-            .responseBody
+            .expectBody<CompleteUploadVO>()
+            .returnResult().responseBody
             ?: fail("完成上传返回body为空")
 
         //附件是否可访问

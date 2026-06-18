@@ -18,6 +18,7 @@ import top.inept.blog.feature.article.repository.ArticleObjectStorageRepository
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.vo.AuthLoginVO
+import top.inept.blog.feature.categories.repository.CategoriesRepository
 import top.inept.blog.feature.categories.service.CategoriesService
 import top.inept.blog.feature.objectstorage.service.ObjectStorageService
 import top.inept.blog.feature.rbac.repository.RoleRepository
@@ -64,6 +65,9 @@ abstract class IntegrationTestBase {
 
     @Autowired
     lateinit var categoriesService: CategoriesService
+
+    @Autowired
+    lateinit var categoriesRepository: CategoriesRepository
 
     @Autowired
     lateinit var articleObjectStorageRepository: ArticleObjectStorageRepository
