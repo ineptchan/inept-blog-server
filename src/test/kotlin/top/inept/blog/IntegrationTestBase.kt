@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.web.servlet.client.RestTestClient
 import top.inept.blog.extensions.log
 import top.inept.blog.feature.article.repository.ArticleObjectStorageRepository
+import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.vo.AuthLoginVO
@@ -71,6 +72,9 @@ abstract class IntegrationTestBase {
 
     @Autowired
     lateinit var articleObjectStorageRepository: ArticleObjectStorageRepository
+
+    @Autowired
+    lateinit var articleRepository: ArticleRepository
 
     @AfterAll
     fun afterAll() {

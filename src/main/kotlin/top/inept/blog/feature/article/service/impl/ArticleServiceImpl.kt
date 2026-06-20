@@ -114,6 +114,7 @@ class ArticleServiceImpl(
         articleRepository.deleteById(id)
     }
 
+    @Transactional
     override fun updateArticleStatus(dto: UpdateArticleStatusDTO) {
         //批量更新文章状态
         articleRepository.updateStatusByIds(dto.articleStatus, dto.articleIds)
