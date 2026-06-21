@@ -47,9 +47,9 @@ class UserCommentController(
     @PreAuthorize("hasAuthority('user:comment:like')")
     @Operation(summary = "取消点赞评论")
     @DeleteMapping("/{id}/like")
-    fun cancelLikeComment(
+    fun unlikeComment(
         @Parameter(description = "openapi.comment.id", required = true) @PathVariable id: Long
     ): ResponseEntity<LikeCommentVO> {
-        return ResponseEntity.ok(commentService.cancelLikeComment(id))
+        return ResponseEntity.ok(commentService.unlikeComment(id))
     }
 }

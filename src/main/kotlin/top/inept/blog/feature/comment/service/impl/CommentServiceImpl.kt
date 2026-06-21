@@ -228,7 +228,7 @@ class CommentServiceImpl(
     }
 
     @Transactional
-    override fun cancelLikeComment(commentId: Long): LikeCommentVO {
+    override fun unlikeComment(commentId: Long): LikeCommentVO {
         //从上下文获取用户名
         val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
             ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)

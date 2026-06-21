@@ -19,5 +19,5 @@ interface CommentService {
     fun getTopComments(articleId: Long, dto: BaseQueryDTO): PageResponse<TopCommentVO>
     fun createAnonymousComment(dto: CreateAnonymousCommentDTO): CommentVO
     fun likeComment(commentId: Long): LikeCommentVO
-    fun cancelLikeComment(commentId: Long): LikeCommentVO
+    fun unlikeComment(commentId: Long): LikeCommentVO
 }
