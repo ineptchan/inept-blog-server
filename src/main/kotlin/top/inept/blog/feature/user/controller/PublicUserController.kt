@@ -8,7 +8,7 @@ import top.inept.blog.feature.user.service.UserService
 
 @Tag(name = "用户接口")
 @RestController
-@RequestMapping("/public/user")
+@RequestMapping("/users")
 @Validated
 class PublicUserController(
     private val userService: UserService,

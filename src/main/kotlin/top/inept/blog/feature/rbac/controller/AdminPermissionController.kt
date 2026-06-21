@@ -20,7 +20,7 @@ import top.inept.blog.feature.rbac.service.PermissionService
 @Tag(name = "权限接口")
 @SecurityRequirement(name = "accessToken")
 @RestController
-@RequestMapping("/admin/permission")
+@RequestMapping("/admin/permissions")
 @Validated
 class AdminPermissionController(
     private val permissionService: PermissionService

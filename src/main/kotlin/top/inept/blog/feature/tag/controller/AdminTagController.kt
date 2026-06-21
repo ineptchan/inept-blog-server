@@ -21,7 +21,7 @@ import top.inept.blog.feature.tag.service.TagService
 @Tag(name = "标签接口")
 @SecurityRequirement(name = "accessToken")
 @RestController
-@RequestMapping("/admin/tag")
+@RequestMapping("/admin/tags")
 @Validated
 class AdminTagController(
     private val tagService: TagService,

@@ -20,7 +20,7 @@ import top.inept.blog.feature.rbac.service.RoleService
 @Tag(name = "角色接口")
 @SecurityRequirement(name = "accessToken")
 @RestController
-@RequestMapping("/admin/role")
+@RequestMapping("/admin/roles")
 @Validated
 class AdminRoleController(
     private val roleService: RoleService

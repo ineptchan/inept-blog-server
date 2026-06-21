@@ -20,7 +20,7 @@ import top.inept.blog.feature.user.service.UserService
 @Tag(name = "用户接口")
 @SecurityRequirement(name = "accessToken")
 @RestController
-@RequestMapping("/admin/user")
+@RequestMapping("/admin/users")
 @Validated
 class AdminUserController(
     private val userService: UserService,

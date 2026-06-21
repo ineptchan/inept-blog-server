@@ -20,7 +20,7 @@ import top.inept.blog.feature.article.service.ArticleService
 
 @Tag(name = "文章接口")
 @RestController
-@RequestMapping("/public/articles")
+@RequestMapping("/articles")
 @Validated
 class PublicArticleController(
     private val articleService: ArticleService,

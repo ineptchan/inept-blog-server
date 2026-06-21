@@ -69,7 +69,7 @@ class UploadsControllerTest : IntegrationTestBase() {
         httpClient.get().uri(completeUploadBody.url).exchange().expectStatus().isOk
 
         //判断头像是否绑定成功
-        val userDetailVO = (httpClient.get().uri("/user/user")
+        val userDetailVO = (httpClient.get().uri("/user/users")
             .header("Authorization", "Bearer $adminToken")
             .exchange()
             .expectStatus().isOk

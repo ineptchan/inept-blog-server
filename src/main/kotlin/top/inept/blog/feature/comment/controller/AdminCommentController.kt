@@ -23,7 +23,7 @@ import top.inept.blog.feature.comment.service.CommentService
 @Tag(name = "评论接口")
 @SecurityRequirement(name = "accessToken")
 @RestController
-@RequestMapping("/admin/comment")
+@RequestMapping("/admin/comments")
 @Validated
 class AdminCommentController(
     private val commentService: CommentService
