@@ -2,6 +2,7 @@ package top.inept.blog.feature.article
 
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.test.web.servlet.client.expectBody
 import top.inept.blog.IntegrationTestBase
 import top.inept.blog.base.PageResponse
@@ -34,7 +35,7 @@ class AdminArticleControllerTest : IntegrationTestBase() {
             ?: fail("返回响应体为空")
     }
 
-    private fun createArticle(): ArticleVO {
+    private fun createArticle(status: ArticleStatus = ArticleStatus.DRAFT): ArticleVO {
         val str = randomString("article")
         val category = createCategory()
 
@@ -47,6 +48,7 @@ class AdminArticleControllerTest : IntegrationTestBase() {
                     content = "content-$str",
                     categoryId = category.id,
                     tagIds = emptyList(),
+                    status = status,
                 )
             )
             .exchange()
@@ -159,5 +161,24 @@ class AdminArticleControllerTest : IntegrationTestBase() {
         if (!isDelete) fail("文章删除失败")
 
         if (articleRepository.findByIdOrNull(articleVO.id) != null) fail("文章删除失败")
+    }
+
+    @Test
+    fun `公开文章获取测试`() {
+        //测试未公开的文章
+        val draftArticleVO = createArticle(ArticleStatus.DRAFT)
+
+        httpClient.get().uri("/public/articles/${draftArticleVO.id}")
+            .exchange()
+            .expectStatus().isEqualTo(HttpStatus.NOT_FOUND)
+            .expectBody()
+            .jsonPath("$.errorCode").isEqualTo("message.articles.id_not_found_or_not_public")
+
+        //测试公开的文章
+        val publishedArticleVO = createArticle(ArticleStatus.PUBLISHED)
+
+        httpClient.get().uri("/public/articles/${publishedArticleVO.id}")
+            .exchange()
+            .expectStatus().isOk
     }
 }

@@ -6,21 +6,20 @@ import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import top.inept.blog.base.PageResponse
 import top.inept.blog.extensions.toPageResponse
+import top.inept.blog.feature.article.model.convert.toArticleVO
 import top.inept.blog.feature.article.model.convert.toHomeArticleVO
 import top.inept.blog.feature.article.model.dto.QueryArticleDTO
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.vo.ArticleVO
 import top.inept.blog.feature.article.model.vo.HomeArticleVO
 import top.inept.blog.feature.article.service.ArticleService
 
 @Tag(name = "文章接口")
 @RestController
-@RequestMapping("/articles")
+@RequestMapping("/public/articles")
 @Validated
 class PublicArticleController(
     private val articleService: ArticleService,
@@ -37,7 +36,9 @@ class PublicArticleController(
         return ResponseEntity.ok(articlePage.toPageResponse { it.toHomeArticleVO() })
     }
 
-    //TODO 获取文章详细信息
-    //TODO 获取文章详细信息
-    //TODO 获取文章详细信息
+    @Operation(summary = "获取文章详情")
+    @GetMapping("/{id}")
+    fun getArticle(@PathVariable id: Long): ResponseEntity<ArticleVO> {
+        return ResponseEntity.ok(articleService.getPublishedArticleById(id).toArticleVO())
+    }
 }

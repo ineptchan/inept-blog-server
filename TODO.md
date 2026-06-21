@@ -2,7 +2,7 @@
 2. [ ] 实现匿名评论
 3. [ ] 实现文章访问量
 4. [X] 未传递slug自动尝试生成
-5. [ ] 创建docker镜像
+5. [X] 创建docker镜像
 6. [ ] 为项目添加liquibase支持
 7. [ ] 创建用户用邮箱发密码，密码由系统随机生成
 8. [ ] 完善测试
@@ -19,7 +19,7 @@
 19. [ ] 搜索功能添加排序
 20. [X] `GET /admin/user`添加返回绑定的角色
 21. [ ] 访问文章ip记录
-22. [ ] Flyway / Liquibase
+22. [X] Flyway / Liquibase
 23. [ ] auth相关接口返回token过期时间
 24. [ ] 搜索可以用Elasticsearch
 25. [ ] 添加删除文章附件 视频。。的接口
@@ -27,9 +27,10 @@
 27. [ ] 文章提交软删除
 28. [ ] 添加文章点赞 浏览数
 29. [ ] 支持ABAC?
-30. [ ] 预签名上传，合并时需要判断是否是一个用户的请求
+30. [X] 预签名上传，合并时需要判断是否是一个用户的请求
 31. [ ] 原生 enum 类型 `@Enumerated(EnumType.STRING) @JdbcTypeCode(SqlTypes.NAMED_ENUM)`
 32. [ ] minio权限最小化
+33. [ ] docker需要开发镜像
 
 ## 对象存储
 

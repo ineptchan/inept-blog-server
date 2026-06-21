@@ -20,6 +20,7 @@ import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.Article
 import top.inept.blog.feature.article.model.entity.QArticle
 import top.inept.blog.feature.article.model.entity.constraints.ArticleConstraints
+import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.service.ArticleService
@@ -65,6 +66,7 @@ class ArticleServiceImpl(
             author = user,
             category = categories,
             tags = tags.toMutableSet(),
+            articleStatus = dto.status,
         )
 
         saveAndFlushArticleOrThrow(dbArticle)
@@ -152,6 +154,11 @@ class ArticleServiceImpl(
         }
 
         return articleRepository.findAll(predicate, pageRequest)
+    }
+
+    override fun getPublishedArticleById(id: Long): Article {
+        return articleRepository.findByIdAndArticleStatus(id, ArticleStatus.PUBLISHED)
+            ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND_OR_NOT_PUBLIC, id)
     }
 
     private fun saveAndFlushArticleOrThrow(dbArticle: Article): Article {

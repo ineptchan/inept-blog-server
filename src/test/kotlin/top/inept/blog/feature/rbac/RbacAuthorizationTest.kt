@@ -48,7 +48,7 @@ class RbacAuthorizationTest : IntegrationTestBase() {
 
     @Test
     fun `测试rabc权限不足拒绝`() {
-        httpClient.get().uri("admin/users")
+        httpClient.get().uri("/admin/users")
             .header("Authorization", "Bearer $token")
             .exchange()
             .expectStatus().isForbidden

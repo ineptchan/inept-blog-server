@@ -28,4 +28,6 @@ interface ArticleRepository : JpaRepository<Article, Long>, JpaSpecificationExec
     @Modifying
     @Query("update Article a set a.featuredImage = :url where a.id = :id")
     fun updateFeaturedImageById(id: Long, url: String)
+
+    fun findByIdAndArticleStatus(id: Long, articleStatus: ArticleStatus): Article?
 }

@@ -11,6 +11,7 @@ import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 interface ArticleService {
     fun getArticles(): List<Article>
     fun getArticleById(id: Long): Article
+    fun getPublishedArticleById(id: Long): Article
     fun createArticle(dto: CreateArticleDTO): Article
     fun updateArticle(id: Long, dto: UpdateArticleDTO): Article
     fun deleteArticle(id: Long)
