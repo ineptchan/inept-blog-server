@@ -19,7 +19,7 @@ import top.inept.blog.feature.categories.service.CategoriesService
 
 @Tag(name = "分类接口")
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/public/categories")
 @Validated
 class PublicCategoriesController(
     val categoriesService: CategoriesService
