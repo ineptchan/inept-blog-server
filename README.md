@@ -82,6 +82,18 @@ docker build -t inept-blog-server:latest .
 docker compose up -d --build
 ```
 
+## new
+
+```shell
+mkdir -p secrets
+
+openssl rand -base64 32 > secrets/postgres_password.txt
+openssl rand -hex 16 > secrets/minio_root_user.txt
+openssl rand -base64 32 > secrets/minio_root_password.txt
+openssl rand -base64 64 > secrets/spring_jwt_access_secret_key.txt
+openssl rand -base64 64 > secrets/spring_jwt_refresh_secret_key.txt
+```
+
 ## 非商业用途声明
 
 本项目为开源项目，仅供非商业用途。
