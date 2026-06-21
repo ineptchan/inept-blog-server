@@ -41,7 +41,7 @@ services:
     secrets:
       - postgres_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
 
   minio:
     image: minio/minio:latest
