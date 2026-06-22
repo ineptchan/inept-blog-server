@@ -40,4 +40,7 @@ data class ArticleVO(
 
     @field:Schema(description = "openapi.common.updated_at")
     var updatedAt: Instant?,
+
+    @field:Schema(description = "openapi.article.like", example = "12")
+    val likeCount: Long
 )

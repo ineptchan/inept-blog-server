@@ -1,4 +1,4 @@
-package top.inept.blog.feature.article.repository.model
+package top.inept.blog.feature.article.model.entity.model
 
 data class ArticleTitleDTO(
     val id: Long,

@@ -12,6 +12,7 @@ import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
 import top.inept.blog.feature.article.model.vo.ArticleVO
 import top.inept.blog.feature.article.model.vo.HomeArticleVO
+import top.inept.blog.feature.article.model.vo.LikeArticleVO
 import top.inept.blog.feature.categories.model.dto.CreateCategoriesDTO
 import top.inept.blog.feature.categories.model.vo.CategoriesVO
 import java.util.*
@@ -180,5 +181,50 @@ class AdminArticleControllerTest : IntegrationTestBase() {
         httpClient.get().uri("/public/articles/${publishedArticleVO.id}")
             .exchange()
             .expectStatus().isOk
+    }
+
+    @Test
+    fun `点赞文章测试`() {
+        val article = createArticle()
+
+        val likeArticleVO = (httpClient.post().uri("/user/articles/${article.id}/like")
+            .header("Authorization", "Bearer $adminToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<LikeArticleVO>()
+            .returnResult().responseBody
+            ?: fail("返回响应体为空"))
+
+        assertEquals(
+            article.likeCount + 1,
+            likeArticleVO.likeCount,
+            "点赞数应在原基础上加 1",
+        )
+
+        //取消点赞
+        val unlikeArticleVO = (httpClient.delete().uri("/user/articles/${article.id}/like")
+            .header("Authorization", "Bearer $adminToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<LikeArticleVO>()
+            .returnResult().responseBody
+            ?: fail("返回响应体为空"))
+
+        if (unlikeArticleVO.likeCount != article.likeCount) {
+            fail("点赞与预期不符合")
+        }
+    }
+
+    @Test
+    fun `未点赞进行点赞错误测试`() {
+        val article = createArticle()
+
+        //取消点赞
+        httpClient.delete().uri("/user/articles/${article.id}/like")
+            .header("Authorization", "Bearer $adminToken")
+            .exchange()
+            .expectStatus().isEqualTo(HttpStatus.CONFLICT)
+            .expectBody()
+            .jsonPath("$.errorCode").isEqualTo("message.articles.like_not_found")
     }
 }

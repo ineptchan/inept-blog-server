@@ -1,16 +1,11 @@
 package top.inept.blog.feature.article.repository
 
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.stereotype.Repository
 import top.inept.blog.feature.article.model.entity.ArticleObjectStorage
 
 @Repository
-interface ArticleObjectStorageRepository :
-    JpaRepository<ArticleObjectStorage, Long>,
-    JpaSpecificationExecutor<ArticleObjectStorage>,
-    QuerydslPredicateExecutor<ArticleObjectStorage> {
+interface ArticleObjectStorageRepository : JpaRepository<ArticleObjectStorage, Long> {
 
     fun findByObjectStorage_Id(id: Long): ArticleObjectStorage?
 

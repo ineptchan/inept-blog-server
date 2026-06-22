@@ -6,7 +6,7 @@ import top.inept.blog.feature.article.model.dto.QueryArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.Article
-import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
+import top.inept.blog.feature.article.model.entity.model.ArticleTitleDTO
 
 interface ArticleService {
     fun getArticles(): List<Article>
@@ -20,4 +20,6 @@ interface ArticleService {
     fun getArticleTitleById(id: Long): ArticleTitleDTO
     fun existsArticleById(id: Long): Boolean
     fun getHomeArticles(dto: QueryArticleDTO): Page<Article>
+    fun likeArticle(articleId: Long): Long
+    fun unlikeArticle(articleId: Long): Long
 }

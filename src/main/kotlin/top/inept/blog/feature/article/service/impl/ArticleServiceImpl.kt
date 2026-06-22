@@ -1,6 +1,7 @@
 package top.inept.blog.feature.article.service.impl
 
 import com.querydsl.core.BooleanBuilder
+import jakarta.persistence.EntityManager
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
@@ -18,15 +19,19 @@ import top.inept.blog.feature.article.model.dto.QueryArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleDTO
 import top.inept.blog.feature.article.model.dto.UpdateArticleStatusDTO
 import top.inept.blog.feature.article.model.entity.Article
+import top.inept.blog.feature.article.model.entity.ArticleLike
 import top.inept.blog.feature.article.model.entity.QArticle
 import top.inept.blog.feature.article.model.entity.constraints.ArticleConstraints
+import top.inept.blog.feature.article.model.entity.constraints.ArticleLikeConstraints
 import top.inept.blog.feature.article.model.entity.enums.ArticleStatus
+import top.inept.blog.feature.article.model.entity.model.ArticleTitleDTO
+import top.inept.blog.feature.article.repository.ArticleLikeRepository
 import top.inept.blog.feature.article.repository.ArticleRepository
-import top.inept.blog.feature.article.repository.model.ArticleTitleDTO
 import top.inept.blog.feature.article.service.ArticleService
 import top.inept.blog.feature.auth.constant.JwtClaimConstants
 import top.inept.blog.feature.categories.service.CategoriesService
 import top.inept.blog.feature.tag.service.TagService
+import top.inept.blog.feature.user.model.entity.User
 import top.inept.blog.feature.user.service.UserService
 import top.inept.blog.utils.SecurityUtil
 
@@ -36,6 +41,8 @@ class ArticleServiceImpl(
     private val userService: UserService,
     private val categoriesService: CategoriesService,
     private val tagService: TagService,
+    private val entityManager: EntityManager,
+    private val articleLikeRepository: ArticleLikeRepository
 ) : ArticleService {
     override fun getArticles(): List<Article> = articleRepository.findAll()
 
@@ -159,6 +166,76 @@ class ArticleServiceImpl(
     override fun getPublishedArticleById(id: Long): Article {
         return articleRepository.findByIdAndArticleStatus(id, ArticleStatus.PUBLISHED)
             ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND_OR_NOT_PUBLIC, id)
+    }
+
+    @Transactional
+    override fun likeArticle(articleId: Long): Long {
+        //article表likeCount增加
+        val updated = articleRepository.increaseLikeCount(articleId)
+        if (updated == 0) {
+            throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, articleId)
+        }
+
+        val userId = SecurityUtil.currentJwt()?.getClaimAsString(JwtClaimConstants.USER_ID)?.toLongOrNull()
+            ?: throw BusinessException(UserErrorCode.USER_ID_MISSING_CONTEXT)
+
+
+        val articleLike = ArticleLike(
+            article = entityManager.getReference(Article::class.java, articleId),
+            user = entityManager.getReference(User::class.java, userId)
+        )
+
+        saveArticleLikeAndFlushArticleOrThrow(articleLike)
+
+        return articleLikeRepository.countByArticle_Id(articleId)
+    }
+
+    @Transactional
+    override fun unlikeArticle(articleId: Long): Long {
+        //article表likeCount减少
+        val likeCountDTO = (articleRepository.findLikeCountById(articleId)
+            ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, articleId))
+
+        val userId = SecurityUtil.currentJwt()?.getClaimAsString(JwtClaimConstants.USER_ID)?.toLongOrNull()
+            ?: throw BusinessException(UserErrorCode.USER_ID_MISSING_CONTEXT)
+
+        val updated = articleRepository.decreaseLikeCount(articleId)
+        //判断是否点赞过
+        if (updated == 0) {
+            throw BusinessException(ArticleErrorCode.LIKE_NOT_FOUND, articleId)
+        }
+
+        val likeCount = if (likeCountDTO.likeCount == 0L) {
+            //数据不同步了，用article_likes表获取真实数据
+            val likeCount = articleLikeRepository.countByArticle_Id(articleId)
+            //修改错误的数据
+            articleRepository.updateLikeCountById(articleId, likeCount)
+            likeCount
+        } else {
+            //正常情况
+            val updated = articleLikeRepository.deleteByArticle_IdAndUser_Id(articleId, userId)
+            if (updated == 0) {
+                throw BusinessException(ArticleErrorCode.LIKE_NOT_FOUND, articleId)
+            }
+
+            likeCountDTO.likeCount - 1
+        }
+
+        return likeCount
+    }
+
+    private fun saveArticleLikeAndFlushArticleOrThrow(articleLike: ArticleLike): ArticleLike {
+        return try {
+            articleLikeRepository.saveAndFlush(articleLike)
+        } catch (e: DataIntegrityViolationException) {
+            val violation = e.cause as? ConstraintViolationException
+            when (violation?.constraintName) {
+                ArticleLikeConstraints.UNIQUE_ARTICLE_USER ->
+                    throw BusinessException(ArticleErrorCode.LIKE_ALREADY_EXISTS)
+
+                else -> throw BusinessException(CommonErrorCode.UNKNOWN)
+            }
+        }
     }
 
     private fun saveAndFlushArticleOrThrow(dbArticle: Article): Article {

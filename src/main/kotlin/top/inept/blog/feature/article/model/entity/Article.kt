@@ -57,6 +57,9 @@ class Article(
     @Column(name = "updated_at")
     var updatedAt: Instant? = null,
 
+    @Column(name = "like_count", nullable = false)
+    var likeCount: Long = 0,
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "article_tag_table",

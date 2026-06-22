@@ -1,6 +1,7 @@
 package top.inept.blog.feature.article.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -45,7 +46,10 @@ class AdminArticleController(
     @PreAuthorize("hasAuthority('admin:article:read')")
     @Operation(summary = "根据id获取文章")
     @GetMapping("/{id}")
-    fun getArticleById(@PathVariable id: Long): ResponseEntity<ArticleVO> {
+    fun getArticleById(
+        @Parameter(description = "openapi.article.id", required = true)
+        @PathVariable id: Long
+    ): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.getArticleById(id).toArticleVO())
     }
 
@@ -59,14 +63,21 @@ class AdminArticleController(
     @PreAuthorize("hasAuthority('admin:article:update')")
     @Operation(summary = "更新文章")
     @PatchMapping("/{id}")
-    fun updateArticle(@PathVariable id: Long, @Valid @RequestBody dto: UpdateArticleDTO): ResponseEntity<ArticleVO> {
+    fun updateArticle(
+        @Parameter(description = "openapi.article.id", required = true)
+        @PathVariable id: Long,
+        @Valid @RequestBody dto: UpdateArticleDTO
+    ): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.updateArticle(id, dto).toArticleVO())
     }
 
     @PreAuthorize("hasAuthority('admin:article:delete')")
     @Operation(summary = "删除文章")
     @DeleteMapping("/{id}")
-    fun deleteArticle(@PathVariable id: Long): ResponseEntity<Boolean> {
+    fun deleteArticle(
+        @Parameter(description = "openapi.article.id", required = true)
+        @PathVariable id: Long
+    ): ResponseEntity<Boolean> {
         articleService.deleteArticle(id)
         return ResponseEntity.ok(true)
     }

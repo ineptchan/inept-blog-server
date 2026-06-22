@@ -1,6 +1,7 @@
 package top.inept.blog.feature.article.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
@@ -38,7 +39,10 @@ class PublicArticleController(
 
     @Operation(summary = "获取文章详情")
     @GetMapping("/{id}")
-    fun getArticle(@PathVariable id: Long): ResponseEntity<ArticleVO> {
+    fun getArticle(
+        @Parameter(description = "openapi.article.id", required = true)
+        @PathVariable id: Long
+    ): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.getPublishedArticleById(id).toArticleVO())
     }
 }
