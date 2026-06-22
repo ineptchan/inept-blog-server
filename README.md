@@ -42,7 +42,7 @@ openssl rand -base64 32 > secrets/minio_root_password.txt
 openssl rand -base64 64 > secrets/spring_jwt_access_secret_key.txt
 openssl rand -base64 64 > secrets/spring_jwt_refresh_secret_key.txt
 
-docker compose up -d
+docker compose -f docker/compose/docker-compose.prod.yml up --build 
 ```
 
 ### 搭建开发环境

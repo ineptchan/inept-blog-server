@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: .
+      context: ../prod
       dockerfile: Dockerfile
     container_name: springboot-app
     ports:
