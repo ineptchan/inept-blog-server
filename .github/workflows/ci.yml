@@ -66,16 +66,6 @@ jobs:
           echo "MinIO not ready in time"
           exit 1
 
-      - name: Create MinIO bucket (optional)
-        run: |
-          curl -sSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
-          chmod +x mc
-          sudo mv mc /usr/local/bin/mc
-
-          mc alias set local http://localhost:9000 "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
-          mc mb -p "local/$MINIO_BUCKET" || true
-          mc anonymous set download local/$MINIO_BUCKET/public
-
       - name: Build and test
         run: ./gradlew build --no-daemon --stacktrace --info
 
