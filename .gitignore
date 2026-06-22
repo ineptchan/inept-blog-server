@@ -42,4 +42,4 @@ out/
 ### Dev ###
 .hypothesis
 .env
-dev
+/dev
