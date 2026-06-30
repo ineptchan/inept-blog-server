@@ -1,5 +1,6 @@
 package top.inept.blog.feature.rbac
 
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import top.inept.blog.IntegrationTestBase
 import top.inept.blog.feature.rbac.model.dto.AddRolePermissionsDTO
@@ -27,10 +28,9 @@ class RoleBindPermissionTest : IntegrationTestBase() {
             fail("与预期角色不符")
         }
 
-        //判断是否全部绑定
-        val size = (newDbRoleVO.permissions.map { it.id } - adminArticlePermissions.map { it.id }.toList()).size
-        if (size != 0) {
-            fail("权限数量与预期不符, 差${size}")
-        }
+        val actual = dbRole.permissionBindings.map { it.permission.id }.toSet()
+        val expected = adminArticlePermissions.map { it.id }.toSet()
+
+        assertTrue(actual.containsAll(expected))
     }
 }
