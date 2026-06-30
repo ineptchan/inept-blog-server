@@ -1,10 +1,12 @@
 package top.inept.blog.feature.rbac
 
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import top.inept.blog.IntegrationTestBase
 import top.inept.blog.util.DTOGeneration
 
 class UserBindRoleTest : IntegrationTestBase() {
+    @Test
     fun `用户绑定角色`() {
         val createRoleDTO = DTOGeneration.createRoleDTO()
 

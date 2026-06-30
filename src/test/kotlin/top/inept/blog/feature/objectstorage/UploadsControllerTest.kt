@@ -1,9 +1,6 @@
 package top.inept.blog.feature.objectstorage
 
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.client.expectBody
@@ -23,6 +20,7 @@ import java.util.*
 import kotlin.test.junit5.JUnit5Asserter.fail
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class UploadsControllerTest : IntegrationTestBase() {
     @Test
     @Order(1)

@@ -22,6 +22,7 @@ import top.inept.blog.feature.auth.model.vo.AuthLoginVO
 import top.inept.blog.feature.categories.repository.CategoriesRepository
 import top.inept.blog.feature.categories.service.CategoriesService
 import top.inept.blog.feature.objectstorage.service.ObjectStorageService
+import top.inept.blog.feature.rbac.repository.PermissionRepository
 import top.inept.blog.feature.rbac.repository.RoleRepository
 import top.inept.blog.feature.rbac.service.PermissionService
 import top.inept.blog.feature.rbac.service.RoleService
@@ -54,6 +55,9 @@ abstract class IntegrationTestBase {
 
     @Autowired
     lateinit var permissionService: PermissionService
+
+    @Autowired
+    lateinit var permissionRepository: PermissionRepository
 
     @Autowired
     lateinit var objectStorageService: ObjectStorageService
