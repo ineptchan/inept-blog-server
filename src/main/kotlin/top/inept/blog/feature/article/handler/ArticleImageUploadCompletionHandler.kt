@@ -89,19 +89,22 @@ class ArticleImageUploadCompletionHandler(
         objectStorageManager.saveAndFlushOrThrow(newObjectStorage)
 
         //保存对象存储与文章关系
+        //用pendingObjectStorage获得绑定的article
         val articleObjectStorage = articleObjectStorageRepository.findByObjectStorage_Id(pendingObjectStorage.id)
-        articleObjectStorage?.let {
+        if (articleObjectStorage != null) {
             articleObjectStorageRepository.save(
                 ArticleObjectStorage(
-                    article = it.article,
+                    article = articleObjectStorage.article,
                     objectStorage = newObjectStorage
                 )
             )
+        } else {
+            throw BusinessException(ObjectStorageErrorCode.ARTICLE_OBJECT_RELATION_NOT_FOUND, pendingObjectStorage.id)
         }
 
         //保存原始文件的has256
         pendingObjectStorage.fileHash = ShaUtil.sha256Hex(originalFileMessageDigest)
-        objectStorageManager.saveAndFlushOrThrow(newObjectStorage)
+        objectStorageManager.saveAndFlushOrThrow(pendingObjectStorage)
 
         //上传webp版本
         webpBytes.inputStream().use {

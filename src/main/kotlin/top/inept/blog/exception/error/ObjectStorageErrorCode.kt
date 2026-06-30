@@ -19,6 +19,7 @@ enum class ObjectStorageErrorCode(
     OBJECT_SIZE_MISMATCH("message.object_storage.object_size_mismatch", HttpStatus.BAD_REQUEST),
     CONTENT_TYPE_MISMATCH("message.object_storage.content_type_mismatch", HttpStatus.UNSUPPORTED_MEDIA_TYPE),
     ARTICLE_ID_REQUIRED("message.object_storage.article_id_required", HttpStatus.BAD_REQUEST),
+    ARTICLE_OBJECT_RELATION_NOT_FOUND("message.object_storage.article_object_relation_not_found", HttpStatus.NOT_FOUND),
 
     PARSER_IMAGE_ERROR("message.object_storage.parser_image_error", HttpStatus.BAD_REQUEST),
     AVATAR_FILE_TOO_LARGE("message.object_storage.avatar_file_too_large", HttpStatus.PAYLOAD_TOO_LARGE),
