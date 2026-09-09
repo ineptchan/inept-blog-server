@@ -28,7 +28,7 @@ class RoleBindPermissionTest : IntegrationTestBase() {
             fail("与预期角色不符")
         }
 
-        val actual = dbRole.permissionBindings.map { it.permission.id }.toSet()
+        val actual = newDbRoleVO.permissions.map { it.id }.toSet()
         val expected = adminArticlePermissions.map { it.id }.toSet()
 
         assertTrue(actual.containsAll(expected))
