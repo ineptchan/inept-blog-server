@@ -166,7 +166,7 @@ class CommentServiceImpl(
         val builder = BooleanBuilder()
             .and(c.parentComment.id.eq(commentId))
 
-        status?.let { c.status.eq(it) }
+        status?.let { builder.and(c.status.eq(it)) }
 
         return commentRepository.findAll(builder, pageRequest).toPageResponse { it.toCommentReplyVO() }
     }
