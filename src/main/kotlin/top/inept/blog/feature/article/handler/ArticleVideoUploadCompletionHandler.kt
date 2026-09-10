@@ -12,7 +12,9 @@ import top.inept.blog.feature.article.repository.ArticleObjectStorageRepository
 import top.inept.blog.feature.article.repository.ArticleRepository
 import top.inept.blog.feature.objectstorage.handler.UploadCompletionHandler
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
-import top.inept.blog.feature.objectstorage.model.entity.enums.*
+import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
+import top.inept.blog.feature.objectstorage.model.entity.enums.Status
+import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
 import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.service.ObjectStorageManager
 import top.inept.blog.properties.ObjectStorageProperties
@@ -53,7 +55,7 @@ class ArticleVideoUploadCompletionHandler(
         }
 
         val objectKey = "${UUID.randomUUID()}.${File(pendingObjectStorage.originalFileName).extension}"
-        val bucketName = pendingObjectStorage.purpose.getBucketName()
+        val bucketName = pendingObjectStorage.purpose.bucketName
         val objectSize = pendingObjectStorage.fileSize
 
         //插入对象
@@ -90,7 +92,7 @@ class ArticleVideoUploadCompletionHandler(
                 .`object`(objectKey)
                 .source(
                     CopySource.builder()
-                        .bucket(pendingObjectStorage.purpose.getPendingBucketName())
+                        .bucket(pendingObjectStorage.purpose.pendingBucketName)
                         .`object`(pendingObjectStorage.objectKey)
                         .build()
                 )

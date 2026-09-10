@@ -14,7 +14,6 @@ import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
 import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
 import top.inept.blog.feature.objectstorage.model.entity.enums.Status
 import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
-import top.inept.blog.feature.objectstorage.model.entity.enums.getBucketName
 import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.service.ObjectStorageManager
 import top.inept.blog.properties.ObjectStorageProperties
@@ -73,7 +72,7 @@ class ArticleFeaturedImageUploadCompletionHandler(
         val objectKey = "${UUID.randomUUID()}.webp"
         val contentType = "image/webp"
         val objectSize = webpBytes.size.toLong()
-        val bucketName = pendingObjectStorage.purpose.getBucketName()
+        val bucketName = pendingObjectStorage.purpose.bucketName
 
         val newObjectStorage = ObjectStorage(
             ownerUser = pendingObjectStorage.ownerUser,

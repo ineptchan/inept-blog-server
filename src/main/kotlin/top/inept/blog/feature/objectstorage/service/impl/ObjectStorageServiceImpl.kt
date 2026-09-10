@@ -8,6 +8,7 @@ import io.minio.http.Method
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.ArticleErrorCode
@@ -23,7 +24,8 @@ import top.inept.blog.feature.objectstorage.handler.UploadCompletionHandler
 import top.inept.blog.feature.objectstorage.model.dto.CompleteUploadDTO
 import top.inept.blog.feature.objectstorage.model.dto.PresignUploadDTO
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
-import top.inept.blog.feature.objectstorage.model.entity.enums.*
+import top.inept.blog.feature.objectstorage.model.entity.enums.Status
+import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
 import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
 import top.inept.blog.feature.objectstorage.model.vo.PresignUploadVO
 import top.inept.blog.feature.objectstorage.repository.ObjectStorageRepository
@@ -55,15 +57,20 @@ class ObjectStorageServiceImpl(
             throw BusinessException(ObjectStorageErrorCode.CONTENT_SIZE_EXCEEDED, dto.fileSize, maxSize)
         }
 
-        if (dto.purpose in listOf(
-                Purpose.ARTICLE_IMAGE,
-                Purpose.ARTICLE_FEATURED_IMAGE,
-                Purpose.ARTICLE_VIDEO,
-                Purpose.ARTICLE_ATTACHMENT
-            ) && dto.articleId == null
-        ) {
+        //判断文章id
+        if (dto.articleId == null) {
             throw BusinessException(ObjectStorageErrorCode.ARTICLE_ID_REQUIRED, dto.purpose)
         }
+
+        //判断是否有权限使用
+        val securityContext = SecurityContextHolder.getContext()
+        val permissionCodes = SecurityUtil.parsePermissionCodes(securityContext)
+
+        val purposePermissionCode = dto.purpose.permissionCode
+        if (purposePermissionCode != null && purposePermissionCode !in permissionCodes) {
+            throw BusinessException(ObjectStorageErrorCode.UPLOAD_PERMISSION_DENIED, purposePermissionCode)
+        }
+
 
         //判断文章在数据库是否存在
         dto.articleId?.let { articleId ->
@@ -73,7 +80,7 @@ class ObjectStorageServiceImpl(
         }
 
         val objectKey = "${UUID.randomUUID()}.${File(dto.fileName).extension}"
-        val bucketName = dto.purpose.getPendingBucketName()
+        val bucketName = dto.purpose.pendingBucketName
         val method = Method.PUT
         val duration = 5
         val unit = TimeUnit.MINUTES

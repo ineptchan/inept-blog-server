@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -24,12 +25,26 @@ import top.inept.blog.feature.objectstorage.service.ObjectStorageService
 class UploadsController(
     private val objectStorageService: ObjectStorageService
 ) {
+    @PreAuthorize(
+        """
+        hasAnyAuthority('admin:article:upload:image',
+                        'admin:article:upload:featured-image',
+                        'admin:article:upload:video',
+                        'admin:article:upload:attachment')"""
+    )
     @Operation(summary = "预签名上传")
     @PostMapping("/presign-upload")
     fun presignUpload(@Valid @RequestBody dto: PresignUploadDTO): ResponseEntity<PresignUploadVO> {
         return ResponseEntity.ok(objectStorageService.presignUpload(dto))
     }
 
+    @PreAuthorize(
+        """
+        hasAnyAuthority('admin:article:upload:image',
+                        'admin:article:upload:featured-image',
+                        'admin:article:upload:video',
+                        'admin:article:upload:attachment')"""
+    )
     @Operation(summary = "完成对象上传")
     @PostMapping("/complete-upload")
     fun completeUpload(@Valid @RequestBody dto: CompleteUploadDTO): ResponseEntity<CompleteUploadVO> {
