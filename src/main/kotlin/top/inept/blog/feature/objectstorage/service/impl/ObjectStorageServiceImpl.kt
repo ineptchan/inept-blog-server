@@ -24,6 +24,7 @@ import top.inept.blog.feature.objectstorage.handler.UploadCompletionHandler
 import top.inept.blog.feature.objectstorage.model.dto.CompleteUploadDTO
 import top.inept.blog.feature.objectstorage.model.dto.PresignUploadDTO
 import top.inept.blog.feature.objectstorage.model.entity.ObjectStorage
+import top.inept.blog.feature.objectstorage.model.entity.enums.Purpose
 import top.inept.blog.feature.objectstorage.model.entity.enums.Status
 import top.inept.blog.feature.objectstorage.model.entity.enums.Visibility
 import top.inept.blog.feature.objectstorage.model.vo.CompleteUploadVO
@@ -58,7 +59,13 @@ class ObjectStorageServiceImpl(
         }
 
         //判断文章id
-        if (dto.articleId == null) {
+        if (dto.purpose in listOf(
+                Purpose.ARTICLE_IMAGE,
+                Purpose.ARTICLE_FEATURED_IMAGE,
+                Purpose.ARTICLE_VIDEO,
+                Purpose.ARTICLE_ATTACHMENT
+            ) && dto.articleId == null
+        ) {
             throw BusinessException(ObjectStorageErrorCode.ARTICLE_ID_REQUIRED, dto.purpose)
         }
 
