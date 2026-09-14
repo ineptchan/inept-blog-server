@@ -32,22 +32,17 @@ class AuthController(
     @Operation(summary = "登录")
     @PostMapping("/login")
     fun login(@Valid @RequestBody dto: AuthLoginDTO, response: HttpServletResponse): ResponseEntity<AuthLoginVO> {
-        val combo = authService.login(dto)
+        val loginResult = authService.login(dto)
 
         //在prod配置模式下必须https才能用携带cookie
         val secure = environment.acceptsProfiles(Profiles.of("prod"))
+        response.addRefreshTokenHeader(
+            refreshToken = loginResult.refreshToken,
+            maxAge = Duration.ofMinutes(jwtProperties.refreshExpiresMinutes),
+            secure
+        )
 
-        val cookie = ResponseCookie.from("X-Refresh-Token", combo.refreshToken)
-            .httpOnly(true)
-            .secure(secure)
-            .sameSite("Lax")
-            .path("/auth")
-            .maxAge(Duration.ofMinutes(jwtProperties.refreshExpiresMinutes))
-            .build()
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-
-        return ResponseEntity.ok(combo.dto)
+        return ResponseEntity.ok(loginResult.dto)
     }
 
     @Operation(summary = "刷新令牌")
@@ -56,10 +51,20 @@ class AuthController(
     fun refresh(
         @Parameter(hidden = true)
         @CookieValue("X-Refresh-Token")
-        token: String
+        token: String,
+        response: HttpServletResponse
     ): ResponseEntity<RefreshVO> {
-        val accessToken = authService.refreshAccessTokenByRefreshToken(token)
-        return ResponseEntity.ok(RefreshVO(accessToken))
+        val refreshResult = authService.refreshToken(token)
+
+        //在prod配置模式下必须https才能用携带cookie
+        val secure = environment.acceptsProfiles(Profiles.of("prod"))
+        response.addRefreshTokenHeader(
+            refreshToken = refreshResult.refreshToken,
+            maxAge = Duration.ofMinutes(jwtProperties.refreshExpiresMinutes),
+            secure
+        )
+
+        return ResponseEntity.ok(RefreshVO(refreshResult.accessToken))
     }
 
     @Operation(summary = "退出登录")
@@ -75,17 +80,19 @@ class AuthController(
 
         //在prod配置模式下必须https才能用携带cookie
         val secure = environment.acceptsProfiles(Profiles.of("prod"))
+        response.addRefreshTokenHeader("", Duration.ZERO, secure)
 
-        val deleteCookie = ResponseCookie.from("X-Refresh-Token", "")
+        return ResponseEntity.ok("ok")
+    }
+
+    private fun HttpServletResponse.addRefreshTokenHeader(refreshToken: String, maxAge: Duration, secure: Boolean) {
+        val cookie = ResponseCookie.from("X-Refresh-Token", refreshToken)
             .httpOnly(true)
             .secure(secure)
             .sameSite("Lax")
             .path("/auth")
-            .maxAge(Duration.ZERO)
+            .maxAge(maxAge)
             .build()
-
-        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString())
-
-        return ResponseEntity.ok("ok")
+        this.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import top.inept.blog.feature.auth.model.entity.constraints.RefreshTokenConstraints
 import top.inept.blog.feature.user.model.entity.User
 import java.time.Instant
+import java.util.*
 
 /**
  * Refresh token
@@ -66,6 +67,9 @@ class RefreshToken(
 
     @Column(name = "ip_address", length = 45)
     var ip_address: String? = null,
+
+    @Column(name = "family_id", nullable = false)
+    var familyId: UUID,
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "replaced_by_id")

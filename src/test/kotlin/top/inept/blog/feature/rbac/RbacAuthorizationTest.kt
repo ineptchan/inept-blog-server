@@ -26,13 +26,13 @@ class RbacAuthorizationTest : IntegrationTestBase() {
         val createUserDTO = DTOGeneration.createUserDTO()
         val user = userService.createUser(createUserDTO)
 
-        val (refreshToken, accessToken) = AuthUtil.loginAndGetRefreshToken(
+        val (refreshToken, loginVO) = AuthUtil.login(
             httpClient,
             createUserDTO.username,
             createUserDTO.password
         )
         userId = user.id
-        token = accessToken
+        token = loginVO.accessToken
     }
 
     @AfterEach

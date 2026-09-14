@@ -1,9 +1,11 @@
 package top.inept.blog.feature.auth.repository
 
 import org.springframework.data.jpa.repository.*
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import top.inept.blog.feature.auth.model.entity.RefreshToken
 import java.time.Instant
+import java.util.*
 
 @Repository
 interface RefreshTokenRepository : JpaRepository<RefreshToken, Long>, JpaSpecificationExecutor<RefreshToken> {
@@ -21,7 +23,14 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken, Long>, JpaSpecifi
 """
     )
     fun revokeActiveTokenByUserId(
-        userId: Long,
-        now: Instant
+        @Param("userId") userId: Long,
+        @Param("now") now: Instant
+    ): Int
+
+    @Modifying
+    @Query("update RefreshToken rt set rt.revokedAt = :now where rt.familyId = :familyId")
+    fun revokeTokenByFamilyId(
+        @Param("familyId") familyId: UUID,
+        @Param("now") now: Instant
     ): Int
 }
