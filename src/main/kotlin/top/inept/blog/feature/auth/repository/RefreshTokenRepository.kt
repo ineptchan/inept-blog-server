@@ -1,5 +1,6 @@
 package top.inept.blog.feature.auth.repository
 
+import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.*
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -11,6 +12,10 @@ import java.util.*
 interface RefreshTokenRepository : JpaRepository<RefreshToken, Long>, JpaSpecificationExecutor<RefreshToken> {
     @EntityGraph(attributePaths = ["user"])
     fun findByTokenHash(refreshTokenSha256: String): RefreshToken?
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @EntityGraph(attributePaths = ["user"])
+    fun findForUpdateByTokenHash(refreshTokenSha256: String): RefreshToken?
 
     @Modifying
     @Query(

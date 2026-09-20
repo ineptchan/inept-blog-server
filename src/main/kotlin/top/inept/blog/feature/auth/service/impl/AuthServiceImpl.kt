@@ -35,6 +35,18 @@ class AuthServiceImpl(
     @Qualifier("refreshJwtEncoder") private val refreshEncoder: JwtEncoder,
     @Qualifier("refreshJwtDecoder") private val refreshDecoder: JwtDecoder,
 ) : AuthService {
+    private fun getRefreshToken(refreshTokenString: String): RefreshToken {
+        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshTokenString)
+        return refreshTokenRepository.findByTokenHash(refreshTokenSha256)
+            ?: throw BusinessException(AuthErrorCode.REFRESH_TOKEN_DB_NOT_FOUND)
+    }
+
+    private fun getRefreshTokenForUpdate(refreshTokenString: String): RefreshToken {
+        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshTokenString)
+        return refreshTokenRepository.findForUpdateByTokenHash(refreshTokenSha256)
+            ?: throw BusinessException(AuthErrorCode.REFRESH_TOKEN_DB_NOT_FOUND)
+    }
+
     @Transactional
     override fun login(dto: AuthLoginDTO): LoginResult {
         //根据用户名查找用户
@@ -93,7 +105,7 @@ class AuthServiceImpl(
         }
 
         //根据sha256去数据库查找RefreshToken
-        val oldDbRefreshToken = getRefreshTokenByToken(refreshTokenString)
+        val oldDbRefreshToken = getRefreshTokenForUpdate(refreshTokenString)
 
         val user = oldDbRefreshToken.user
 
@@ -150,7 +162,7 @@ class AuthServiceImpl(
         if (refreshTokenString.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
 
         //根据sha256去数据库查找RefreshToken
-        val dbRefreshToken = getRefreshTokenByToken(refreshTokenString)
+        val dbRefreshToken = getRefreshTokenForUpdate(refreshTokenString)
 
         //校验RefreshToken是否合法
         val jwt = try {
@@ -165,19 +177,6 @@ class AuthServiceImpl(
         //撤销信息写入数据库
         dbRefreshToken.revokedAt = Instant.now()
         refreshTokenRepository.saveAndFlush(dbRefreshToken)
-    }
-
-    /**
-     * Returns the refresh token by token
-     * 根据sha256去数据库查找RefreshToken
-     * @param refreshTokenString the refresh token string
-     * @return the refresh token
-     * @throws BusinessException
-     */
-    private fun getRefreshTokenByToken(refreshTokenString: String): RefreshToken {
-        val refreshTokenSha256 = ShaUtil.sha256Hex(refreshTokenString)
-        return refreshTokenRepository.findByTokenHash(refreshTokenSha256)
-            ?: throw BusinessException(AuthErrorCode.REFRESH_TOKEN_DB_NOT_FOUND)
     }
 
     private fun createRefreshJwt(username: String): Jwt {
