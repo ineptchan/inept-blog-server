@@ -54,18 +54,30 @@ class AuthControllerTest : IntegrationTestBase() {
     @Test
     fun `测试RefreshToken被盗`() {
         //用户正常登录
-        val (firstRefreshToken, _) = AuthUtil.login(httpClient, "admintest", "admin123456")
+        val (userRefreshToken, _) = AuthUtil.login(httpClient, "admintest", "admin123456")
         //密钥被盗刷新
-        AuthUtil.refreshToken(httpClient, firstRefreshToken)
+        val (hackerRefreshToken, _) = AuthUtil.refreshToken(httpClient, userRefreshToken)
         //用户未察觉继续用firstRefreshToken刷新
-        val res = httpClient.post()
+        val res2 = httpClient.post()
             .uri("/auth/refresh")
-            .cookie("X-Refresh-Token", firstRefreshToken)
+            .cookie("X-Refresh-Token", userRefreshToken)
             .exchange()
             .expectBody<ProblemDetail>()
             .returnResult().responseBody ?: fail("响应没内容")
 
-        if (res.status != HttpStatus.UNAUTHORIZED.value() && res.properties?.get("errorCode") != "message.auth.refresh_token_reused") {
+        if (res2.status != HttpStatus.UNAUTHORIZED.value() && res2.properties?.get("errorCode") != "message.auth.refresh_token_reused") {
+            fail("预期错误码为 message.auth.refresh_token_reused")
+        }
+
+        //黑客尝试刷新
+        val res3 = httpClient.post()
+            .uri("/auth/refresh")
+            .cookie("X-Refresh-Token", hackerRefreshToken)
+            .exchange()
+            .expectBody<ProblemDetail>()
+            .returnResult().responseBody ?: fail("响应没内容")
+
+        if (res3.status != HttpStatus.UNAUTHORIZED.value() && res3.properties?.get("errorCode") != "message.auth.refresh_token_reused") {
             fail("预期错误码为 message.auth.refresh_token_reused")
         }
     }

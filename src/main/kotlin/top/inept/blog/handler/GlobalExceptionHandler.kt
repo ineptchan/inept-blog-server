@@ -13,6 +13,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import top.inept.blog.base.ValidationError
 import top.inept.blog.exception.BusinessException
+import top.inept.blog.exception.RefreshTokenRevokedException
+import top.inept.blog.exception.error.AuthErrorCode
 import top.inept.blog.extensions.get
 import top.inept.blog.extensions.log
 import top.inept.blog.utils.ProblemDetailUtil
@@ -29,6 +31,22 @@ class GlobalExceptionHandler(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             title = messages["message.common.server_unknown_error"],
             detail = messages["message.common.server_unknown_error.detail"]
+        )
+
+        return problemDetail
+    }
+
+    @ExceptionHandler(RefreshTokenRevokedException::class)
+    fun handleRefreshTokenRevokedException(ex: RefreshTokenRevokedException): ProblemDetail {
+        log.error("刷新令牌已被重复使用", ex)
+
+        val errorCode = AuthErrorCode.REFRESH_TOKEN_REUSED
+
+        val problemDetail = ProblemDetailUtil.buildProblemDetail(
+            status = errorCode.httpStatus,
+            title = messages[errorCode.messageKey],
+            detail = messages.get("${errorCode.messageKey}.detail"),
+            errorCode = errorCode.messageKey
         )
 
         return problemDetail

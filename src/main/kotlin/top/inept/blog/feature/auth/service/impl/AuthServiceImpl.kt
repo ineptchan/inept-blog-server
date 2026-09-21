@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
 import top.inept.blog.exception.BusinessException
+import top.inept.blog.exception.RefreshTokenRevokedException
 import top.inept.blog.exception.error.AuthErrorCode
 import top.inept.blog.feature.auth.constant.JwtClaimConstants
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
@@ -91,7 +92,9 @@ class AuthServiceImpl(
         return LoginResult(vo, refreshToken)
     }
 
-    @Transactional
+    @Transactional(
+        dontRollbackOn = [RefreshTokenRevokedException::class]
+    )
     override fun refreshToken(refreshTokenString: String): RefreshResult {
         if (refreshTokenString.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
 
@@ -113,7 +116,7 @@ class AuthServiceImpl(
         if (oldDbRefreshToken.lastUsedAt != null) {
             //使用过被重复刷新可能代表RefreshToken被盗用，将同一个replacedById的RefreshToken全部撤销，让用户重新登录
             refreshTokenRepository.revokeTokenByFamilyId(oldDbRefreshToken.familyId, now)
-            throw BusinessException(AuthErrorCode.REFRESH_TOKEN_REUSED)
+            throw RefreshTokenRevokedException()
         }
         //判断用户状态
         if (!user.status) throw BusinessException(AuthErrorCode.DISABLE_USER, user.username)
