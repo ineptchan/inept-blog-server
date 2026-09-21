@@ -39,7 +39,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-resttestclient")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    runtimeOnly("com.h2database:h2")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

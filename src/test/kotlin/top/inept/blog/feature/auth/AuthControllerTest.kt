@@ -1,6 +1,9 @@
 package top.inept.blog.feature.auth
 
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
+import org.springframework.test.web.servlet.client.expectBody
 import top.inept.blog.IntegrationTestBase
 import top.inept.blog.util.AuthUtil
 import kotlin.test.junit5.JUnit5Asserter.fail
@@ -59,6 +62,11 @@ class AuthControllerTest : IntegrationTestBase() {
             .uri("/auth/refresh")
             .cookie("X-Refresh-Token", firstRefreshToken)
             .exchange()
-            .expectStatus().isUnauthorized
+            .expectBody<ProblemDetail>()
+            .returnResult().responseBody ?: fail("响应没内容")
+
+        if (res.status != HttpStatus.UNAUTHORIZED.value() && res.properties?.get("errorCode") != "message.auth.refresh_token_reused") {
+            fail("预期错误码为 message.auth.refresh_token_reused")
+        }
     }
 }
