@@ -53,6 +53,16 @@ class AdminArticleController(
         return ResponseEntity.ok(articleService.getArticleById(id).toArticleVO())
     }
 
+    @PreAuthorize("hasAuthority('admin:article:read')")
+    @Operation(summary = "根据slug获取文章")
+    @GetMapping("/slug/{slug}")
+    fun getArticleBySlug(
+        @Parameter(description = "openapi.article.slug", required = true)
+        @PathVariable slug: String
+    ): ResponseEntity<ArticleVO> {
+        return ResponseEntity.ok(articleService.getArticleBySlug(slug).toArticleVO())
+    }
+
     @PreAuthorize("hasAuthority('admin:article:create')")
     @Operation(summary = "创建文章")
     @PostMapping

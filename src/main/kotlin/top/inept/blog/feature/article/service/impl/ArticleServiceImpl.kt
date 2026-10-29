@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -50,6 +51,12 @@ class ArticleServiceImpl(
         //根据id查找文章
         return articleRepository.findByIdOrNull(id)
             ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND, id)
+    }
+
+    override fun getArticleBySlug(slug: String): Article {
+        return articleRepository.findBySlug(slug)
+            ?: throw BusinessException(ArticleErrorCode.SLUG_NOT_FOUND, id)
+
     }
 
     override fun createArticle(dto: CreateArticleDTO): Article {
@@ -165,6 +172,11 @@ class ArticleServiceImpl(
 
     override fun getPublishedArticleById(id: Long): Article {
         return articleRepository.findByIdAndArticleStatus(id, ArticleStatus.PUBLISHED)
+            ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND_OR_NOT_PUBLIC, id)
+    }
+
+    override fun getPublishedArticleBySlug(slug: String): Article {
+        return articleRepository.findBySlugAndArticleStatus(slug, ArticleStatus.PUBLISHED)
             ?: throw BusinessException(ArticleErrorCode.ID_NOT_FOUND_OR_NOT_PUBLIC, id)
     }
 

@@ -46,4 +46,8 @@ interface ArticleRepository : JpaRepository<Article, Long>, JpaSpecificationExec
     @Modifying
     @Query("update Article a set a.likeCount = ?2 where a.id = ?1")
     fun updateLikeCountById(articleId: Long, likeCount: Long): Int
+
+    fun findBySlug(slug: String): Article?
+    fun findBySlugAndArticleStatus(slug: String, articleStatus: ArticleStatus): Article?
+
 }

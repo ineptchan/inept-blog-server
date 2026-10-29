@@ -45,4 +45,13 @@ class PublicArticleController(
     ): ResponseEntity<ArticleVO> {
         return ResponseEntity.ok(articleService.getPublishedArticleById(id).toArticleVO())
     }
+
+    @Operation(summary = "获取文章详情按slug")
+    @GetMapping("/slug/{slug}")
+    fun getArticle(
+        @Parameter(description = "openapi.article.slug", required = true)
+        @PathVariable slug: String
+    ): ResponseEntity<ArticleVO> {
+        return ResponseEntity.ok(articleService.getPublishedArticleBySlug(slug).toArticleVO())
+    }
 }

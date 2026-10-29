@@ -11,7 +11,9 @@ import top.inept.blog.feature.article.model.entity.model.ArticleTitleDTO
 interface ArticleService {
     fun getArticles(): List<Article>
     fun getArticleById(id: Long): Article
+    fun getArticleBySlug(slug: String): Article
     fun getPublishedArticleById(id: Long): Article
+    fun getPublishedArticleBySlug(slug: String): Article
     fun createArticle(dto: CreateArticleDTO): Article
     fun updateArticle(id: Long, dto: UpdateArticleDTO): Article
     fun deleteArticle(id: Long)
