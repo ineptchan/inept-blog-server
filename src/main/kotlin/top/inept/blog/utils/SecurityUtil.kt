@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import top.inept.blog.exception.BusinessException
 import top.inept.blog.exception.error.UserErrorCode
+import top.inept.blog.feature.auth.constant.JwtClaimConstants
 
 object SecurityUtil {
     fun parseUsername(securityContext: SecurityContext): String? {
@@ -15,7 +16,6 @@ object SecurityUtil {
             null
         }
     }
-
 
     fun currentJwt(): Jwt? {
         val authentication = SecurityContextHolder.getContext().authentication
@@ -30,6 +30,21 @@ object SecurityUtil {
             authentication.authorities.mapNotNull { it.authority }.toSet()
         } else {
             throw BusinessException(UserErrorCode.PERMISSION_MISSING_CONTEXT)
+        }
+    }
+
+    fun parseUserId(securityContext: SecurityContext): Long? {
+        val authentication = securityContext.authentication
+        val principal = authentication?.principal
+        return if (
+            authentication != null
+            && authentication.isAuthenticated
+            && principal != null
+            && principal is Jwt
+        ) {
+            (principal.claims[JwtClaimConstants.USER_ID] as String).toLongOrNull()
+        } else {
+            null
         }
     }
 

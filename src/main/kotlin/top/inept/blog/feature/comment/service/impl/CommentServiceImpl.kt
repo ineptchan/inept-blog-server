@@ -94,12 +94,12 @@ class CommentServiceImpl(
 
     @Transactional
     override fun createComment(articleId: Long, dto: CreateCommentDTO): CommentVO {
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+        //从上下文获取UserId
+        val contextUserId = SecurityUtil.parseUserId(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERID_MISSING_CONTEXT)
 
         //根据用户名获取用户
-        val user = userService.getUserByUsername(username)
+        val user = userService.getUserById(contextUserId)
 
         //判断有没有父级评论
         val parentComment = dto.parentCommentId?.let {
@@ -191,25 +191,21 @@ class CommentServiceImpl(
 
     @Transactional
     override fun likeComment(commentId: Long): LikeCommentVO {
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
-
-        //获取用户id
-        val userId = userService.getUserIdByUsername(username)
-            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
+        //从上下文获取UserId
+        val contextUserId = SecurityUtil.parseUserId(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERID_MISSING_CONTEXT)
 
         //检查评论是否存在
         if (!commentRepository.existsById(commentId))
             throw BusinessException(CommentErrorCode.ID_NOT_FOUND, commentId)
 
         //判断用户是否点过赞
-        val isLike = commentLikeRepository.existsByComment_IdAndUser_Id(commentId, userId)
+        val isLike = commentLikeRepository.existsByComment_IdAndUser_Id(commentId, contextUserId)
 
         //未点赞
         if (!isLike) {
             val comment = entityManager.getReference(Comment::class.java, commentId)
-            val user = entityManager.getReference(User::class.java, userId)
+            val user = entityManager.getReference(User::class.java, contextUserId)
             val commentLike = CommentLike(
                 comment = comment,
                 user = user
@@ -229,20 +225,16 @@ class CommentServiceImpl(
 
     @Transactional
     override fun unlikeComment(commentId: Long): LikeCommentVO {
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
-
-        //获取用户id
-        val userId = userService.getUserIdByUsername(username)
-            ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
+        //从上下文获取UserId
+        val contextUserId = SecurityUtil.parseUserId(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERID_MISSING_CONTEXT)
 
         //检查评论是否存在
         if (!commentRepository.existsById(commentId))
             throw BusinessException(CommentErrorCode.ID_NOT_FOUND, commentId)
 
         //判断用户是否点过赞
-        val dbCommentLike = commentLikeRepository.findByComment_IdAndUser_Id(commentId, userId)
+        val dbCommentLike = commentLikeRepository.findByComment_IdAndUser_Id(commentId, contextUserId)
         val isLike = dbCommentLike != null
 
         if (isLike) {

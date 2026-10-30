@@ -44,6 +44,10 @@ where ur.user.id = :userId
     @Query("select u from User u where u.username = :username")
     fun findWithRolesByUsername(@Param("username") username: String): User?
 
+    @EntityGraph(attributePaths = ["roleBindings", "roleBindings.role"])
+    @Query("select u from User u where u.id = :userId")
+    fun findWithRolesByUserId(@Param("userId") userId: Long): User?
+
     @Modifying
     @Query("update User u set u.avatar = :avatar where u.id = :id")
     fun updateAvatarById(@Param("id") id: Long, @Param("avatar") avatar: String)

@@ -92,12 +92,12 @@ class ArticleServiceImpl(
         //根据id查找文章
         val dbArticle = getArticleById(id)
 
-        //从上下文获取用户名
-        val username = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+        //从上下文获取UserId
+        val contextUserId = SecurityUtil.parseUserId(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERID_MISSING_CONTEXT)
 
         //根据用户名获取用户
-        userService.getUserByUsername(username)
+        userService.getUserById(contextUserId)
 
         //TODO 复查功能？
         //判断所属用户

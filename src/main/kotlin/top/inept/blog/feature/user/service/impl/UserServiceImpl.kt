@@ -122,6 +122,12 @@ class UserServiceImpl(
             ?: throw BusinessException(UserErrorCode.USERNAME_NOT_FOUND, username)
     }
 
+    fun getUserWithRolesByUserId(userId: Long): User {
+        //根据UserId查找用户
+        return userRepository.findWithRolesByUserId(userId)
+            ?: throw BusinessException(UserErrorCode.ID_NOT_FOUND, userId)
+    }
+
     @Transactional
     override fun createUser(dto: CreateUserDTO): User {
         val encodePassword = PasswordUtil.encode(dto.password)
@@ -215,12 +221,12 @@ class UserServiceImpl(
     }
 
     override fun getProfile(): UserDetailVO {
-        //从上下文获取用户名
-        val contextUsername = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+        //从上下文获取UserId
+        val contextUserId = SecurityUtil.parseUserId(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERID_MISSING_CONTEXT)
 
         //根据用户名获取用户
-        val dbUser = getUserWithRolesByUsername(contextUsername)
+        val dbUser = getUserWithRolesByUserId(contextUserId)
 
         val permissionCodes = userRepository.findPermissionCodes(dbUser.id)
 
@@ -229,12 +235,12 @@ class UserServiceImpl(
 
     @Transactional
     override fun updateProfile(dto: UpdateUserProfileDTO): User {
-        //从上下文获取用户名
-        val contextUsername = SecurityUtil.parseUsername(SecurityContextHolder.getContext())
-            ?: throw BusinessException(UserErrorCode.USERNAME_MISSING_CONTEXT)
+        //从上下文获取UserId
+        val contextUserId = SecurityUtil.parseUserId(SecurityContextHolder.getContext())
+            ?: throw BusinessException(UserErrorCode.USERID_MISSING_CONTEXT)
 
         //根据用户名获取用户
-        val dbUser = getUserByUsername(contextUsername)
+        val dbUser = getUserById(contextUserId)
 
         dbUser.apply {
             dto.nickname?.let { nickname = it }
