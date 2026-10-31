@@ -94,7 +94,7 @@ class AdminRoleController(
 
     @PreAuthorize("hasAuthority('admin:role:permission:delete')")
     @Operation(summary = "移除单个角色绑定的权限")
-    @PostMapping("/{roleId}/permissions/{permId}")
+    @DeleteMapping("/{roleId}/permissions/{permId}")
     fun removeRolePermission(
         @PathVariable roleId: Long,
         @PathVariable permId: Long
