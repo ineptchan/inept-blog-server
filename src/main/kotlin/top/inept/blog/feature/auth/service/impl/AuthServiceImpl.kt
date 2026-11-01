@@ -79,7 +79,7 @@ class AuthServiceImpl(
 
         //签发AccessToken
         val permissionCodes = userRepository.findPermissionCodes(user.id)
-        val accessJwt = createAccessJwt(permissionCodes, user.id, user.username)
+        val accessJwt = createAccessJwt(permissionCodes, user.id, user.username, user.authVersion)
 
         val vo = AuthLoginVO(
             id = user.id,
@@ -137,7 +137,7 @@ class AuthServiceImpl(
 
         //签发AccessToken
         val permissionCodes = userRepository.findPermissionCodes(user.id)
-        val accessJwt = createAccessJwt(permissionCodes, user.id, user.username)
+        val accessJwt = createAccessJwt(permissionCodes, user.id, user.username, user.authVersion)
 
         //签发新的RefreshToken
         val newRefreshJwt = createRefreshJwt(user.username)
@@ -161,15 +161,15 @@ class AuthServiceImpl(
     }
 
     @Transactional
-    override fun logout(refreshTokenString: String) {
-        if (refreshTokenString.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
+    override fun logout(refreshToken: String) {
+        if (refreshToken.isEmpty()) throw BusinessException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND)
 
         //根据sha256去数据库查找RefreshToken
-        val dbRefreshToken = getRefreshTokenForUpdate(refreshTokenString)
+        val dbRefreshToken = getRefreshTokenForUpdate(refreshToken)
 
         //校验RefreshToken是否合法
         val jwt = try {
-            refreshDecoder.decode(refreshTokenString)
+            refreshDecoder.decode(refreshToken)
         } catch (_: JwtException) {
             throw BusinessException(AuthErrorCode.TOKEN_VERIFICATION)
         }
@@ -201,14 +201,14 @@ class AuthServiceImpl(
         return refreshEncoder.encode(JwtEncoderParameters.from(headers, claims))
     }
 
-    private fun createAccessJwt(permissionCodes: List<String>, userId: Long, username: String): Jwt {
+    private fun createAccessJwt(permissionCodes: List<String>, userId: Long, username: String, authVersion: Long): Jwt {
         val authorities = permissionCodes.map { SimpleGrantedAuthority(it) }
         val auth = UsernamePasswordAuthenticationToken(username, null, authorities)
 
-        return createAccessJwt(auth, userId)
+        return createAccessJwt(auth, userId, authVersion)
     }
 
-    private fun createAccessJwt(auth: Authentication, userId: Long): Jwt {
+    private fun createAccessJwt(auth: Authentication, userId: Long, authVersion: Long): Jwt {
         //现在的时间
         val now = Instant.now()
         //过期时间
@@ -224,6 +224,7 @@ class AuthServiceImpl(
             claim(JwtClaimConstants.TOKEN_USE, JwtClaimConstants.TOKEN_USE_ACCESS)
             claim(JwtClaimConstants.USER_ID, userId.toString())
             claim(JwtClaimConstants.AUTH, authorities)
+            claim(JwtClaimConstants.AUTH_VERSION, authVersion.toString())
         }.build()
 
         val headers = JwsHeader.with(MacAlgorithm.HS256).build()

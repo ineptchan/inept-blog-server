@@ -32,7 +32,7 @@ class UserUserController(
     @PreAuthorize("hasAuthority('user:user:update')")
     @Operation(summary = "更新用户资料")
     @PatchMapping
-    fun updateProfile(@Valid @ModelAttribute dto: UpdateUserProfileDTO): ResponseEntity<UserVO> {
+    fun updateProfile(@Valid @RequestBody dto: UpdateUserProfileDTO): ResponseEntity<UserVO> {
         return ResponseEntity.ok(userService.updateProfile(dto).toUserVO())
     }
 }

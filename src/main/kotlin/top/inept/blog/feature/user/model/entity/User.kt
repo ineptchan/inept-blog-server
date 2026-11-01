@@ -62,6 +62,9 @@ class User(
     @Column(name = "status", nullable = false)
     var status: Boolean = true,
 
+    @Column(name = "auth_version", nullable = false)
+    var authVersion: Long = 0,
+
     /**
      * 创建时间
      */

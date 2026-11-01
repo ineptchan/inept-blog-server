@@ -6,6 +6,9 @@ import org.springframework.test.web.servlet.client.expectBody
 import top.inept.blog.feature.auth.model.dto.AuthLoginDTO
 import top.inept.blog.feature.auth.model.vo.AuthLoginVO
 import top.inept.blog.feature.auth.model.vo.RefreshVO
+import top.inept.blog.feature.user.model.dto.CreateUserDTO
+import top.inept.blog.feature.user.model.vo.UserDetailVO
+import top.inept.blog.feature.user.model.vo.UserVO
 import kotlin.test.junit5.JUnit5Asserter.fail
 
 object AuthUtil {
@@ -43,5 +46,32 @@ object AuthUtil {
             ?: fail("返回响应体为空"))
 
         return Pair(refreshToken, refreshVO)
+    }
+
+    fun createUser(client: RestTestClient, createUserDTO: CreateUserDTO, token: String): UserVO {
+        return client.post()
+            .uri("/admin/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer $token")
+            .body(createUserDTO)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<UserVO>()
+            .returnResult()
+            .responseBody
+            ?: fail("返回响应体为空")
+    }
+
+    fun getProfile(client: RestTestClient, token: String): UserDetailVO {
+        return client
+            .get()
+            .uri("/user/users")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<UserDetailVO>()
+            .returnResult()
+            .responseBody
+            ?: fail("返回响应体为空")
     }
 }

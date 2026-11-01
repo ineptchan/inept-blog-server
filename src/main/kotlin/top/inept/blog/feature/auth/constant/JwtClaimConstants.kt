@@ -7,4 +7,5 @@ object JwtClaimConstants {
 
     const val AUTH = "auth"
     const val USER_ID = "user_id"
+    const val AUTH_VERSION = "auth_version"
 }

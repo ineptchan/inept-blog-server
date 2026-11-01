@@ -14,6 +14,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.client.RestTestClient
+import org.springframework.test.web.servlet.client.expectBody
 import top.inept.blog.extensions.log
 import top.inept.blog.feature.article.repository.ArticleObjectStorageRepository
 import top.inept.blog.feature.article.repository.ArticleRepository
@@ -97,7 +98,7 @@ abstract class IntegrationTestBase {
                 username = "admintest",
                 password = "admin123456"
             )
-        ).exchange().expectStatus().isOk.expectBody(AuthLoginVO::class.java).returnResult()
+        ).exchange().expectStatus().isOk.expectBody<AuthLoginVO>().returnResult()
 
         val body = result.responseBody
             ?: fail("登录响应体为空")

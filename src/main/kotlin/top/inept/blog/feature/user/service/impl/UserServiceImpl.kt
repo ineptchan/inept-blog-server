@@ -204,6 +204,8 @@ class UserServiceImpl(
             }
         }
 
+        dbUser.authVersion += 1
+
         saveAndFlushOrThrow(dbUser)
 
         //撤销refreshToken
@@ -247,6 +249,7 @@ class UserServiceImpl(
             dto.password?.let {
                 PasswordUtil.encode(it)?.let { encodePassword ->
                     password = encodePassword
+                    authVersion += 1
                 }
             }
         }
@@ -257,6 +260,8 @@ class UserServiceImpl(
         if (dto.password != null) {
             refreshRepository.revokeActiveTokenByUserId(dbUser.id, Instant.now())
         }
+
+        dbUser.authVersion += 1
 
         return dbUser
     }
@@ -283,9 +288,12 @@ class UserServiceImpl(
 
         dbUser.replaceRoles(roles)
 
+        dbUser.authVersion += 1
+
         return saveAndFlushOrThrow(dbUser).toUserRolesVO()
     }
 
+    @Transactional
     override fun addUserRoles(
         id: Long,
         dto: AddUserRolesDTO
@@ -305,9 +313,12 @@ class UserServiceImpl(
 
         dbUser.addRoles(roles)
 
+        dbUser.authVersion += 1
+
         return saveAndFlushOrThrow(dbUser).toUserRolesVO()
     }
 
+    @Transactional
     override fun removeUserRole(
         userId: Long,
         roleId: Long
@@ -316,6 +327,8 @@ class UserServiceImpl(
 
         val isRemove = dbUser.roleBindings.removeIf { it.role.id == roleId }
         if (!isRemove) throw BusinessException(UserErrorCode.USER_NOT_BINDING_ROLE, roleId)
+
+        dbUser.authVersion += 1
 
         return saveAndFlushOrThrow(dbUser).toUserRolesVO()
     }

@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
-import org.springframework.security.oauth2.jwt.JwtDecoder
-import org.springframework.security.oauth2.jwt.JwtEncoder
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
+import org.springframework.security.oauth2.jwt.*
+import top.inept.blog.feature.auth.constant.JwtClaimConstants
+import top.inept.blog.feature.auth.validation.AuthVersionValidator
 import top.inept.blog.properties.JwtProperties
 import java.nio.charset.StandardCharsets
 import javax.crypto.SecretKey
@@ -26,10 +25,41 @@ class JwtConfig {
         SecretKeySpec(props.refreshSecretKey.toByteArray(StandardCharsets.UTF_8), "HmacSHA256")
 
     @Bean("accessJwtDecoder")
-    fun accessJwtDecoder(@Qualifier("accessJwtSecret") jwtSecret: SecretKey): JwtDecoder =
-        NimbusJwtDecoder.withSecretKey(jwtSecret)
+    fun accessJwtDecoder(
+        @Qualifier("accessJwtSecret") jwtSecret: SecretKey,
+        props: JwtProperties,
+        authVersionValidator: AuthVersionValidator,
+    ): JwtDecoder {
+        val decoder = NimbusJwtDecoder.withSecretKey(jwtSecret)
             .macAlgorithm(MacAlgorithm.HS256)
             .build()
+
+        val basicValidator = JwtValidators.createDefaultWithIssuer(props.issuer)
+        val tokenUseValidator = JwtClaimValidator<String>(
+            JwtClaimConstants.TOKEN_USE
+        ) { it == JwtClaimConstants.TOKEN_USE_ACCESS }
+
+        decoder.setJwtValidator { jwt ->
+            //验证token使用用途
+            val basicResult = basicValidator.validate(jwt)
+
+            if (basicResult.hasErrors()) {
+                basicResult
+            } else {
+                //spring默认验证
+                val tokenUseResult = tokenUseValidator.validate(jwt)
+
+                if (tokenUseResult.hasErrors()) {
+                    tokenUseResult
+                } else {
+                    //验证authVersion
+                    authVersionValidator.validate(jwt)
+                }
+            }
+        }
+
+        return decoder
+    }
 
     @Bean("refreshJwtDecoder")
     fun refreshJwtDecoder(@Qualifier("refreshJwtSecret") jwtSecret: SecretKey): JwtDecoder =

@@ -6,6 +6,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import top.inept.blog.feature.user.model.entity.User
+import top.inept.blog.feature.user.model.projection.UserAuthStateProjection
 
 @Repository
 interface UserRepository : JpaRepository<User, Long>, JpaSpecificationExecutor<User>,
@@ -51,4 +52,7 @@ where ur.user.id = :userId
     @Modifying
     @Query("update User u set u.avatar = :avatar where u.id = :id")
     fun updateAvatarById(@Param("id") id: Long, @Param("avatar") avatar: String)
+
+    @Query("select u.status as status, u.authVersion as authVersion from User u where u.id = :userId")
+    fun findAuthStateByUserId(@Param("userId") userId: Long): UserAuthStateProjection?
 }

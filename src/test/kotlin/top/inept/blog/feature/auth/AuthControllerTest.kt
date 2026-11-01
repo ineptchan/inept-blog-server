@@ -1,10 +1,15 @@
 package top.inept.blog.feature.auth
 
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.test.web.servlet.client.expectBody
 import top.inept.blog.IntegrationTestBase
+import top.inept.blog.feature.user.model.dto.CreateUserDTO
+import top.inept.blog.feature.user.model.dto.UpdateUserProfileDTO
+import top.inept.blog.feature.user.model.vo.UserVO
 import top.inept.blog.util.AuthUtil
 import kotlin.test.junit5.JUnit5Asserter.fail
 
@@ -80,5 +85,44 @@ class AuthControllerTest : IntegrationTestBase() {
         if (res3.status != HttpStatus.UNAUTHORIZED.value() && res3.properties?.get("errorCode") != "message.auth.refresh_token_reused") {
             fail("预期错误码为 message.auth.refresh_token_reused")
         }
+    }
+
+    @Test
+    fun `测试authVersion`() {
+        val createUserDTO = CreateUserDTO(
+            "test001",
+            "test001",
+            "admin123456",
+            null,
+            listOf(2)
+        )
+        val userVO = AuthUtil.createUser(httpClient, createUserDTO, adminToken!!)
+
+        val (_, res) = AuthUtil.login(httpClient, createUserDTO.username, createUserDTO.password)
+        val token = res.accessToken
+        AuthUtil.getProfile(httpClient, token)
+
+        //修改密码
+        httpClient
+            .patch()
+            .uri("/user/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+            .body(
+                UpdateUserProfileDTO(
+                    nickname = null,
+                    password = "admin1234567",
+                )
+            )
+            .exchange()
+            .expectBody<UserVO>()
+            .returnResult().responseBody
+            ?: fail("响应没内容")
+
+        httpClient.get()
+            .uri("/user/users")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectStatus().isUnauthorized
     }
 }
